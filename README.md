@@ -7,8 +7,6 @@
 
 A Low Level Video Player inspired by [VKVideoPlayer](https://github.com/viki-org/VKVideoPlayer).
 
-LLVideoPlayer comes without any UI controls for flexibility. Your custom controls can be added to the container view 'LLVideoPlayerView'.
-
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
@@ -38,6 +36,10 @@ NSURL *url = [NSURL URLWithString:@"<your stream url>"];
 // delegate
 // see the header file for details.
 ```
+
+## Customize UI Controls
+
+LLVideoPlayer comes without any UI controls for flexibility. Your can add your custom contols to the container view `LLVideoPlayerView`.
 
 ## Requirements
 
