@@ -1,0 +1,757 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0ED3C5D73F8BB9171D21935766462B37 /* LLVideoPlayer-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C9CC47DDBE2038E07B42ED05B7D1BD7A /* LLVideoPlayer-dummy.m */; };
+		2024B1875095C2D2974196780D81036C /* Pods-LLVideoPlayer_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = F2951FCE8D7AF329794F9F97E268F653 /* Pods-LLVideoPlayer_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2A612CE8CBF0A45A820364CAA66559EE /* Pods-LLVideoPlayer_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F1D650470810D691F30B5C4DF9E81AD /* Pods-LLVideoPlayer_Example-dummy.m */; };
+		2F034410086D902AAAAC52AA3CAABB30 /* LLVideoPlayer-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 039D0EF72B84E2577210A9F45E7CAAB2 /* LLVideoPlayer-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2FB12BECB46AFDB0BFA3A7CDE9F401B3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */; };
+		4F484B5332716B522A3D458F1B66EC8B /* Pods-LLVideoPlayer_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9C2DDB466728DEA0F0793AE195F5001 /* Pods-LLVideoPlayer_Tests-dummy.m */; };
+		78C99EA145E42A3606B2E52785672442 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */; };
+		ACE9335A1E0CE499002F46F9 /* LLVideoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE933491E0CE499002F46F9 /* LLVideoTrack.m */; };
+		ACE9335B1E0CE499002F46F9 /* LLVideoTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE9334A1E0CE499002F46F9 /* LLVideoTrack.h */; };
+		ACE9335C1E0CE499002F46F9 /* LLVideoPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE9334B1E0CE499002F46F9 /* LLVideoPlayerView.m */; };
+		ACE9335D1E0CE499002F46F9 /* LLVideoPlayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE9334C1E0CE499002F46F9 /* LLVideoPlayerView.h */; };
+		ACE9335E1E0CE499002F46F9 /* LLVideoPlayerLayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE9334D1E0CE499002F46F9 /* LLVideoPlayerLayerView.m */; };
+		ACE9335F1E0CE499002F46F9 /* LLVideoPlayerLayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE9334E1E0CE499002F46F9 /* LLVideoPlayerLayerView.h */; };
+		ACE933601E0CE499002F46F9 /* LLVideoPlayerInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE9334F1E0CE499002F46F9 /* LLVideoPlayerInternal.h */; };
+		ACE933611E0CE499002F46F9 /* LLVideoPlayerHelper+Private.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE933501E0CE499002F46F9 /* LLVideoPlayerHelper+Private.m */; };
+		ACE933621E0CE499002F46F9 /* LLVideoPlayerHelper+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE933511E0CE499002F46F9 /* LLVideoPlayerHelper+Private.h */; };
+		ACE933631E0CE499002F46F9 /* LLVideoPlayerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE933521E0CE499002F46F9 /* LLVideoPlayerHelper.m */; };
+		ACE933641E0CE499002F46F9 /* LLVideoPlayerHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE933531E0CE499002F46F9 /* LLVideoPlayerHelper.h */; };
+		ACE933651E0CE499002F46F9 /* LLVideoPlayerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE933541E0CE499002F46F9 /* LLVideoPlayerDelegate.h */; };
+		ACE933661E0CE499002F46F9 /* LLVideoPlayerDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE933551E0CE499002F46F9 /* LLVideoPlayerDefines.h */; };
+		ACE933671E0CE499002F46F9 /* LLVideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE933561E0CE499002F46F9 /* LLVideoPlayer.m */; };
+		ACE933681E0CE499002F46F9 /* LLVideoPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE933571E0CE499002F46F9 /* LLVideoPlayer.h */; };
+		ACE933691E0CE499002F46F9 /* AVPlayer+LLPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = ACE933581E0CE499002F46F9 /* AVPlayer+LLPlayer.m */; };
+		ACE9336A1E0CE499002F46F9 /* AVPlayer+LLPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = ACE933591E0CE499002F46F9 /* AVPlayer+LLPlayer.h */; };
+		D108B93490EB377C47D159A080FFC50E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */; };
+		F0EF6BD7D7DE381ACAC9808B61AE5A77 /* Pods-LLVideoPlayer_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AEF7544F6D932E49AA5C5E08C0E7875 /* Pods-LLVideoPlayer_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9958B83D3BD25EF87083EBCE582F3D2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1DBA92953EBE7E69D588B5BDF47FB14;
+			remoteInfo = LLVideoPlayer;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		039D0EF72B84E2577210A9F45E7CAAB2 /* LLVideoPlayer-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LLVideoPlayer-umbrella.h"; sourceTree = "<group>"; };
+		045850C46AB7FA995B7D48D33EDFB0E0 /* Pods-LLVideoPlayer_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-LLVideoPlayer_Example.modulemap"; sourceTree = "<group>"; };
+		0844E59B0A855716363B33F9D1876743 /* Pods-LLVideoPlayer_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-LLVideoPlayer_Tests.modulemap"; sourceTree = "<group>"; };
+		0B69324291249D4D450F7552331D7EEB /* Pods-LLVideoPlayer_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-LLVideoPlayer_Example-acknowledgements.plist"; sourceTree = "<group>"; };
+		1AEF7544F6D932E49AA5C5E08C0E7875 /* Pods-LLVideoPlayer_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-LLVideoPlayer_Tests-umbrella.h"; sourceTree = "<group>"; };
+		1E34251FF58040369225BB06C411561D /* LLVideoPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LLVideoPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F1D650470810D691F30B5C4DF9E81AD /* Pods-LLVideoPlayer_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LLVideoPlayer_Example-dummy.m"; sourceTree = "<group>"; };
+		3176709B4E9A06E89E1650D07275A8BB /* Pods-LLVideoPlayer_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Example-resources.sh"; sourceTree = "<group>"; };
+		348642BDEF4A5344C646455687D3B795 /* Pods_LLVideoPlayer_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LLVideoPlayer_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D3008A05509BE8B522E03CA7D122D34 /* Pods-LLVideoPlayer_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LLVideoPlayer_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		548560AE95EDDEF2348296F47FF850B2 /* Pods-LLVideoPlayer_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LLVideoPlayer_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
+		56BFD693407BD756601286B6EF74D730 /* Pods-LLVideoPlayer_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Tests-resources.sh"; sourceTree = "<group>"; };
+		62B675D775BAD535779EAD0ABC9FA2FE /* Pods-LLVideoPlayer_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Example-frameworks.sh"; sourceTree = "<group>"; };
+		67243BF6C0F4B3975693C7901FA999A9 /* Pods-LLVideoPlayer_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		7087E8B50955CA66D149E76249C69A8A /* Pods-LLVideoPlayer_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Example.release.xcconfig"; sourceTree = "<group>"; };
+		8EC9A467191820050F726980C1F636DC /* Pods-LLVideoPlayer_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		98FEC4C8C0BE3FEF8F5AAE5D28C48BBF /* LLVideoPlayer.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = LLVideoPlayer.modulemap; sourceTree = "<group>"; };
+		A1070A8963706254E26C82CA5F16862F /* LLVideoPlayer-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LLVideoPlayer-prefix.pch"; sourceTree = "<group>"; };
+		A9C2DDB466728DEA0F0793AE195F5001 /* Pods-LLVideoPlayer_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LLVideoPlayer_Tests-dummy.m"; sourceTree = "<group>"; };
+		AADEBABF28D9035AD108C2BD8E6AF285 /* Pods-LLVideoPlayer_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Tests-frameworks.sh"; sourceTree = "<group>"; };
+		ACE933491E0CE499002F46F9 /* LLVideoTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLVideoTrack.m; sourceTree = "<group>"; };
+		ACE9334A1E0CE499002F46F9 /* LLVideoTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoTrack.h; sourceTree = "<group>"; };
+		ACE9334B1E0CE499002F46F9 /* LLVideoPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerView.m; sourceTree = "<group>"; };
+		ACE9334C1E0CE499002F46F9 /* LLVideoPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerView.h; sourceTree = "<group>"; };
+		ACE9334D1E0CE499002F46F9 /* LLVideoPlayerLayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerLayerView.m; sourceTree = "<group>"; };
+		ACE9334E1E0CE499002F46F9 /* LLVideoPlayerLayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerLayerView.h; sourceTree = "<group>"; };
+		ACE9334F1E0CE499002F46F9 /* LLVideoPlayerInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerInternal.h; sourceTree = "<group>"; };
+		ACE933501E0CE499002F46F9 /* LLVideoPlayerHelper+Private.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LLVideoPlayerHelper+Private.m"; sourceTree = "<group>"; };
+		ACE933511E0CE499002F46F9 /* LLVideoPlayerHelper+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LLVideoPlayerHelper+Private.h"; sourceTree = "<group>"; };
+		ACE933521E0CE499002F46F9 /* LLVideoPlayerHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerHelper.m; sourceTree = "<group>"; };
+		ACE933531E0CE499002F46F9 /* LLVideoPlayerHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerHelper.h; sourceTree = "<group>"; };
+		ACE933541E0CE499002F46F9 /* LLVideoPlayerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDelegate.h; sourceTree = "<group>"; };
+		ACE933551E0CE499002F46F9 /* LLVideoPlayerDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDefines.h; sourceTree = "<group>"; };
+		ACE933561E0CE499002F46F9 /* LLVideoPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayer.m; sourceTree = "<group>"; };
+		ACE933571E0CE499002F46F9 /* LLVideoPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayer.h; sourceTree = "<group>"; };
+		ACE933581E0CE499002F46F9 /* AVPlayer+LLPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AVPlayer+LLPlayer.m"; sourceTree = "<group>"; };
+		ACE933591E0CE499002F46F9 /* AVPlayer+LLPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AVPlayer+LLPlayer.h"; sourceTree = "<group>"; };
+		B25BB03152DD5EAF35EB64EBAF512FB0 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B2AFC592F2446F3B5ED28D588E949EF8 /* Pods-LLVideoPlayer_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		C1D3B09A1F81CBE0471C607C4149CE0E /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C9CC47DDBE2038E07B42ED05B7D1BD7A /* LLVideoPlayer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LLVideoPlayer-dummy.m"; sourceTree = "<group>"; };
+		CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		D39C0FA9C98DD0D4905C2546648C82C1 /* Pods_LLVideoPlayer_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LLVideoPlayer_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E00CCE428BCFD9D3F7CDAA4014A36AA4 /* LLVideoPlayer.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LLVideoPlayer.xcconfig; sourceTree = "<group>"; };
+		E51598F34A761F1BF4D911841619F13C /* Pods-LLVideoPlayer_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-LLVideoPlayer_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
+		F2951FCE8D7AF329794F9F97E268F653 /* Pods-LLVideoPlayer_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-LLVideoPlayer_Example-umbrella.h"; sourceTree = "<group>"; };
+		F6F4CF590CFA34EAE24B518B12992567 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		37B52FBD56501FCF35459F5EC5DCB80F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D108B93490EB377C47D159A080FFC50E /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB2025BEF59912E0823302F00796136F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78C99EA145E42A3606B2E52785672442 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAFB227F80EF0B5AECD9FDDFD0BCD9DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2FB12BECB46AFDB0BFA3A7CDE9F401B3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0626236C10C6F76D69EA6FCEA56B3A64 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				2690F14319514FBF8584EADB689B3A1C /* Pods-LLVideoPlayer_Example */,
+				4A27A3C5F5794B71EB53246DBD26054F /* Pods-LLVideoPlayer_Tests */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		1422FD071421CF5158EF9FF21F314312 /* LLVideoPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				ACE933491E0CE499002F46F9 /* LLVideoTrack.m */,
+				ACE9334A1E0CE499002F46F9 /* LLVideoTrack.h */,
+				ACE9334B1E0CE499002F46F9 /* LLVideoPlayerView.m */,
+				ACE9334C1E0CE499002F46F9 /* LLVideoPlayerView.h */,
+				ACE9334D1E0CE499002F46F9 /* LLVideoPlayerLayerView.m */,
+				ACE9334E1E0CE499002F46F9 /* LLVideoPlayerLayerView.h */,
+				ACE9334F1E0CE499002F46F9 /* LLVideoPlayerInternal.h */,
+				ACE933501E0CE499002F46F9 /* LLVideoPlayerHelper+Private.m */,
+				ACE933511E0CE499002F46F9 /* LLVideoPlayerHelper+Private.h */,
+				ACE933521E0CE499002F46F9 /* LLVideoPlayerHelper.m */,
+				ACE933531E0CE499002F46F9 /* LLVideoPlayerHelper.h */,
+				ACE933541E0CE499002F46F9 /* LLVideoPlayerDelegate.h */,
+				ACE933551E0CE499002F46F9 /* LLVideoPlayerDefines.h */,
+				ACE933561E0CE499002F46F9 /* LLVideoPlayer.m */,
+				ACE933571E0CE499002F46F9 /* LLVideoPlayer.h */,
+				ACE933581E0CE499002F46F9 /* AVPlayer+LLPlayer.m */,
+				ACE933591E0CE499002F46F9 /* AVPlayer+LLPlayer.h */,
+			);
+			path = LLVideoPlayer;
+			sourceTree = "<group>";
+		};
+		2690F14319514FBF8584EADB689B3A1C /* Pods-LLVideoPlayer_Example */ = {
+			isa = PBXGroup;
+			children = (
+				B25BB03152DD5EAF35EB64EBAF512FB0 /* Info.plist */,
+				045850C46AB7FA995B7D48D33EDFB0E0 /* Pods-LLVideoPlayer_Example.modulemap */,
+				548560AE95EDDEF2348296F47FF850B2 /* Pods-LLVideoPlayer_Example-acknowledgements.markdown */,
+				0B69324291249D4D450F7552331D7EEB /* Pods-LLVideoPlayer_Example-acknowledgements.plist */,
+				1F1D650470810D691F30B5C4DF9E81AD /* Pods-LLVideoPlayer_Example-dummy.m */,
+				62B675D775BAD535779EAD0ABC9FA2FE /* Pods-LLVideoPlayer_Example-frameworks.sh */,
+				3176709B4E9A06E89E1650D07275A8BB /* Pods-LLVideoPlayer_Example-resources.sh */,
+				F2951FCE8D7AF329794F9F97E268F653 /* Pods-LLVideoPlayer_Example-umbrella.h */,
+				67243BF6C0F4B3975693C7901FA999A9 /* Pods-LLVideoPlayer_Example.debug.xcconfig */,
+				7087E8B50955CA66D149E76249C69A8A /* Pods-LLVideoPlayer_Example.release.xcconfig */,
+			);
+			name = "Pods-LLVideoPlayer_Example";
+			path = "Target Support Files/Pods-LLVideoPlayer_Example";
+			sourceTree = "<group>";
+		};
+		3BCF4E8F89D8EF29CD376B80FE16FD5A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1E34251FF58040369225BB06C411561D /* LLVideoPlayer.framework */,
+				D39C0FA9C98DD0D4905C2546648C82C1 /* Pods_LLVideoPlayer_Example.framework */,
+				348642BDEF4A5344C646455687D3B795 /* Pods_LLVideoPlayer_Tests.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4A27A3C5F5794B71EB53246DBD26054F /* Pods-LLVideoPlayer_Tests */ = {
+			isa = PBXGroup;
+			children = (
+				F6F4CF590CFA34EAE24B518B12992567 /* Info.plist */,
+				0844E59B0A855716363B33F9D1876743 /* Pods-LLVideoPlayer_Tests.modulemap */,
+				4D3008A05509BE8B522E03CA7D122D34 /* Pods-LLVideoPlayer_Tests-acknowledgements.markdown */,
+				E51598F34A761F1BF4D911841619F13C /* Pods-LLVideoPlayer_Tests-acknowledgements.plist */,
+				A9C2DDB466728DEA0F0793AE195F5001 /* Pods-LLVideoPlayer_Tests-dummy.m */,
+				AADEBABF28D9035AD108C2BD8E6AF285 /* Pods-LLVideoPlayer_Tests-frameworks.sh */,
+				56BFD693407BD756601286B6EF74D730 /* Pods-LLVideoPlayer_Tests-resources.sh */,
+				1AEF7544F6D932E49AA5C5E08C0E7875 /* Pods-LLVideoPlayer_Tests-umbrella.h */,
+				8EC9A467191820050F726980C1F636DC /* Pods-LLVideoPlayer_Tests.debug.xcconfig */,
+				B2AFC592F2446F3B5ED28D588E949EF8 /* Pods-LLVideoPlayer_Tests.release.xcconfig */,
+			);
+			name = "Pods-LLVideoPlayer_Tests";
+			path = "Target Support Files/Pods-LLVideoPlayer_Tests";
+			sourceTree = "<group>";
+		};
+		60BA95FAEAD26AC56A81FCB3DDBA1DF4 /* LLVideoPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				1422FD071421CF5158EF9FF21F314312 /* LLVideoPlayer */,
+				8242A29B540C66B51D9080688DE85110 /* Support Files */,
+			);
+			name = LLVideoPlayer;
+			path = ../..;
+			sourceTree = "<group>";
+		};
+		7531C8F8DE19F1AA3C8A7AC97A91DC29 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		7DB346D0F39D3F0E887471402A8071AB = {
+			isa = PBXGroup;
+			children = (
+				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
+				E638BB6508C135960816B297CE6B623C /* Development Pods */,
+				BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */,
+				3BCF4E8F89D8EF29CD376B80FE16FD5A /* Products */,
+				0626236C10C6F76D69EA6FCEA56B3A64 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		8242A29B540C66B51D9080688DE85110 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				C1D3B09A1F81CBE0471C607C4149CE0E /* Info.plist */,
+				98FEC4C8C0BE3FEF8F5AAE5D28C48BBF /* LLVideoPlayer.modulemap */,
+				E00CCE428BCFD9D3F7CDAA4014A36AA4 /* LLVideoPlayer.xcconfig */,
+				C9CC47DDBE2038E07B42ED05B7D1BD7A /* LLVideoPlayer-dummy.m */,
+				A1070A8963706254E26C82CA5F16862F /* LLVideoPlayer-prefix.pch */,
+				039D0EF72B84E2577210A9F45E7CAAB2 /* LLVideoPlayer-umbrella.h */,
+			);
+			name = "Support Files";
+			path = "Example/Pods/Target Support Files/LLVideoPlayer";
+			sourceTree = "<group>";
+		};
+		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7531C8F8DE19F1AA3C8A7AC97A91DC29 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E638BB6508C135960816B297CE6B623C /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				60BA95FAEAD26AC56A81FCB3DDBA1DF4 /* LLVideoPlayer */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		251B84BF6121F1CE6657940F2A0B5D4C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0EF6BD7D7DE381ACAC9808B61AE5A77 /* Pods-LLVideoPlayer_Tests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82117DCF51194E2B1D94489632A36F09 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ACE9335B1E0CE499002F46F9 /* LLVideoTrack.h in Headers */,
+				2F034410086D902AAAAC52AA3CAABB30 /* LLVideoPlayer-umbrella.h in Headers */,
+				ACE933641E0CE499002F46F9 /* LLVideoPlayerHelper.h in Headers */,
+				ACE933661E0CE499002F46F9 /* LLVideoPlayerDefines.h in Headers */,
+				ACE9335F1E0CE499002F46F9 /* LLVideoPlayerLayerView.h in Headers */,
+				ACE9336A1E0CE499002F46F9 /* AVPlayer+LLPlayer.h in Headers */,
+				ACE933681E0CE499002F46F9 /* LLVideoPlayer.h in Headers */,
+				ACE933651E0CE499002F46F9 /* LLVideoPlayerDelegate.h in Headers */,
+				ACE933621E0CE499002F46F9 /* LLVideoPlayerHelper+Private.h in Headers */,
+				ACE933601E0CE499002F46F9 /* LLVideoPlayerInternal.h in Headers */,
+				ACE9335D1E0CE499002F46F9 /* LLVideoPlayerView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E3C527451DCC906E572FD3FF306C3905 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2024B1875095C2D2974196780D81036C /* Pods-LLVideoPlayer_Example-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		C1DBA92953EBE7E69D588B5BDF47FB14 /* LLVideoPlayer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8719BFDEC915ACE98A6F734D6E9761C7 /* Build configuration list for PBXNativeTarget "LLVideoPlayer" */;
+			buildPhases = (
+				19A31A498FCD9A877AB1001FC8FD2BE9 /* Sources */,
+				BB2025BEF59912E0823302F00796136F /* Frameworks */,
+				82117DCF51194E2B1D94489632A36F09 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LLVideoPlayer;
+			productName = LLVideoPlayer;
+			productReference = 1E34251FF58040369225BB06C411561D /* LLVideoPlayer.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		D317A02E7843D754081C2F985FBEBEF6 /* Pods-LLVideoPlayer_Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E60221DFE2EC11A21E257F7C73396261 /* Build configuration list for PBXNativeTarget "Pods-LLVideoPlayer_Tests" */;
+			buildPhases = (
+				A7AEFF05DCA53645E89C1E5A451CC947 /* Sources */,
+				FAFB227F80EF0B5AECD9FDDFD0BCD9DF /* Frameworks */,
+				251B84BF6121F1CE6657940F2A0B5D4C /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-LLVideoPlayer_Tests";
+			productName = "Pods-LLVideoPlayer_Tests";
+			productReference = 348642BDEF4A5344C646455687D3B795 /* Pods_LLVideoPlayer_Tests.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		D7D88CF7BF80317425651845A9699B30 /* Pods-LLVideoPlayer_Example */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33D4A81D77AE12D24C351041C2F5D6D1 /* Build configuration list for PBXNativeTarget "Pods-LLVideoPlayer_Example" */;
+			buildPhases = (
+				E14380A7B7D8A3FBE3F9D31ED48E8722 /* Sources */,
+				37B52FBD56501FCF35459F5EC5DCB80F /* Frameworks */,
+				E3C527451DCC906E572FD3FF306C3905 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0E5AA123C6878AA3B98B5C42A01F30A4 /* PBXTargetDependency */,
+			);
+			name = "Pods-LLVideoPlayer_Example";
+			productName = "Pods-LLVideoPlayer_Example";
+			productReference = D39C0FA9C98DD0D4905C2546648C82C1 /* Pods_LLVideoPlayer_Example.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0700;
+			};
+			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
+			productRefGroup = 3BCF4E8F89D8EF29CD376B80FE16FD5A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C1DBA92953EBE7E69D588B5BDF47FB14 /* LLVideoPlayer */,
+				D7D88CF7BF80317425651845A9699B30 /* Pods-LLVideoPlayer_Example */,
+				D317A02E7843D754081C2F985FBEBEF6 /* Pods-LLVideoPlayer_Tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		19A31A498FCD9A877AB1001FC8FD2BE9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0ED3C5D73F8BB9171D21935766462B37 /* LLVideoPlayer-dummy.m in Sources */,
+				ACE9335A1E0CE499002F46F9 /* LLVideoTrack.m in Sources */,
+				ACE933691E0CE499002F46F9 /* AVPlayer+LLPlayer.m in Sources */,
+				ACE933611E0CE499002F46F9 /* LLVideoPlayerHelper+Private.m in Sources */,
+				ACE9335C1E0CE499002F46F9 /* LLVideoPlayerView.m in Sources */,
+				ACE933631E0CE499002F46F9 /* LLVideoPlayerHelper.m in Sources */,
+				ACE9335E1E0CE499002F46F9 /* LLVideoPlayerLayerView.m in Sources */,
+				ACE933671E0CE499002F46F9 /* LLVideoPlayer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7AEFF05DCA53645E89C1E5A451CC947 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F484B5332716B522A3D458F1B66EC8B /* Pods-LLVideoPlayer_Tests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E14380A7B7D8A3FBE3F9D31ED48E8722 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A612CE8CBF0A45A820364CAA66559EE /* Pods-LLVideoPlayer_Example-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0E5AA123C6878AA3B98B5C42A01F30A4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LLVideoPlayer;
+			target = C1DBA92953EBE7E69D588B5BDF47FB14 /* LLVideoPlayer */;
+			targetProxy = 9958B83D3BD25EF87083EBCE582F3D2F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		08E7663CCE2D27C768CEFB73DF72B552 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B2AFC592F2446F3B5ED28D588E949EF8 /* Pods-LLVideoPlayer_Tests.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-LLVideoPlayer_Tests/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LLVideoPlayer_Tests/Pods-LLVideoPlayer_Tests.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LLVideoPlayer_Tests;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		0EE8D39922D0EBDB248759CCAABBDD16 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E00CCE428BCFD9D3F7CDAA4014A36AA4 /* LLVideoPlayer.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/LLVideoPlayer/LLVideoPlayer-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/LLVideoPlayer/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/LLVideoPlayer/LLVideoPlayer.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = LLVideoPlayer;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		20E3C5FA199B2423D394E0B3917212CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7087E8B50955CA66D149E76249C69A8A /* Pods-LLVideoPlayer_Example.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-LLVideoPlayer_Example/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LLVideoPlayer_Example/Pods-LLVideoPlayer_Example.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LLVideoPlayer_Example;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		4AF6D8B9B069985802A3AD4A7C78D561 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 67243BF6C0F4B3975693C7901FA999A9 /* Pods-LLVideoPlayer_Example.debug.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-LLVideoPlayer_Example/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LLVideoPlayer_Example/Pods-LLVideoPlayer_Example.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LLVideoPlayer_Example;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		5381A12C06BED97ADE5A9FDB2AE191A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E00CCE428BCFD9D3F7CDAA4014A36AA4 /* LLVideoPlayer.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/LLVideoPlayer/LLVideoPlayer-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/LLVideoPlayer/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/LLVideoPlayer/LLVideoPlayer.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = LLVideoPlayer;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		545F8EFE521849650FD4BEF565A6F531 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8EC9A467191820050F726980C1F636DC /* Pods-LLVideoPlayer_Tests.debug.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-LLVideoPlayer_Tests/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LLVideoPlayer_Tests/Pods-LLVideoPlayer_Tests.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LLVideoPlayer_Tests;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8DED8AD26D381A6ACFF202E5217EC498 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9E1E4E48AF2EAB23169E611BF694090A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE_SPECIFIER = NO_SIGNING/;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E1E4E48AF2EAB23169E611BF694090A /* Debug */,
+				8DED8AD26D381A6ACFF202E5217EC498 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33D4A81D77AE12D24C351041C2F5D6D1 /* Build configuration list for PBXNativeTarget "Pods-LLVideoPlayer_Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AF6D8B9B069985802A3AD4A7C78D561 /* Debug */,
+				20E3C5FA199B2423D394E0B3917212CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8719BFDEC915ACE98A6F734D6E9761C7 /* Build configuration list for PBXNativeTarget "LLVideoPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0EE8D39922D0EBDB248759CCAABBDD16 /* Debug */,
+				5381A12C06BED97ADE5A9FDB2AE191A6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E60221DFE2EC11A21E257F7C73396261 /* Build configuration list for PBXNativeTarget "Pods-LLVideoPlayer_Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				545F8EFE521849650FD4BEF565A6F531 /* Debug */,
+				08E7663CCE2D27C768CEFB73DF72B552 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+}

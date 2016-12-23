@@ -1,0 +1,43 @@
+//
+//  LLVideoTrack.m
+//  IMYVideoPlayer
+//
+//  Created by mario on 2016/11/29.
+//  Copyright © 2016 mario. All rights reserved.
+//
+
+#import "LLVideoTrack.h"
+
+@interface LLVideoTrack ()
+
+@property (nonatomic, strong) NSURL *streamURL;
+
+@end
+
+@implementation LLVideoTrack
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p> streamURL: %@, totalDuration: %@, lastWatchedDuration: %@, isPlayedToEnd: %@",
+            NSStringFromClass([self class]), self,
+            self.streamURL, self.totalDuration, self.lastWatchedDuration,
+            self.isPlayedToEnd ? @"YES" : @"NO"];
+}
+
+- (instancetype)init
+{
+    @throw [NSException exceptionWithName:@"LLVideoTrack"
+                                   reason:NSInternalInconsistencyException
+                                 userInfo:@{NSLocalizedDescriptionKey : @"use initWithStreamURL: instead"}];
+}
+
+- (instancetype)initWithStreamURL:(NSURL *)streamURL
+{
+    self = [super init];
+    if (self) {
+        self.streamURL = streamURL;
+    }
+    return self;
+}
+
+@end

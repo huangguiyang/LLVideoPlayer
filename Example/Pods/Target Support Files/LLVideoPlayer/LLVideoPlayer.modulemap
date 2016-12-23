@@ -1,0 +1,6 @@
+framework module LLVideoPlayer {
+  umbrella header "LLVideoPlayer-umbrella.h"
+
+  export *
+  module * { export * }
+}

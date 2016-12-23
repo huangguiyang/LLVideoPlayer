@@ -1,0 +1,16 @@
+PODS:
+  - LLVideoPlayer (0.1.0)
+
+DEPENDENCIES:
+  - LLVideoPlayer (from `../`)
+
+EXTERNAL SOURCES:
+  LLVideoPlayer:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  LLVideoPlayer: b7807cf8921b2b00b0da3c5425b1b4c1f4b41075
+
+PODFILE CHECKSUM: cfe2e7edb267c1f3a750b871ca2492d02b650dde
+
+COCOAPODS: 1.2.0.beta.1
