@@ -13,6 +13,32 @@ LLVideoPlayer comes without any UI controls for flexibility. Your custom control
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+```
+// create
+self.player = [[LLVideoPlayer alloc] init];
+[self.view addSubview:self.player.view];
+self.player.view.frame = CGRectMake(10, 80, 300, 200);
+self.player.delegate = self;
+
+
+// load
+NSURL *url = [NSURL URLWithString:@"<your stream url>"];  
+[self.player loadVideoWithStreamURL:url];
+
+
+// pause
+[self.player pauseContent];
+
+// play
+[self.player playContent];
+
+// dismiss
+[self.player dismissContent];
+
+// delegate
+// see the header file for details.
+```
+
 ## Requirements
 
 iOS 7 or above
