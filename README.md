@@ -7,6 +7,8 @@
 
 A Low Level Video Player inspired by [VKVideoPlayer](https://github.com/viki-org/VKVideoPlayer).
 
+LLVideoPlayer comes without any UI controls for flexibility. Your custom controls can be added to the container view 'LLVideoPlayerView'.
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
