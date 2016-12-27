@@ -1,6 +1,6 @@
 # LLVideoPlayer
 
-[![CI Status](http://img.shields.io/travis/mario/LLVideoPlayer.svg?style=flat)](https://travis-ci.org/mario/LLVideoPlayer)
+[![CI Status](https://travis-ci.org/huangguiyang/LLVideoPlayer.svg?branch=master](https://travis-ci.org/huangguiyang/LLVideoPlayer)
 [![Version](https://img.shields.io/cocoapods/v/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
 [![License](https://img.shields.io/cocoapods/l/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
 [![Platform](https://img.shields.io/cocoapods/p/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
