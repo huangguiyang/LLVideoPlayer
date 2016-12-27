@@ -18,3 +18,6 @@
 + (NSString *)timeStringFromSecondsValue:(int)seconds;
 
 @end
+
+
+void ll_run_on_ui_thread(dispatch_block_t);

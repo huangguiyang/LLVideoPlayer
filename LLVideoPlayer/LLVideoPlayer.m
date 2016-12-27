@@ -11,7 +11,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AVPlayer+LLPlayer.h"
 #import "LLVideoPlayerInternal.h"
-#import "LLVideoPlayerHelper+Private.h"
 
 typedef void (^VoidBlock) (void);
 
@@ -88,7 +87,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)reloadCurrentVideoTrack
 {
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         VoidBlock completionHandler = ^{
             self.state = LLVideoPlayerStateContentLoading;
             [self playVideoTrack:self.track];
@@ -117,7 +116,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)playContent
 {
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         if (self.state == LLVideoPlayerStateContentPaused) {
             self.state = LLVideoPlayerStateContentPlaying;
         }
@@ -136,7 +135,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)pauseContent:(BOOL)isUserAction completionHandler:(void (^)())completionHandler
 {
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         switch (self.avPlayerItem.status) {
             case AVPlayerItemStatusFailed:
                 LLLog(@"Trying to pause content but AVPlayerItemStatusFailed");
@@ -190,7 +189,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)dismissContent
 {
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         switch (self.avPlayerItem.status) {
             case AVPlayerItemStatusFailed:
                 LLLog(@"Trying to dismiss content at AVPlayerItemStatusFailed");
@@ -247,7 +246,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)seekToLastWatchedDuration:(void (^)(BOOL finished))completionHandler;
 {
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         CGFloat lastWatchedTime = [self.track.lastWatchedDuration floatValue];
         if (lastWatchedTime > 5) {
             lastWatchedTime -= 5;
@@ -305,7 +304,7 @@ typedef void (^VoidBlock) (void);
     AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:streamURL
                                                 options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES}];
     [asset loadValuesAsynchronouslyForKeys:@[kTracksKey, kPlayableKey] completionHandler:^{
-        run_on_ui_thread(^{
+        ll_run_on_ui_thread(^{
             if (NO == [asset.URL.absoluteString isEqualToString:streamURL.absoluteString]) {
                 LLLog(@"URL dismatch: %@ loaded, but cuurent is %@", asset.URL, streamURL);
                 return;
@@ -471,7 +470,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)handlePlayerItemReadyToPlay
 {
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         switch (self.state) {
             case LLVideoPlayerStateContentPaused:
                 // paused, do nothing
@@ -551,7 +550,7 @@ typedef void (^VoidBlock) (void);
 - (void)playerDidPlayToEnd:(NSNotification *)note
 {
     LLLog(@"playerDidPlayToEnd: %@", note);
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         self.track.isPlayedToEnd = YES;
         [self pauseContent:NO completionHandler:^{
             if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
@@ -575,7 +574,7 @@ typedef void (^VoidBlock) (void);
         }
     }
     
-    run_on_ui_thread(^{
+    ll_run_on_ui_thread(^{
         if ([self.delegate respondsToSelector:@selector(videoPlayer:willChangeStateTo:)]) {
             [self.delegate videoPlayer:self willChangeStateTo:newState];
         }

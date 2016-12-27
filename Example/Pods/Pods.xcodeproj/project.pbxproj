@@ -49,12 +49,10 @@
 		C69FAB0BDEBC074CFEE70338DB75628D /* LLVideoTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 2897294C991ADA79C6D6ADA26BE865D2 /* LLVideoTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C8ADC18F442AB0EF625F625810415227 /* MASViewAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 915A6FF0E04F5A5C0ACDE0E32BD2F193 /* MASViewAttribute.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA8F7ECFA6A83DE3117B244E1E5D7D5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
-		CF55389F9D9887AE2CA94BB224C3F457 /* LLVideoPlayerHelper+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E2FF685A051C58D26EF4333D77C3CFC8 /* LLVideoPlayerHelper+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D00C7F91550F848DDF8A7EE5DD66E533 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
 		D56DC520D97C15362386F5A0354C0F74 /* NSArray+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8229525E7067F22D3977D2628DF5F2C3 /* NSArray+MASAdditions.m */; };
 		D68DBA5E548F255EDDAB1BEE44A32BC0 /* MASCompositeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 475326F2A929CD1AFFB74850961F32C0 /* MASCompositeConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D9F68828201E3D071C67499224C5EBB0 /* View+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E7E17DB5590A8C4D9625D67E6FBD243 /* View+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E00BDC1E60443FBEF97ED4DAC469AEF8 /* LLVideoPlayerHelper+Private.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B90D13A6C7D606E9103335E89CF6710 /* LLVideoPlayerHelper+Private.m */; };
 		E248DA5BFA22BF10E5135FC80D7FF939 /* NSArray+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = B179F4D3D34A3CE25A698B8D9AC9D6C2 /* NSArray+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E52E0ED6C8CFE840F61029B986CD639A /* MASConstraint+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E2395DA2EBCF6241A0DA0E1859FF45 /* MASConstraint+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EDD7CE299819D16BC5FE71372EA9684F /* Pods-LLVideoPlayer_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DB25D74BCFF175A9DA21A1802FFF186F /* Pods-LLVideoPlayer_Tests-dummy.m */; };
@@ -102,7 +100,7 @@
 		26503791CCD1A39DB7B208AE24621B0A /* Pods-LLVideoPlayer_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LLVideoPlayer_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		273BCA2B320AFC792DF7D36DD692F10B /* LLVideoPlayer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LLVideoPlayer-dummy.m"; sourceTree = "<group>"; };
 		2897294C991ADA79C6D6ADA26BE865D2 /* LLVideoTrack.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoTrack.h; sourceTree = "<group>"; };
-		2BC9D55E29C88E136048339259BE29A5 /* libPods-LLVideoPlayer_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-LLVideoPlayer_Tests.a"; path = "libPods-LLVideoPlayer_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2BC9D55E29C88E136048339259BE29A5 /* libPods-LLVideoPlayer_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LLVideoPlayer_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E77AB000D06194DF675E7F6903E2D92 /* AVPlayer+LLPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AVPlayer+LLPlayer.h"; sourceTree = "<group>"; };
 		2FCC2A09AC3DCD0E4A3D268DAABC5135 /* View+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "View+MASAdditions.m"; path = "Masonry/View+MASAdditions.m"; sourceTree = "<group>"; };
 		3162AC8E29FA7F3BF0D8641F7F4D9B60 /* MASConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASConstraint.h; path = Masonry/MASConstraint.h; sourceTree = "<group>"; };
@@ -117,8 +115,7 @@
 		45F2643B22BED898E112D6AEC5D1CCC7 /* LLVideoPlayer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayer.m; sourceTree = "<group>"; };
 		475326F2A929CD1AFFB74850961F32C0 /* MASCompositeConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASCompositeConstraint.h; path = Masonry/MASCompositeConstraint.h; sourceTree = "<group>"; };
 		5D518205D13F42C3070B155FBA8A1518 /* LLVideoPlayerHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerHelper.h; sourceTree = "<group>"; };
-		68E845B65D71C65F6F00AEF806031704 /* libPods-LLVideoPlayer_Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-LLVideoPlayer_Example.a"; path = "libPods-LLVideoPlayer_Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6B90D13A6C7D606E9103335E89CF6710 /* LLVideoPlayerHelper+Private.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LLVideoPlayerHelper+Private.m"; sourceTree = "<group>"; };
+		68E845B65D71C65F6F00AEF806031704 /* libPods-LLVideoPlayer_Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LLVideoPlayer_Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		780A86CEB0A0131C88BE12414D500734 /* MASConstraintMaker.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASConstraintMaker.h; path = Masonry/MASConstraintMaker.h; sourceTree = "<group>"; };
 		7882AB8492CA4F59F730C76CC3BBF57A /* Masonry.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Masonry.xcconfig; sourceTree = "<group>"; };
 		7B5A231E76AF7DC6CB887B5B2C522A7A /* Masonry-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Masonry-dummy.m"; sourceTree = "<group>"; };
@@ -131,11 +128,11 @@
 		8CE81E7BAF48882B52F7B96387C968A4 /* LLVideoPlayerDefines.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDefines.h; sourceTree = "<group>"; };
 		8E7E17DB5590A8C4D9625D67E6FBD243 /* View+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "View+MASAdditions.h"; path = "Masonry/View+MASAdditions.h"; sourceTree = "<group>"; };
 		915A6FF0E04F5A5C0ACDE0E32BD2F193 /* MASViewAttribute.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASViewAttribute.h; path = Masonry/MASViewAttribute.h; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9F3A3433B51FAE800FCE1D023F73D260 /* libMasonry.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libMasonry.a; path = libMasonry.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9F3A3433B51FAE800FCE1D023F73D260 /* libMasonry.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMasonry.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F937BDEB8DF93A08D20C5355C0FDB5C /* MASConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASConstraint.m; path = Masonry/MASConstraint.m; sourceTree = "<group>"; };
 		A2F75C96947B2651F82FC18F66C43B49 /* Masonry-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Masonry-prefix.pch"; sourceTree = "<group>"; };
-		A4C86C9E70EABFD22E1D442B82C93C08 /* libLLVideoPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libLLVideoPlayer.a; path = libLLVideoPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4C86C9E70EABFD22E1D442B82C93C08 /* libLLVideoPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLLVideoPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A895F2FE652753E3293F9C28C57D388E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		B179F4D3D34A3CE25A698B8D9AC9D6C2 /* NSArray+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+MASAdditions.h"; path = "Masonry/NSArray+MASAdditions.h"; sourceTree = "<group>"; };
 		B48867DE203BCF3BB3DFCAB8FDC7516B /* MASLayoutConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASLayoutConstraint.h; path = Masonry/MASLayoutConstraint.h; sourceTree = "<group>"; };
@@ -150,7 +147,6 @@
 		DC7C505CEF857656217D697AC81D6D7E /* LLVideoPlayerHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerHelper.m; sourceTree = "<group>"; };
 		DEA505522FB70FA4EDE272F3C15332E3 /* Pods-LLVideoPlayer_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Example.release.xcconfig"; sourceTree = "<group>"; };
 		E158FC65C5404E098F16E26F478DA504 /* NSLayoutConstraint+MASDebugAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSLayoutConstraint+MASDebugAdditions.h"; path = "Masonry/NSLayoutConstraint+MASDebugAdditions.h"; sourceTree = "<group>"; };
-		E2FF685A051C58D26EF4333D77C3CFC8 /* LLVideoPlayerHelper+Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LLVideoPlayerHelper+Private.h"; sourceTree = "<group>"; };
 		E4AB89B93B1FEF5F2D6AFC42E03C2D06 /* LLVideoPlayerLayerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerLayerView.m; sourceTree = "<group>"; };
 		EC0384F145CF471A951BA8E9486AD626 /* Masonry.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Masonry.h; path = Masonry/Masonry.h; sourceTree = "<group>"; };
 		F0C05A2F0697848D9A99F62E9BDD06E1 /* LLVideoPlayer.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LLVideoPlayer.xcconfig; sourceTree = "<group>"; };
@@ -240,7 +236,6 @@
 				25CED739CF35B6D0A1D95AE17D712A7F /* ViewController+MASAdditions.m */,
 				4854BD850DB1ADEB02DE483F0C44E016 /* Support Files */,
 			);
-			name = Masonry;
 			path = Masonry;
 			sourceTree = "<group>";
 		};
@@ -287,8 +282,6 @@
 				DAE203F61380162725090F4AFA46F732 /* LLVideoPlayerDelegate.h */,
 				5D518205D13F42C3070B155FBA8A1518 /* LLVideoPlayerHelper.h */,
 				DC7C505CEF857656217D697AC81D6D7E /* LLVideoPlayerHelper.m */,
-				E2FF685A051C58D26EF4333D77C3CFC8 /* LLVideoPlayerHelper+Private.h */,
-				6B90D13A6C7D606E9103335E89CF6710 /* LLVideoPlayerHelper+Private.m */,
 				09EE992FA2604892EAA0B0C9D23F10C7 /* LLVideoPlayerInternal.h */,
 				C24F929746F5FCC12E6DD3861F8DD4E6 /* LLVideoPlayerLayerView.h */,
 				E4AB89B93B1FEF5F2D6AFC42E03C2D06 /* LLVideoPlayerLayerView.m */,
@@ -297,7 +290,6 @@
 				2897294C991ADA79C6D6ADA26BE865D2 /* LLVideoTrack.h */,
 				344F06EEDC44318C0D2EDBE5D761E0B8 /* LLVideoTrack.m */,
 			);
-			name = LLVideoPlayer;
 			path = LLVideoPlayer;
 			sourceTree = "<group>";
 		};
@@ -402,7 +394,6 @@
 				029445EF3303A2E4479434368EE1E21E /* LLVideoPlayer.h in Headers */,
 				013BEA977135E61A4804B656105D7273 /* LLVideoPlayerDefines.h in Headers */,
 				141E43EE4CDA7D9B1DB4C4CF78A9BDA5 /* LLVideoPlayerDelegate.h in Headers */,
-				CF55389F9D9887AE2CA94BB224C3F457 /* LLVideoPlayerHelper+Private.h in Headers */,
 				9A4119DB6C7BFA86988C4CB2B042B2D0 /* LLVideoPlayerHelper.h in Headers */,
 				38E3AE293D8B0B0EA8DACCCB74301D70 /* LLVideoPlayerInternal.h in Headers */,
 				F71593403A727F66E16618F381C92825 /* LLVideoPlayerLayerView.h in Headers */,
@@ -560,7 +551,6 @@
 				948802F04A1FB3818AA520E19F2F3A87 /* AVPlayer+LLPlayer.m in Sources */,
 				B8B9A7A5F419D55F03E5CFAAFADD7C46 /* LLVideoPlayer-dummy.m in Sources */,
 				8C4980B6B4A9D0160CEA23CAE02D11F9 /* LLVideoPlayer.m in Sources */,
-				E00BDC1E60443FBEF97ED4DAC469AEF8 /* LLVideoPlayerHelper+Private.m in Sources */,
 				AAD74AC68312BF7D501CFC60DE9E044C /* LLVideoPlayerHelper.m in Sources */,
 				BBD20D70E79DAFA8092805CD85946E99 /* LLVideoPlayerLayerView.m in Sources */,
 				244600C786AE87C73D5712E4D92FE79E /* LLVideoPlayerView.m in Sources */,
