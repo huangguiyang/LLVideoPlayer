@@ -305,7 +305,7 @@ typedef void (^VoidBlock) (void);
                                                 options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES}];
     [asset loadValuesAsynchronouslyForKeys:@[kTracksKey, kPlayableKey] completionHandler:^{
         ll_run_on_ui_thread(^{
-            if (NO == [asset.URL.absoluteString isEqualToString:streamURL.absoluteString]) {
+            if (NO == [streamURL isEqual:self.track.streamURL]) {
                 LLLog(@"URL dismatch: %@ loaded, but cuurent is %@", asset.URL, streamURL);
                 return;
             }
