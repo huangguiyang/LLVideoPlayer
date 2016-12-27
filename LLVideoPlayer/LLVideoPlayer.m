@@ -306,7 +306,7 @@ typedef void (^VoidBlock) (void);
     [asset loadValuesAsynchronouslyForKeys:@[kTracksKey, kPlayableKey] completionHandler:^{
         ll_run_on_ui_thread(^{
             if (NO == [streamURL isEqual:self.track.streamURL]) {
-                LLLog(@"URL dismatch: %@ loaded, but cuurent is %@", asset.URL, streamURL);
+                LLLog(@"URL dismatch: %@ loaded, but cuurent is %@",streamURL, self.track.streamURL);
                 return;
             }
             if (self.state == LLVideoPlayerStateDismissed) {
