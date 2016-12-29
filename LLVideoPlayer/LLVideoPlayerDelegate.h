@@ -35,7 +35,7 @@
 
 #pragma mark - 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(LLVideoTrack *)track;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty track:(LLVideoTrack *)track;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp track:(LLVideoTrack *)track;
 
 @end

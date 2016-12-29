@@ -509,15 +509,15 @@ typedef void (^VoidBlock) (void);
 
 - (void)handlePlaybackBufferEmpty
 {
-    if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:)]) {
-        [self.delegate videoPlayer:self playbackBufferEmpty:self.track];
+    if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:track:)]) {
+        [self.delegate videoPlayer:self playbackBufferEmpty:YES track:self.track];
     }
 }
 
 - (void)handlePlaybackLikelyToKeepUp
 {
     if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:)]) {
-        [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.track];
+        [self.delegate videoPlayer:self playbackLikelyToKeepUp:YES track:self.track];
     }
 }
 
