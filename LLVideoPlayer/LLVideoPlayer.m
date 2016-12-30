@@ -358,6 +358,7 @@ typedef void (^VoidBlock) (void);
         [_avPlayerItem removeObserver:self forKeyPath:@"status"];
         [_avPlayerItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
         [_avPlayerItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
+        [_avPlayerItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:AVPlayerItemDidPlayToEndTimeNotification
                                                       object:nil];
@@ -366,6 +367,7 @@ typedef void (^VoidBlock) (void);
             [avPlayerItem addObserver:self forKeyPath:@"status" options:0 context:nil];
             [avPlayerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
             [avPlayerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
+            [avPlayerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(playerDidPlayToEnd:)
                                                          name:AVPlayerItemDidPlayToEndTimeNotification
@@ -464,6 +466,14 @@ typedef void (^VoidBlock) (void);
                 if (self.avPlayerItem.playbackLikelyToKeepUp && NO == [self isPlayingVideo]) {
                     [self.avPlayer play];
                 }
+            }
+        }
+        
+        /// loadedTimeRanges
+        if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
+            LLLog(@"loadedTimeRanges: %@", self.avPlayerItem.loadedTimeRanges);
+            if ([self.delegate respondsToSelector:@selector(videoPlayer:loadedTimeRanges:track:)]) {
+                [self.delegate videoPlayer:self loadedTimeRanges:self.avPlayerItem.loadedTimeRanges track:self.track];
             }
         }
     }

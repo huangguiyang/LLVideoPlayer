@@ -29,6 +29,7 @@
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didStartVideo:(LLVideoTrack *)track;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(LLVideoTrack *)track time:(NSTimeInterval)time;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayToEnd:(LLVideoTrack *)track;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track;
 
 #pragma mark - Error
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error track:(LLVideoTrack *)track;
