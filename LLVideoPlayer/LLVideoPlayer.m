@@ -448,7 +448,9 @@ typedef void (^VoidBlock) (void);
                 [self currentTime] > 0 &&
                 [self currentTime] < [self.avPlayer ll_currentItemDuration] - 1 &&
                 self.state == LLVideoPlayerStateContentPlaying) {
-                [self handlePlaybackBufferEmpty];
+                if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:track:)]) {
+                    [self.delegate videoPlayer:self playbackBufferEmpty:YES track:self.track];
+                }
             }
         }
         
@@ -459,7 +461,9 @@ typedef void (^VoidBlock) (void);
             if (self.avPlayerItem.playbackLikelyToKeepUp &&
                 self.state == LLVideoPlayerStateContentPlaying &&
                 NO == [self isPlayingVideo]) {
-                [self handlePlaybackLikelyToKeepUp];
+                if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:track:)]) {
+                    [self.delegate videoPlayer:self playbackLikelyToKeepUp:YES track:self.track];
+                }
                 [self.avPlayer play];
             }
         }
@@ -505,20 +509,6 @@ typedef void (^VoidBlock) (void);
                 break;
         }
     });
-}
-
-- (void)handlePlaybackBufferEmpty
-{
-    if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:track:)]) {
-        [self.delegate videoPlayer:self playbackBufferEmpty:YES track:self.track];
-    }
-}
-
-- (void)handlePlaybackLikelyToKeepUp
-{
-    if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:)]) {
-        [self.delegate videoPlayer:self playbackLikelyToKeepUp:YES track:self.track];
-    }
 }
 
 #pragma mark - Notifications
