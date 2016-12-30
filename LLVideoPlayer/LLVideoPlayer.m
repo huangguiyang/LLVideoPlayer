@@ -444,12 +444,11 @@ typedef void (^VoidBlock) (void);
         
         if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
             LLLog(@"playbackBufferEmpty: %@", self.avPlayerItem.playbackBufferEmpty ? @"YES" : @"NO");
-            if (self.avPlayerItem.playbackBufferEmpty &&
+            if (self.state == LLVideoPlayerStateContentPlaying &&
                 [self currentTime] > 0 &&
-                [self currentTime] < [self.avPlayer ll_currentItemDuration] - 1 &&
-                self.state == LLVideoPlayerStateContentPlaying) {
+                [self currentTime] < [self.avPlayer ll_currentItemDuration] - 1) {
                 if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:track:)]) {
-                    [self.delegate videoPlayer:self playbackBufferEmpty:YES track:self.track];
+                    [self.delegate videoPlayer:self playbackBufferEmpty:self.avPlayerItem.playbackBufferEmpty track:self.track];
                 }
             }
         }
@@ -458,13 +457,13 @@ typedef void (^VoidBlock) (void);
         
         if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
             LLLog(@"playbackLikelyToKeepUp: %@", self.avPlayerItem.playbackLikelyToKeepUp ? @"YES" : @"NO");
-            if (self.avPlayerItem.playbackLikelyToKeepUp &&
-                self.state == LLVideoPlayerStateContentPlaying &&
-                NO == [self isPlayingVideo]) {
+            if (self.state == LLVideoPlayerStateContentPlaying) {
                 if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:track:)]) {
-                    [self.delegate videoPlayer:self playbackLikelyToKeepUp:YES track:self.track];
+                    [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.avPlayerItem.playbackLikelyToKeepUp track:self.track];
                 }
-                [self.avPlayer play];
+                if (self.avPlayerItem.playbackLikelyToKeepUp && NO == [self isPlayingVideo]) {
+                    [self.avPlayer play];
+                }
             }
         }
     }
