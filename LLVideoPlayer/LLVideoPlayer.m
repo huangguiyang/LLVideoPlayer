@@ -277,7 +277,7 @@ typedef void (^VoidBlock) (void);
 - (void)playVideoTrack:(LLVideoTrack *)track
 {
     if ([self.delegate respondsToSelector:@selector(shouldVideoPlayer:startVideo:)]) {
-        if (NO == [self.delegate respondsToSelector:@selector(shouldVideoPlayer:startVideo:)]) {
+        if (NO == [self.delegate shouldVideoPlayer:self startVideo:track]) {
             return;
         }
     }
