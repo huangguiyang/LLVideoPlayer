@@ -549,14 +549,20 @@ typedef void (^VoidBlock) (void);
 - (void)playerDidPlayToEnd:(NSNotification *)note
 {
     LLLog(@"playerDidPlayToEnd: %@", note);
-    ll_run_on_ui_thread(^{
-        self.track.isPlayedToEnd = YES;
-        [self pauseContent:NO completionHandler:^{
-            if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
-                [self.delegate videoPlayer:self didPlayToEnd:self.track];
-            }
-        }];
-    });
+    AVPlayerItem *finishedItem = (AVPlayerItem *)note.object;
+    if (finishedItem == self.avPlayerItem) {
+        // is current player's item
+        ll_run_on_ui_thread(^{
+            self.track.isPlayedToEnd = YES;
+            [self pauseContent:NO completionHandler:^{
+                if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
+                    [self.delegate videoPlayer:self didPlayToEnd:self.track];
+                }
+            }];
+        });
+    } else {
+        LLLog(@"[WRN] finished playerItem of another AVPlayer");
+    }
 }
 
 #pragma mark - State Changed
