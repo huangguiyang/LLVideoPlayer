@@ -471,7 +471,6 @@ typedef void (^VoidBlock) (void);
         
         /// loadedTimeRanges
         if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
-            LLLog(@"loadedTimeRanges: %@", self.avPlayerItem.loadedTimeRanges);
             if ([self.delegate respondsToSelector:@selector(videoPlayer:loadedTimeRanges:track:)]) {
                 [self.delegate videoPlayer:self loadedTimeRanges:self.avPlayerItem.loadedTimeRanges track:self.track];
             }
@@ -529,9 +528,7 @@ typedef void (^VoidBlock) (void);
     if (timeInSeconds <= 0) {
         return;
     }
-    
-    LLLog(@"time: %f", timeInSeconds);
-    
+        
     if ([self.avPlayer ll_currentItemDuration] > 1) {
         if (nil == self.track.totalDuration) {
             self.track.totalDuration = [NSNumber numberWithFloat:[self.avPlayer ll_currentItemDuration]];
