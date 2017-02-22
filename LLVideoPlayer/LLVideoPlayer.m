@@ -17,6 +17,7 @@ typedef void (^VoidBlock) (void);
 @interface LLVideoPlayer ()
 
 @property (nonatomic, strong) id avTimeObserver;
+@property (nonatomic, strong) AVURLAsset *loadingAsset;
 
 @end
 
@@ -196,6 +197,8 @@ typedef void (^VoidBlock) (void);
                 break;
             case AVPlayerItemStatusUnknown:
                 LLLog(@"Trying to dismiss content at AVPlayerItemStatusUnknown");
+                [self.loadingAsset cancelLoading];
+                self.loadingAsset = nil;
                 break;
             default:
                 break;
@@ -207,6 +210,8 @@ typedef void (^VoidBlock) (void);
                 break;
             case AVPlayerStatusUnknown:
                 LLLog(@"Trying to dismiss content at AVPlayerStatusUnknown");
+                [self.loadingAsset cancelLoading];
+                self.loadingAsset = nil;
                 break;
             default:
                 break;
@@ -272,6 +277,7 @@ typedef void (^VoidBlock) (void);
     self.avTimeObserver = nil;
     self.avPlayer = nil;
     self.avPlayerItem = nil;
+    self.loadingAsset = nil;
 }
 
 - (void)playVideoTrack:(LLVideoTrack *)track
@@ -315,15 +321,18 @@ typedef void (^VoidBlock) (void);
             NSError *error = nil;
             AVKeyValueStatus status = [asset statusOfValueForKey:kTracksKey error:&error];
             if (status == AVKeyValueStatusLoaded) {
+                LLLog(@"AVURLAsset loaded. [OK]");
                 self.avPlayerItem = [AVPlayerItem playerItemWithAsset:asset];
                 self.avPlayer = [self playerWithPlayerItem:self.avPlayerItem];
                 [playerLayerView setPlayer:self.avPlayer];
+                self.loadingAsset = nil;
             } else {
                 LLLog(@"The asset's tracks were not loaded: %@", error);
                 [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track];
             }
         });
     }];
+    self.loadingAsset = asset;
 }
 
 - (AVPlayer*)playerWithPlayerItem:(AVPlayerItem*)playerItem
