@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LLVideoPlayer'
-  s.version          = '0.1.9'
+  s.version          = '0.2.1'
   s.summary          = 'A Low Level Video Player.'
 
   s.description      = <<-DESC
@@ -18,5 +18,4 @@ LLVideoPlayer is a low level video player which is simple and easy to extend.
   s.source_files = 'LLVideoPlayer/**/*.{m,h}'
 
   s.frameworks = 'QuartzCore', 'MediaPlayer', 'AVFoundation'
-  s.dependency 'Masonry'
 end

@@ -58,7 +58,7 @@ NSURL *url = [NSURL URLWithString:@"<your stream url>"];
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track;
 
 #pragma mark - Error
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error track:(LLVideoTrack *)track;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error;
 
 #pragma mark - 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(LLVideoTrack *)track;
