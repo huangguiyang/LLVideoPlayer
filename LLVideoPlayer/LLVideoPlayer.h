@@ -43,10 +43,7 @@
 - (void)seekToLastWatchedDuration;
 
 #pragma mark - Data
-- (float)currentBitRateInKbps;
-
-#pragma mark - Subclass
-- (void)initialize;
-- (void)customizeAVPlayer:(AVPlayer *)player;
+- (double)currentBitRateInKbps;
+- (NSTimeInterval)currentTime;
 
 @end

@@ -25,12 +25,7 @@ typedef void (^VoidBlock) (void);
 
 - (instancetype)init
 {
-    self = [super init];
-    if (self) {
-        self.view = [[LLVideoPlayerView alloc] init];
-        [self initialize];
-    }
-    return self;
+    return [self initWithVideoPlayerView:[LLVideoPlayerView new]];
 }
 
 - (instancetype)initWithVideoPlayerView:(LLVideoPlayerView *)videoPlayerView
@@ -38,7 +33,7 @@ typedef void (^VoidBlock) (void);
     self = [super init];
     if (self) {
         self.view = videoPlayerView;
-        [self initialize];
+        self.state = LLVideoPlayerStateUnknown;
     }
     return self;
 }
@@ -46,13 +41,6 @@ typedef void (^VoidBlock) (void);
 - (void)dealloc
 {
     [self clearPlayer];
-}
-
-#pragma mark - Initialize
-
-- (void)initialize
-{
-    self.state = LLVideoPlayerStateUnknown;
 }
 
 #pragma mark - Load
@@ -263,13 +251,6 @@ typedef void (^VoidBlock) (void);
     });
 }
 
-#pragma mark - Data
-
-- (float)currentBitRateInKbps
-{
-    return [self.avPlayerItem.accessLog.events.lastObject observedBitrate]/1000;
-}
-
 #pragma mark - AVPlayer
 
 - (void)clearPlayer
@@ -341,7 +322,6 @@ typedef void (^VoidBlock) (void);
     if ([player respondsToSelector:@selector(setAllowsExternalPlayback:)]) {
         player.allowsExternalPlayback = NO;
     }
-    [self customizeAVPlayer:player];
     return player;
 }
 
@@ -650,14 +630,12 @@ typedef void (^VoidBlock) (void);
     }
 }
 
-#pragma mark - Subclass
-
-- (void)customizeAVPlayer:(AVPlayer *)player
-{
-    
-}
-
 #pragma mark - Misc
+
+- (double)currentBitRateInKbps
+{
+    return [self.avPlayerItem.accessLog.events.lastObject observedBitrate]/1000;
+}
 
 - (NSTimeInterval)currentTime
 {
