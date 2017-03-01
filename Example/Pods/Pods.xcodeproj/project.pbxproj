@@ -7,58 +7,58 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		009ABFD0FE8D157A1042B970F659A7B2 /* ViewController+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 25CED739CF35B6D0A1D95AE17D712A7F /* ViewController+MASAdditions.m */; };
-		013BEA977135E61A4804B656105D7273 /* LLVideoPlayerDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 8CE81E7BAF48882B52F7B96387C968A4 /* LLVideoPlayerDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		029445EF3303A2E4479434368EE1E21E /* LLVideoPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3361092F628954BA7A93794A4340E223 /* LLVideoPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		047E26B890D535DEF7D9B1EFB53235B7 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC25E870AB54CE1449377641CDCCC810 /* MediaPlayer.framework */; };
-		0ADAFCE0C296958EF93B903F24DF5067 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C762C4F3A304C10AF7EBEA6AAA8508A0 /* NSLayoutConstraint+MASDebugAdditions.m */; };
-		0D1A9BCCFFC026E3A068D6E6D24B83A5 /* View+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FCC2A09AC3DCD0E4A3D268DAABC5135 /* View+MASAdditions.m */; };
-		141E43EE4CDA7D9B1DB4C4CF78A9BDA5 /* LLVideoPlayerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = DAE203F61380162725090F4AFA46F732 /* LLVideoPlayerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		18901DE07DE0AE0A883FD2B9D28B22A4 /* MASConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 3162AC8E29FA7F3BF0D8641F7F4D9B60 /* MASConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1D03823958A2654669CE0253598E593D /* Masonry.h in Headers */ = {isa = PBXBuildFile; fileRef = EC0384F145CF471A951BA8E9486AD626 /* Masonry.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1EDB1D5A35CD68DD93CC95ADD1976105 /* MASConstraintMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AB44751192F0AA8DA5F75A06138D15 /* MASConstraintMaker.m */; };
-		244600C786AE87C73D5712E4D92FE79E /* LLVideoPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = D75FADFAA5242D1CF2A19FB15E4289BF /* LLVideoPlayerView.m */; };
-		2CECF86F54A3C1F6C0BE646877F39424 /* MASViewConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = C7C02266037F030E22468AC86802DB57 /* MASViewConstraint.m */; };
-		38E3AE293D8B0B0EA8DACCCB74301D70 /* LLVideoPlayerInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 09EE992FA2604892EAA0B0C9D23F10C7 /* LLVideoPlayerInternal.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		005BB4AFC2267EB79C92A2B7CD19DD48 /* LLVideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C9A990768B0DFE20B763778D3D9A0B0 /* LLVideoPlayer.m */; };
+		012F635298DC56EB0515E2A84C5AE2DB /* LLVideoPlayerHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 04E0374AC24232A820E1475742648274 /* LLVideoPlayerHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		01E09711F001C49F92A97060414E262B /* MASCompositeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 475326F2A929CD1AFFB74850961F32C0 /* MASCompositeConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07EA57F1988412E98C8DF42048027069 /* LLVideoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = D27EBA19C48DE5E4561559DD4D9C6E7F /* LLVideoTrack.m */; };
+		124B0D00A773F0B8D6988B72CF6BD527 /* LLVideoPlayerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 572B73C6F3FA3428A589634CAE43FF67 /* LLVideoPlayerHelper.m */; };
+		13635B78121B99E5C03C92506A161607 /* MASViewAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 82F28AEAAF722BC62BF5B37D6663BBC2 /* MASViewAttribute.m */; };
+		1567A7E15EDDBF79999928094023EAD6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A895F2FE652753E3293F9C28C57D388E /* QuartzCore.framework */; };
+		1EC363D6911160B063DB6CC87F595A5B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D348591B949F16F6AF110262B2B7C242 /* UIKit.framework */; };
+		1F3BD3BC28432BB5E2F73501E06E4579 /* MASUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 1321572A3ED9C894C94A131BE29B81B2 /* MASUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2DBB74B8B5DDB1F621433DD12BF35102 /* MASViewConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = C7C02266037F030E22468AC86802DB57 /* MASViewConstraint.m */; };
+		3849869EA17BA89EDCCB0DB0DE717995 /* AVPlayer+LLPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 72DE0CE8C123165E86373D5A1C85B9EA /* AVPlayer+LLPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3E8E6916C563B9CB12AA417275FC6EB3 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C762C4F3A304C10AF7EBEA6AAA8508A0 /* NSLayoutConstraint+MASDebugAdditions.m */; };
+		4438AA579022D8C2760FFFA750869DB5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
+		490CA524521F7D444EA58FA915D7E99C /* NSArray+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = B179F4D3D34A3CE25A698B8D9AC9D6C2 /* NSArray+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		49B903D576E09560C52AA92FDCC31A68 /* Masonry.h in Headers */ = {isa = PBXBuildFile; fileRef = EC0384F145CF471A951BA8E9486AD626 /* Masonry.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4CBE1B46550A3FB90FDD1CB9CBA7B7FE /* MASConstraint+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E2395DA2EBCF6241A0DA0E1859FF45 /* MASConstraint+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D28DC7AFDFB688FA24114D365CFDC28 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
-		5324FF01F6E7113A32746FBF1E9653EF /* MASConstraintMaker.h in Headers */ = {isa = PBXBuildFile; fileRef = 780A86CEB0A0131C88BE12414D500734 /* MASConstraintMaker.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		577B6DE799DE52F17FD6D93C048F7C4B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
-		5BFC59A308E822FE6AAE895397814143 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D348591B949F16F6AF110262B2B7C242 /* UIKit.framework */; };
-		5C60A973688E1AB9F7FA0A42D61E898B /* AVPlayer+LLPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2E77AB000D06194DF675E7F6903E2D92 /* AVPlayer+LLPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6165E6A9948A89A2F018E6F8E419EEFE /* Masonry-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A231E76AF7DC6CB887B5B2C522A7A /* Masonry-dummy.m */; };
-		6C660BF78224B4BB61A1CE7D6B4E1F22 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02CA9B95A5F4B9CFE1E63ADABF554AC1 /* AVFoundation.framework */; };
-		710642F4256D1F294AACB6532017A7A8 /* View+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A9F610CB90E57B81F8F7DCA2176E0FD /* View+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		566EA65277D377CE9AF9BC125521965B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
+		61CCEA01CBE8EFFA5515E7A0D8635AAE /* MASCompositeConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = D5EC6EDDDD3E503C5B2E967D3FEECFEB /* MASCompositeConstraint.m */; };
+		6249770A7D163B0F3001D5A76C5FA01C /* MASConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 3162AC8E29FA7F3BF0D8641F7F4D9B60 /* MASConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68F98758BA84B8EC3472A8C6FD646D16 /* Masonry-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A231E76AF7DC6CB887B5B2C522A7A /* Masonry-dummy.m */; };
+		6A1DCFF02277254DA30BAD562A2E5ED9 /* LLVideoPlayerInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 297589723E1D2BE1191E12DCF54F19E2 /* LLVideoPlayerInternal.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DF5484FC3E373DA49B2B0C0C900B1EC /* LLVideoPlayerDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 81D40A6FB53A5DDD831E79FDB05AE17B /* LLVideoPlayerDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6EFAC23F76208B89E86385507B731DB3 /* LLVideoPlayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 699E8C2AC1FD05F371E033FF3BDD9FF2 /* LLVideoPlayerView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7147CB849CE262EB09577B80D54BF79D /* LLVideoPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3042CC97D6746B85FB6F87882F7F85EF /* LLVideoPlayerView.m */; };
+		790E8D80D625269424DF2B6FF9B69E93 /* LLVideoPlayerLayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0845271854348F4D0B9BC2B9401BDB9F /* LLVideoPlayerLayerView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79B7C6470187C17CC0E99321A2E7DC38 /* Pods-LLVideoPlayer_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 42C0F0CE62978A347C248895155B57D2 /* Pods-LLVideoPlayer_Example-dummy.m */; };
-		7CB85E15C02A59360C6C5C9CD1F266DD /* LLVideoPlayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D07DFB3F9E9C6C165AE17416DD7A6C8 /* LLVideoPlayerView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8982EE9DFBBB52672F5E3DF515E1542F /* MASConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F937BDEB8DF93A08D20C5355C0FDB5C /* MASConstraint.m */; };
-		8C4980B6B4A9D0160CEA23CAE02D11F9 /* LLVideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 45F2643B22BED898E112D6AEC5D1CCC7 /* LLVideoPlayer.m */; };
-		8E575910D8FC6D75566FA8D61DC15ED3 /* MASCompositeConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = D5EC6EDDDD3E503C5B2E967D3FEECFEB /* MASCompositeConstraint.m */; };
-		948802F04A1FB3818AA520E19F2F3A87 /* AVPlayer+LLPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FD4B05E0AFD0207A8E79EF9EE18B8002 /* AVPlayer+LLPlayer.m */; };
-		98E8AFD1E82B6C90DC560281AC7DED91 /* MASLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 807FFD255E8235D5B42FE078299B5F1B /* MASLayoutConstraint.m */; };
-		9A4119DB6C7BFA86988C4CB2B042B2D0 /* LLVideoPlayerHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D518205D13F42C3070B155FBA8A1518 /* LLVideoPlayerHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9D64134918986F7B401FFDE5B5C5B5DD /* MASLayoutConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = B48867DE203BCF3BB3DFCAB8FDC7516B /* MASLayoutConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		AABF546235D647C1496F2418DECEE158 /* MASViewAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 82F28AEAAF722BC62BF5B37D6663BBC2 /* MASViewAttribute.m */; };
-		AAD74AC68312BF7D501CFC60DE9E044C /* LLVideoPlayerHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DC7C505CEF857656217D697AC81D6D7E /* LLVideoPlayerHelper.m */; };
-		ADFB2C2B5681358E80CB117AB4034962 /* NSLayoutConstraint+MASDebugAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = E158FC65C5404E098F16E26F478DA504 /* NSLayoutConstraint+MASDebugAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B3279DCAC272B135A1D20BD6949FEBB7 /* LLVideoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 344F06EEDC44318C0D2EDBE5D761E0B8 /* LLVideoTrack.m */; };
-		B76C21C495D95D60E5F72AB6C5D8A37B /* NSArray+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = FBE23E70FF64ACC81816A368E171B903 /* NSArray+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B8B9A7A5F419D55F03E5CFAAFADD7C46 /* LLVideoPlayer-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 273BCA2B320AFC792DF7D36DD692F10B /* LLVideoPlayer-dummy.m */; };
-		BBD20D70E79DAFA8092805CD85946E99 /* LLVideoPlayerLayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = E4AB89B93B1FEF5F2D6AFC42E03C2D06 /* LLVideoPlayerLayerView.m */; };
-		BEA4D7614AE2A87465AC194C3EF78605 /* MASUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 1321572A3ED9C894C94A131BE29B81B2 /* MASUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BEAF32E8A5818AE9BABDCDCE2ACF07E3 /* MASViewConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 043FB94CF93050E20D8E4C071ACFA5D2 /* MASViewConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C69FAB0BDEBC074CFEE70338DB75628D /* LLVideoTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 2897294C991ADA79C6D6ADA26BE865D2 /* LLVideoTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C8ADC18F442AB0EF625F625810415227 /* MASViewAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 915A6FF0E04F5A5C0ACDE0E32BD2F193 /* MASViewAttribute.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7BDDE51AF16FA53A09506EDB91E1C3C2 /* NSArray+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8229525E7067F22D3977D2628DF5F2C3 /* NSArray+MASAdditions.m */; };
+		80A04F245A20E7E62B913FEAF27D32A6 /* LLVideoPlayer-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EC10FADDAF76E52D75FDCCDDDD43E23 /* LLVideoPlayer-dummy.m */; };
+		86EE1CB5473A4A07081D8DE3A2C45924 /* View+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E7E17DB5590A8C4D9625D67E6FBD243 /* View+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		89450A58FD91E5B227171FC75160E4EA /* MASConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F937BDEB8DF93A08D20C5355C0FDB5C /* MASConstraint.m */; };
+		92D33FB4E4763D6369C2FE431B9B784D /* LLVideoPlayerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 97B1EEAF29376E0C4A35881B4CB83FF3 /* LLVideoPlayerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		95354B0F82A5C2CC7E1342E72F8B9305 /* LLVideoPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = EE805598ACB80554BFD176D7531D84A6 /* LLVideoPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		955BE39896CA35F2A585DC3309E5FDA5 /* MASLayoutConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 807FFD255E8235D5B42FE078299B5F1B /* MASLayoutConstraint.m */; };
+		983CB852CBBFBC04C2A6BA407E34F59B /* View+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A9F610CB90E57B81F8F7DCA2176E0FD /* View+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9934AEA2C891C201D8ED5746FF42FE1B /* NSLayoutConstraint+MASDebugAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = E158FC65C5404E098F16E26F478DA504 /* NSLayoutConstraint+MASDebugAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A1FA046FDFC42676D17FEC387B10D24A /* View+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FCC2A09AC3DCD0E4A3D268DAABC5135 /* View+MASAdditions.m */; };
+		A6436E3CFFCBFE591E2D2A68ED90CAC6 /* MASLayoutConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = B48867DE203BCF3BB3DFCAB8FDC7516B /* MASLayoutConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A83991D7C1373DF66020C2FDFC5D7564 /* MASViewConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 043FB94CF93050E20D8E4C071ACFA5D2 /* MASViewConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AE6F05CF7F7E20A342D00257AC5E1021 /* AVPlayer+LLPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD616D9DD51F9454611C394E624EDB9 /* AVPlayer+LLPlayer.m */; };
+		AFFD3754694F1E526C054EA9516E65F4 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC25E870AB54CE1449377641CDCCC810 /* MediaPlayer.framework */; };
+		C202AEA464956A26A8D74A768AEDE048 /* LLVideoPlayerLayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = EC6D6C740033C2080EC670009492DC30 /* LLVideoPlayerLayerView.m */; };
+		C88F85D3200060BD98FC13EA58121706 /* ViewController+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = FA891F8E85C079B4FB101DDD5BC7A477 /* ViewController+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA8F7ECFA6A83DE3117B244E1E5D7D5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
-		D00C7F91550F848DDF8A7EE5DD66E533 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */; };
-		D56DC520D97C15362386F5A0354C0F74 /* NSArray+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8229525E7067F22D3977D2628DF5F2C3 /* NSArray+MASAdditions.m */; };
-		D68DBA5E548F255EDDAB1BEE44A32BC0 /* MASCompositeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = 475326F2A929CD1AFFB74850961F32C0 /* MASCompositeConstraint.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D9F68828201E3D071C67499224C5EBB0 /* View+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E7E17DB5590A8C4D9625D67E6FBD243 /* View+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E248DA5BFA22BF10E5135FC80D7FF939 /* NSArray+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = B179F4D3D34A3CE25A698B8D9AC9D6C2 /* NSArray+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E52E0ED6C8CFE840F61029B986CD639A /* MASConstraint+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E2395DA2EBCF6241A0DA0E1859FF45 /* MASConstraint+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D3A2A9826035881FE68057CF4E161FBC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02CA9B95A5F4B9CFE1E63ADABF554AC1 /* AVFoundation.framework */; };
+		D7CE05A743B7ACD50796191FA442814C /* ViewController+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 25CED739CF35B6D0A1D95AE17D712A7F /* ViewController+MASAdditions.m */; };
+		DF7F88B58B564EDF169EC0C9CF8E5124 /* MASConstraintMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = F8AB44751192F0AA8DA5F75A06138D15 /* MASConstraintMaker.m */; };
+		E072DA57403C4BFF9B10467BE05604C5 /* NSArray+MASShorthandAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = FBE23E70FF64ACC81816A368E171B903 /* NSArray+MASShorthandAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E1E771349813022263F549BDF33CB4BB /* MASViewAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 915A6FF0E04F5A5C0ACDE0E32BD2F193 /* MASViewAttribute.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EC48DE078CA5E55922CCE02354D475CD /* MASConstraintMaker.h in Headers */ = {isa = PBXBuildFile; fileRef = 780A86CEB0A0131C88BE12414D500734 /* MASConstraintMaker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EDD7CE299819D16BC5FE71372EA9684F /* Pods-LLVideoPlayer_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DB25D74BCFF175A9DA21A1802FFF186F /* Pods-LLVideoPlayer_Tests-dummy.m */; };
-		EF36968C8037912E48DD387765F1F5F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A895F2FE652753E3293F9C28C57D388E /* QuartzCore.framework */; };
-		F5399FE0A1C0F07EB8AA820091DF4F56 /* ViewController+MASAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = FA891F8E85C079B4FB101DDD5BC7A477 /* ViewController+MASAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F71593403A727F66E16618F381C92825 /* LLVideoPlayerLayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = C24F929746F5FCC12E6DD3861F8DD4E6 /* LLVideoPlayerLayerView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FE3D89448A696407B60916A0BF71ABD3 /* LLVideoTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2B0C97E3BC51E0D460923A0D3C03ED /* LLVideoTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,21 +66,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 593AA6D3D2D50804B2F2D9FBF3A144A4;
+			remoteGlobalIDString = 5CB9D331D844DA10E036E51A6B9DA508;
 			remoteInfo = LLVideoPlayer;
 		};
 		9892A4ED60CD5F1F040CC39D292A6A1E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 7E5DAEE7BCA46EBEE52C072DC4884271;
-			remoteInfo = Masonry;
-		};
-		C9DE16A0B97632DDC6C42BD659029B81 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7E5DAEE7BCA46EBEE52C072DC4884271;
+			remoteGlobalIDString = 9DC8D9E02903E93BD0B2FEC9D846EA20;
 			remoteInfo = Masonry;
 		};
 /* End PBXContainerItemProxy section */
@@ -91,71 +84,71 @@
 		02CA9B95A5F4B9CFE1E63ADABF554AC1 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		043FB94CF93050E20D8E4C071ACFA5D2 /* MASViewConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASViewConstraint.h; path = Masonry/MASViewConstraint.h; sourceTree = "<group>"; };
 		04DC7279A2C5CBC160D3493D366EF093 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		09EE992FA2604892EAA0B0C9D23F10C7 /* LLVideoPlayerInternal.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerInternal.h; sourceTree = "<group>"; };
+		04E0374AC24232A820E1475742648274 /* LLVideoPlayerHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerHelper.h; sourceTree = "<group>"; };
+		0845271854348F4D0B9BC2B9401BDB9F /* LLVideoPlayerLayerView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerLayerView.h; sourceTree = "<group>"; };
 		0B65D37D59181382BFB9E5FAED0F3047 /* Pods-LLVideoPlayer_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LLVideoPlayer_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		0CCC7025C7E23F9ED38076C6C3074E05 /* Pods-LLVideoPlayer_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-LLVideoPlayer_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
 		1321572A3ED9C894C94A131BE29B81B2 /* MASUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASUtilities.h; path = Masonry/MASUtilities.h; sourceTree = "<group>"; };
 		22E2395DA2EBCF6241A0DA0E1859FF45 /* MASConstraint+Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "MASConstraint+Private.h"; path = "Masonry/MASConstraint+Private.h"; sourceTree = "<group>"; };
 		25CED739CF35B6D0A1D95AE17D712A7F /* ViewController+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "ViewController+MASAdditions.m"; path = "Masonry/ViewController+MASAdditions.m"; sourceTree = "<group>"; };
 		26503791CCD1A39DB7B208AE24621B0A /* Pods-LLVideoPlayer_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LLVideoPlayer_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		273BCA2B320AFC792DF7D36DD692F10B /* LLVideoPlayer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LLVideoPlayer-dummy.m"; sourceTree = "<group>"; };
-		2897294C991ADA79C6D6ADA26BE865D2 /* LLVideoTrack.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoTrack.h; sourceTree = "<group>"; };
-		2BC9D55E29C88E136048339259BE29A5 /* libPods-LLVideoPlayer_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LLVideoPlayer_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2E77AB000D06194DF675E7F6903E2D92 /* AVPlayer+LLPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AVPlayer+LLPlayer.h"; sourceTree = "<group>"; };
+		297589723E1D2BE1191E12DCF54F19E2 /* LLVideoPlayerInternal.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerInternal.h; sourceTree = "<group>"; };
+		2BC9D55E29C88E136048339259BE29A5 /* libPods-LLVideoPlayer_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-LLVideoPlayer_Tests.a"; path = "libPods-LLVideoPlayer_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EC10FADDAF76E52D75FDCCDDDD43E23 /* LLVideoPlayer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "LLVideoPlayer-dummy.m"; sourceTree = "<group>"; };
 		2FCC2A09AC3DCD0E4A3D268DAABC5135 /* View+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "View+MASAdditions.m"; path = "Masonry/View+MASAdditions.m"; sourceTree = "<group>"; };
+		3042CC97D6746B85FB6F87882F7F85EF /* LLVideoPlayerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerView.m; sourceTree = "<group>"; };
 		3162AC8E29FA7F3BF0D8641F7F4D9B60 /* MASConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASConstraint.h; path = Masonry/MASConstraint.h; sourceTree = "<group>"; };
-		3361092F628954BA7A93794A4340E223 /* LLVideoPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayer.h; sourceTree = "<group>"; };
-		344F06EEDC44318C0D2EDBE5D761E0B8 /* LLVideoTrack.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoTrack.m; sourceTree = "<group>"; };
 		358D33C07E3DD4283118B710104D4336 /* Pods-LLVideoPlayer_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		38FA18C50667191B7E809A8CFD06358D /* Pods-LLVideoPlayer_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Example-resources.sh"; sourceTree = "<group>"; };
 		3A3F393246AEDF52C1D8C9C5C84A9C48 /* Pods-LLVideoPlayer_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Example-frameworks.sh"; sourceTree = "<group>"; };
+		3C9A990768B0DFE20B763778D3D9A0B0 /* LLVideoPlayer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayer.m; sourceTree = "<group>"; };
 		3CEAF4663F0E682FDC940AB5ADC50AD9 /* Pods-LLVideoPlayer_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Tests-frameworks.sh"; sourceTree = "<group>"; };
 		418F758ABD16E64CDC06753145D8522B /* Pods-LLVideoPlayer_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		42C0F0CE62978A347C248895155B57D2 /* Pods-LLVideoPlayer_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LLVideoPlayer_Example-dummy.m"; sourceTree = "<group>"; };
-		45F2643B22BED898E112D6AEC5D1CCC7 /* LLVideoPlayer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayer.m; sourceTree = "<group>"; };
 		475326F2A929CD1AFFB74850961F32C0 /* MASCompositeConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASCompositeConstraint.h; path = Masonry/MASCompositeConstraint.h; sourceTree = "<group>"; };
-		5D518205D13F42C3070B155FBA8A1518 /* LLVideoPlayerHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerHelper.h; sourceTree = "<group>"; };
-		68E845B65D71C65F6F00AEF806031704 /* libPods-LLVideoPlayer_Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LLVideoPlayer_Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D2B0C97E3BC51E0D460923A0D3C03ED /* LLVideoTrack.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoTrack.h; sourceTree = "<group>"; };
+		572B73C6F3FA3428A589634CAE43FF67 /* LLVideoPlayerHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerHelper.m; sourceTree = "<group>"; };
+		68E845B65D71C65F6F00AEF806031704 /* libPods-LLVideoPlayer_Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-LLVideoPlayer_Example.a"; path = "libPods-LLVideoPlayer_Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		699E8C2AC1FD05F371E033FF3BDD9FF2 /* LLVideoPlayerView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerView.h; sourceTree = "<group>"; };
+		6CD616D9DD51F9454611C394E624EDB9 /* AVPlayer+LLPlayer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "AVPlayer+LLPlayer.m"; sourceTree = "<group>"; };
+		72DE0CE8C123165E86373D5A1C85B9EA /* AVPlayer+LLPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AVPlayer+LLPlayer.h"; sourceTree = "<group>"; };
 		780A86CEB0A0131C88BE12414D500734 /* MASConstraintMaker.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASConstraintMaker.h; path = Masonry/MASConstraintMaker.h; sourceTree = "<group>"; };
 		7882AB8492CA4F59F730C76CC3BBF57A /* Masonry.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Masonry.xcconfig; sourceTree = "<group>"; };
 		7B5A231E76AF7DC6CB887B5B2C522A7A /* Masonry-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Masonry-dummy.m"; sourceTree = "<group>"; };
-		7D07DFB3F9E9C6C165AE17416DD7A6C8 /* LLVideoPlayerView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerView.h; sourceTree = "<group>"; };
 		807FFD255E8235D5B42FE078299B5F1B /* MASLayoutConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASLayoutConstraint.m; path = Masonry/MASLayoutConstraint.m; sourceTree = "<group>"; };
+		81D40A6FB53A5DDD831E79FDB05AE17B /* LLVideoPlayerDefines.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDefines.h; sourceTree = "<group>"; };
 		8229525E7067F22D3977D2628DF5F2C3 /* NSArray+MASAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSArray+MASAdditions.m"; path = "Masonry/NSArray+MASAdditions.m"; sourceTree = "<group>"; };
 		82F28AEAAF722BC62BF5B37D6663BBC2 /* MASViewAttribute.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASViewAttribute.m; path = Masonry/MASViewAttribute.m; sourceTree = "<group>"; };
 		8861736EBF3CE7E9DE27D4EB02E26D7A /* Pods-LLVideoPlayer_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LLVideoPlayer_Tests-resources.sh"; sourceTree = "<group>"; };
 		8A9F610CB90E57B81F8F7DCA2176E0FD /* View+MASShorthandAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "View+MASShorthandAdditions.h"; path = "Masonry/View+MASShorthandAdditions.h"; sourceTree = "<group>"; };
-		8CE81E7BAF48882B52F7B96387C968A4 /* LLVideoPlayerDefines.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDefines.h; sourceTree = "<group>"; };
 		8E7E17DB5590A8C4D9625D67E6FBD243 /* View+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "View+MASAdditions.h"; path = "Masonry/View+MASAdditions.h"; sourceTree = "<group>"; };
 		915A6FF0E04F5A5C0ACDE0E32BD2F193 /* MASViewAttribute.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASViewAttribute.h; path = Masonry/MASViewAttribute.h; sourceTree = "<group>"; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9F3A3433B51FAE800FCE1D023F73D260 /* libMasonry.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMasonry.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		97B1EEAF29376E0C4A35881B4CB83FF3 /* LLVideoPlayerDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDelegate.h; sourceTree = "<group>"; };
+		9F3A3433B51FAE800FCE1D023F73D260 /* libMasonry.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libMasonry.a; path = libMasonry.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F937BDEB8DF93A08D20C5355C0FDB5C /* MASConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASConstraint.m; path = Masonry/MASConstraint.m; sourceTree = "<group>"; };
 		A2F75C96947B2651F82FC18F66C43B49 /* Masonry-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Masonry-prefix.pch"; sourceTree = "<group>"; };
-		A4C86C9E70EABFD22E1D442B82C93C08 /* libLLVideoPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLLVideoPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4C86C9E70EABFD22E1D442B82C93C08 /* libLLVideoPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libLLVideoPlayer.a; path = libLLVideoPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A895F2FE652753E3293F9C28C57D388E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		B179F4D3D34A3CE25A698B8D9AC9D6C2 /* NSArray+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+MASAdditions.h"; path = "Masonry/NSArray+MASAdditions.h"; sourceTree = "<group>"; };
 		B48867DE203BCF3BB3DFCAB8FDC7516B /* MASLayoutConstraint.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MASLayoutConstraint.h; path = Masonry/MASLayoutConstraint.h; sourceTree = "<group>"; };
-		C24F929746F5FCC12E6DD3861F8DD4E6 /* LLVideoPlayerLayerView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerLayerView.h; sourceTree = "<group>"; };
 		C762C4F3A304C10AF7EBEA6AAA8508A0 /* NSLayoutConstraint+MASDebugAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSLayoutConstraint+MASDebugAdditions.m"; path = "Masonry/NSLayoutConstraint+MASDebugAdditions.m"; sourceTree = "<group>"; };
 		C7C02266037F030E22468AC86802DB57 /* MASViewConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASViewConstraint.m; path = Masonry/MASViewConstraint.m; sourceTree = "<group>"; };
+		D27EBA19C48DE5E4561559DD4D9C6E7F /* LLVideoTrack.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoTrack.m; sourceTree = "<group>"; };
 		D348591B949F16F6AF110262B2B7C242 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		D5EC6EDDDD3E503C5B2E967D3FEECFEB /* MASCompositeConstraint.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASCompositeConstraint.m; path = Masonry/MASCompositeConstraint.m; sourceTree = "<group>"; };
-		D75FADFAA5242D1CF2A19FB15E4289BF /* LLVideoPlayerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerView.m; sourceTree = "<group>"; };
-		DAE203F61380162725090F4AFA46F732 /* LLVideoPlayerDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayerDelegate.h; sourceTree = "<group>"; };
 		DB25D74BCFF175A9DA21A1802FFF186F /* Pods-LLVideoPlayer_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LLVideoPlayer_Tests-dummy.m"; sourceTree = "<group>"; };
-		DC7C505CEF857656217D697AC81D6D7E /* LLVideoPlayerHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerHelper.m; sourceTree = "<group>"; };
 		DEA505522FB70FA4EDE272F3C15332E3 /* Pods-LLVideoPlayer_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LLVideoPlayer_Example.release.xcconfig"; sourceTree = "<group>"; };
 		E158FC65C5404E098F16E26F478DA504 /* NSLayoutConstraint+MASDebugAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSLayoutConstraint+MASDebugAdditions.h"; path = "Masonry/NSLayoutConstraint+MASDebugAdditions.h"; sourceTree = "<group>"; };
-		E4AB89B93B1FEF5F2D6AFC42E03C2D06 /* LLVideoPlayerLayerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerLayerView.m; sourceTree = "<group>"; };
 		EC0384F145CF471A951BA8E9486AD626 /* Masonry.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Masonry.h; path = Masonry/Masonry.h; sourceTree = "<group>"; };
-		F0C05A2F0697848D9A99F62E9BDD06E1 /* LLVideoPlayer.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LLVideoPlayer.xcconfig; sourceTree = "<group>"; };
+		EC6D6C740033C2080EC670009492DC30 /* LLVideoPlayerLayerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = LLVideoPlayerLayerView.m; sourceTree = "<group>"; };
+		EE805598ACB80554BFD176D7531D84A6 /* LLVideoPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = LLVideoPlayer.h; sourceTree = "<group>"; };
+		EED9C930FD1E86C299A838DC6251680D /* LLVideoPlayer.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = LLVideoPlayer.xcconfig; sourceTree = "<group>"; };
+		F43C32DFD0867D0A316521884B686E1B /* LLVideoPlayer-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LLVideoPlayer-prefix.pch"; sourceTree = "<group>"; };
 		F8AB44751192F0AA8DA5F75A06138D15 /* MASConstraintMaker.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MASConstraintMaker.m; path = Masonry/MASConstraintMaker.m; sourceTree = "<group>"; };
 		FA891F8E85C079B4FB101DDD5BC7A477 /* ViewController+MASAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "ViewController+MASAdditions.h"; path = "Masonry/ViewController+MASAdditions.h"; sourceTree = "<group>"; };
 		FBE23E70FF64ACC81816A368E171B903 /* NSArray+MASShorthandAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSArray+MASShorthandAdditions.h"; path = "Masonry/NSArray+MASShorthandAdditions.h"; sourceTree = "<group>"; };
 		FC25E870AB54CE1449377641CDCCC810 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/MediaPlayer.framework; sourceTree = DEVELOPER_DIR; };
-		FC69051713E442287EB1462386772B21 /* LLVideoPlayer-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "LLVideoPlayer-prefix.pch"; sourceTree = "<group>"; };
-		FD4B05E0AFD0207A8E79EF9EE18B8002 /* AVPlayer+LLPlayer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "AVPlayer+LLPlayer.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,12 +160,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		73E8A8F5C58F226B3E17AB03F6D9D3C8 /* Frameworks */ = {
+		6FD8312A1AEB348F49A81C438DB25115 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D00C7F91550F848DDF8A7EE5DD66E533 /* Foundation.framework in Frameworks */,
-				5BFC59A308E822FE6AAE895397814143 /* UIKit.framework in Frameworks */,
+				566EA65277D377CE9AF9BC125521965B /* Foundation.framework in Frameworks */,
+				1EC363D6911160B063DB6CC87F595A5B /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,14 +177,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		90D5F41DA6419563C70462CA74666F19 /* Frameworks */ = {
+		C87EB3B9492D97CC5BB7622A3154A949 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6C660BF78224B4BB61A1CE7D6B4E1F22 /* AVFoundation.framework in Frameworks */,
-				577B6DE799DE52F17FD6D93C048F7C4B /* Foundation.framework in Frameworks */,
-				047E26B890D535DEF7D9B1EFB53235B7 /* MediaPlayer.framework in Frameworks */,
-				EF36968C8037912E48DD387765F1F5F6 /* QuartzCore.framework in Frameworks */,
+				D3A2A9826035881FE68057CF4E161FBC /* AVFoundation.framework in Frameworks */,
+				4438AA579022D8C2760FFFA750869DB5 /* Foundation.framework in Frameworks */,
+				AFFD3754694F1E526C054EA9516E65F4 /* MediaPlayer.framework in Frameworks */,
+				1567A7E15EDDBF79999928094023EAD6 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +229,7 @@
 				25CED739CF35B6D0A1D95AE17D712A7F /* ViewController+MASAdditions.m */,
 				4854BD850DB1ADEB02DE483F0C44E016 /* Support Files */,
 			);
+			name = Masonry;
 			path = Masonry;
 			sourceTree = "<group>";
 		};
@@ -259,6 +253,39 @@
 			path = "../Target Support Files/Masonry";
 			sourceTree = "<group>";
 		};
+		4D3D513A45EB47A8F927C28D5C0A830C /* LLVideoPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				72DE0CE8C123165E86373D5A1C85B9EA /* AVPlayer+LLPlayer.h */,
+				6CD616D9DD51F9454611C394E624EDB9 /* AVPlayer+LLPlayer.m */,
+				EE805598ACB80554BFD176D7531D84A6 /* LLVideoPlayer.h */,
+				3C9A990768B0DFE20B763778D3D9A0B0 /* LLVideoPlayer.m */,
+				81D40A6FB53A5DDD831E79FDB05AE17B /* LLVideoPlayerDefines.h */,
+				97B1EEAF29376E0C4A35881B4CB83FF3 /* LLVideoPlayerDelegate.h */,
+				04E0374AC24232A820E1475742648274 /* LLVideoPlayerHelper.h */,
+				572B73C6F3FA3428A589634CAE43FF67 /* LLVideoPlayerHelper.m */,
+				297589723E1D2BE1191E12DCF54F19E2 /* LLVideoPlayerInternal.h */,
+				0845271854348F4D0B9BC2B9401BDB9F /* LLVideoPlayerLayerView.h */,
+				EC6D6C740033C2080EC670009492DC30 /* LLVideoPlayerLayerView.m */,
+				699E8C2AC1FD05F371E033FF3BDD9FF2 /* LLVideoPlayerView.h */,
+				3042CC97D6746B85FB6F87882F7F85EF /* LLVideoPlayerView.m */,
+				4D2B0C97E3BC51E0D460923A0D3C03ED /* LLVideoTrack.h */,
+				D27EBA19C48DE5E4561559DD4D9C6E7F /* LLVideoTrack.m */,
+			);
+			name = LLVideoPlayer;
+			path = LLVideoPlayer;
+			sourceTree = "<group>";
+		};
+		5B199F814D8AA2E3F52DD0C721A3DAD7 /* LLVideoPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				4D3D513A45EB47A8F927C28D5C0A830C /* LLVideoPlayer */,
+				89FEF3F57F6516445E507B7F38BE8E20 /* Support Files */,
+			);
+			name = LLVideoPlayer;
+			path = ../..;
+			sourceTree = "<group>";
+		};
 		7DB346D0F39D3F0E887471402A8071AB = {
 			isa = PBXGroup;
 			children = (
@@ -271,26 +298,15 @@
 			);
 			sourceTree = "<group>";
 		};
-		8C5062DD624DA5DFDA62580FAB664206 /* LLVideoPlayer */ = {
+		89FEF3F57F6516445E507B7F38BE8E20 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				2E77AB000D06194DF675E7F6903E2D92 /* AVPlayer+LLPlayer.h */,
-				FD4B05E0AFD0207A8E79EF9EE18B8002 /* AVPlayer+LLPlayer.m */,
-				3361092F628954BA7A93794A4340E223 /* LLVideoPlayer.h */,
-				45F2643B22BED898E112D6AEC5D1CCC7 /* LLVideoPlayer.m */,
-				8CE81E7BAF48882B52F7B96387C968A4 /* LLVideoPlayerDefines.h */,
-				DAE203F61380162725090F4AFA46F732 /* LLVideoPlayerDelegate.h */,
-				5D518205D13F42C3070B155FBA8A1518 /* LLVideoPlayerHelper.h */,
-				DC7C505CEF857656217D697AC81D6D7E /* LLVideoPlayerHelper.m */,
-				09EE992FA2604892EAA0B0C9D23F10C7 /* LLVideoPlayerInternal.h */,
-				C24F929746F5FCC12E6DD3861F8DD4E6 /* LLVideoPlayerLayerView.h */,
-				E4AB89B93B1FEF5F2D6AFC42E03C2D06 /* LLVideoPlayerLayerView.m */,
-				7D07DFB3F9E9C6C165AE17416DD7A6C8 /* LLVideoPlayerView.h */,
-				D75FADFAA5242D1CF2A19FB15E4289BF /* LLVideoPlayerView.m */,
-				2897294C991ADA79C6D6ADA26BE865D2 /* LLVideoTrack.h */,
-				344F06EEDC44318C0D2EDBE5D761E0B8 /* LLVideoTrack.m */,
+				EED9C930FD1E86C299A838DC6251680D /* LLVideoPlayer.xcconfig */,
+				2EC10FADDAF76E52D75FDCCDDDD43E23 /* LLVideoPlayer-dummy.m */,
+				F43C32DFD0867D0A316521884B686E1B /* LLVideoPlayer-prefix.pch */,
 			);
-			path = LLVideoPlayer;
+			name = "Support Files";
+			path = "Example/Pods/Target Support Files/LLVideoPlayer";
 			sourceTree = "<group>";
 		};
 		BE4DE1E813F1D8D9CDE7E2BC797BDCB2 /* Pods-LLVideoPlayer_Tests */ = {
@@ -306,16 +322,6 @@
 			);
 			name = "Pods-LLVideoPlayer_Tests";
 			path = "Target Support Files/Pods-LLVideoPlayer_Tests";
-			sourceTree = "<group>";
-		};
-		C27255E9FC364F84FCFE0C104282439D /* LLVideoPlayer */ = {
-			isa = PBXGroup;
-			children = (
-				8C5062DD624DA5DFDA62580FAB664206 /* LLVideoPlayer */,
-				EB7BE38F6AEDFA20336666DE0CB7AFC4 /* Support Files */,
-			);
-			name = LLVideoPlayer;
-			path = ../..;
 			sourceTree = "<group>";
 		};
 		CD9F9AAB2B4C3B88E5EC7E8FA1DF058B /* Pods-LLVideoPlayer_Example */ = {
@@ -336,7 +342,7 @@
 		E638BB6508C135960816B297CE6B623C /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C27255E9FC364F84FCFE0C104282439D /* LLVideoPlayer */,
+				5B199F814D8AA2E3F52DD0C721A3DAD7 /* LLVideoPlayer */,
 			);
 			name = "Development Pods";
 			sourceTree = "<group>";
@@ -361,17 +367,6 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		EB7BE38F6AEDFA20336666DE0CB7AFC4 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				F0C05A2F0697848D9A99F62E9BDD06E1 /* LLVideoPlayer.xcconfig */,
-				273BCA2B320AFC792DF7D36DD692F10B /* LLVideoPlayer-dummy.m */,
-				FC69051713E442287EB1462386772B21 /* LLVideoPlayer-prefix.pch */,
-			);
-			name = "Support Files";
-			path = "Example/Pods/Target Support Files/LLVideoPlayer";
-			sourceTree = "<group>";
-		};
 		FF8C2A5499BC7FBADAB3897B50F3600D /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -386,65 +381,47 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		278C465BB6992D211341A5848A00D0C7 /* Headers */ = {
+		30FBC9CC512AC3EEC4FA59534C10BDF2 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C60A973688E1AB9F7FA0A42D61E898B /* AVPlayer+LLPlayer.h in Headers */,
-				029445EF3303A2E4479434368EE1E21E /* LLVideoPlayer.h in Headers */,
-				013BEA977135E61A4804B656105D7273 /* LLVideoPlayerDefines.h in Headers */,
-				141E43EE4CDA7D9B1DB4C4CF78A9BDA5 /* LLVideoPlayerDelegate.h in Headers */,
-				9A4119DB6C7BFA86988C4CB2B042B2D0 /* LLVideoPlayerHelper.h in Headers */,
-				38E3AE293D8B0B0EA8DACCCB74301D70 /* LLVideoPlayerInternal.h in Headers */,
-				F71593403A727F66E16618F381C92825 /* LLVideoPlayerLayerView.h in Headers */,
-				7CB85E15C02A59360C6C5C9CD1F266DD /* LLVideoPlayerView.h in Headers */,
-				C69FAB0BDEBC074CFEE70338DB75628D /* LLVideoTrack.h in Headers */,
+				3849869EA17BA89EDCCB0DB0DE717995 /* AVPlayer+LLPlayer.h in Headers */,
+				95354B0F82A5C2CC7E1342E72F8B9305 /* LLVideoPlayer.h in Headers */,
+				6DF5484FC3E373DA49B2B0C0C900B1EC /* LLVideoPlayerDefines.h in Headers */,
+				92D33FB4E4763D6369C2FE431B9B784D /* LLVideoPlayerDelegate.h in Headers */,
+				012F635298DC56EB0515E2A84C5AE2DB /* LLVideoPlayerHelper.h in Headers */,
+				6A1DCFF02277254DA30BAD562A2E5ED9 /* LLVideoPlayerInternal.h in Headers */,
+				790E8D80D625269424DF2B6FF9B69E93 /* LLVideoPlayerLayerView.h in Headers */,
+				6EFAC23F76208B89E86385507B731DB3 /* LLVideoPlayerView.h in Headers */,
+				FE3D89448A696407B60916A0BF71ABD3 /* LLVideoTrack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9FD00F340E9E23EAE3CFB02F0E4E8A9F /* Headers */ = {
+		BDF73468622762862D2FB76ED4AC0D8E /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D68DBA5E548F255EDDAB1BEE44A32BC0 /* MASCompositeConstraint.h in Headers */,
-				E52E0ED6C8CFE840F61029B986CD639A /* MASConstraint+Private.h in Headers */,
-				18901DE07DE0AE0A883FD2B9D28B22A4 /* MASConstraint.h in Headers */,
-				5324FF01F6E7113A32746FBF1E9653EF /* MASConstraintMaker.h in Headers */,
-				9D64134918986F7B401FFDE5B5C5B5DD /* MASLayoutConstraint.h in Headers */,
-				1D03823958A2654669CE0253598E593D /* Masonry.h in Headers */,
-				BEA4D7614AE2A87465AC194C3EF78605 /* MASUtilities.h in Headers */,
-				C8ADC18F442AB0EF625F625810415227 /* MASViewAttribute.h in Headers */,
-				BEAF32E8A5818AE9BABDCDCE2ACF07E3 /* MASViewConstraint.h in Headers */,
-				E248DA5BFA22BF10E5135FC80D7FF939 /* NSArray+MASAdditions.h in Headers */,
-				B76C21C495D95D60E5F72AB6C5D8A37B /* NSArray+MASShorthandAdditions.h in Headers */,
-				ADFB2C2B5681358E80CB117AB4034962 /* NSLayoutConstraint+MASDebugAdditions.h in Headers */,
-				D9F68828201E3D071C67499224C5EBB0 /* View+MASAdditions.h in Headers */,
-				710642F4256D1F294AACB6532017A7A8 /* View+MASShorthandAdditions.h in Headers */,
-				F5399FE0A1C0F07EB8AA820091DF4F56 /* ViewController+MASAdditions.h in Headers */,
+				01E09711F001C49F92A97060414E262B /* MASCompositeConstraint.h in Headers */,
+				4CBE1B46550A3FB90FDD1CB9CBA7B7FE /* MASConstraint+Private.h in Headers */,
+				6249770A7D163B0F3001D5A76C5FA01C /* MASConstraint.h in Headers */,
+				EC48DE078CA5E55922CCE02354D475CD /* MASConstraintMaker.h in Headers */,
+				A6436E3CFFCBFE591E2D2A68ED90CAC6 /* MASLayoutConstraint.h in Headers */,
+				49B903D576E09560C52AA92FDCC31A68 /* Masonry.h in Headers */,
+				1F3BD3BC28432BB5E2F73501E06E4579 /* MASUtilities.h in Headers */,
+				E1E771349813022263F549BDF33CB4BB /* MASViewAttribute.h in Headers */,
+				A83991D7C1373DF66020C2FDFC5D7564 /* MASViewConstraint.h in Headers */,
+				490CA524521F7D444EA58FA915D7E99C /* NSArray+MASAdditions.h in Headers */,
+				E072DA57403C4BFF9B10467BE05604C5 /* NSArray+MASShorthandAdditions.h in Headers */,
+				9934AEA2C891C201D8ED5746FF42FE1B /* NSLayoutConstraint+MASDebugAdditions.h in Headers */,
+				86EE1CB5473A4A07081D8DE3A2C45924 /* View+MASAdditions.h in Headers */,
+				983CB852CBBFBC04C2A6BA407E34F59B /* View+MASShorthandAdditions.h in Headers */,
+				C88F85D3200060BD98FC13EA58121706 /* ViewController+MASAdditions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		593AA6D3D2D50804B2F2D9FBF3A144A4 /* LLVideoPlayer */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 380A0D366BA04F9C58DBA43500341C63 /* Build configuration list for PBXNativeTarget "LLVideoPlayer" */;
-			buildPhases = (
-				720046A1D29A6704E4CEF5DF668B8EA3 /* Sources */,
-				90D5F41DA6419563C70462CA74666F19 /* Frameworks */,
-				278C465BB6992D211341A5848A00D0C7 /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				1617CBBF57245228331CEEEF3F0024D7 /* PBXTargetDependency */,
-			);
-			name = LLVideoPlayer;
-			productName = LLVideoPlayer;
-			productReference = A4C86C9E70EABFD22E1D442B82C93C08 /* libLLVideoPlayer.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 		5CA995E36D2AF738F29363D77150CDF2 /* Pods-LLVideoPlayer_Example */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D83477967FB335CB0F1363EF3668367F /* Build configuration list for PBXNativeTarget "Pods-LLVideoPlayer_Example" */;
@@ -463,21 +440,21 @@
 			productReference = 68E845B65D71C65F6F00AEF806031704 /* libPods-LLVideoPlayer_Example.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		7E5DAEE7BCA46EBEE52C072DC4884271 /* Masonry */ = {
+		5CB9D331D844DA10E036E51A6B9DA508 /* LLVideoPlayer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 730667CE39F49A35EAA1CB62D3627B91 /* Build configuration list for PBXNativeTarget "Masonry" */;
+			buildConfigurationList = 1158B4037591031CC798BA16A1EDD8E9 /* Build configuration list for PBXNativeTarget "LLVideoPlayer" */;
 			buildPhases = (
-				2CE997AA76D4F3B004DD80F053CD9514 /* Sources */,
-				73E8A8F5C58F226B3E17AB03F6D9D3C8 /* Frameworks */,
-				9FD00F340E9E23EAE3CFB02F0E4E8A9F /* Headers */,
+				6DA4524CBBED48E2F439E733FE9B2547 /* Sources */,
+				C87EB3B9492D97CC5BB7622A3154A949 /* Frameworks */,
+				30FBC9CC512AC3EEC4FA59534C10BDF2 /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Masonry;
-			productName = Masonry;
-			productReference = 9F3A3433B51FAE800FCE1D023F73D260 /* libMasonry.a */;
+			name = LLVideoPlayer;
+			productName = LLVideoPlayer;
+			productReference = A4C86C9E70EABFD22E1D442B82C93C08 /* libLLVideoPlayer.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		7FB18107CF9284E7F20C9EBE2BB19DF4 /* Pods-LLVideoPlayer_Tests */ = {
@@ -494,6 +471,23 @@
 			name = "Pods-LLVideoPlayer_Tests";
 			productName = "Pods-LLVideoPlayer_Tests";
 			productReference = 2BC9D55E29C88E136048339259BE29A5 /* libPods-LLVideoPlayer_Tests.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		9DC8D9E02903E93BD0B2FEC9D846EA20 /* Masonry */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 34CAE1CB89EDBF2E53735CC5D4E5E69F /* Build configuration list for PBXNativeTarget "Masonry" */;
+			buildPhases = (
+				C4BE2DC1E815E7367562323223772531 /* Sources */,
+				6FD8312A1AEB348F49A81C438DB25115 /* Frameworks */,
+				BDF73468622762862D2FB76ED4AC0D8E /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Masonry;
+			productName = Masonry;
+			productReference = 9F3A3433B51FAE800FCE1D023F73D260 /* libMasonry.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -517,8 +511,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				593AA6D3D2D50804B2F2D9FBF3A144A4 /* LLVideoPlayer */,
-				7E5DAEE7BCA46EBEE52C072DC4884271 /* Masonry */,
+				5CB9D331D844DA10E036E51A6B9DA508 /* LLVideoPlayer */,
+				9DC8D9E02903E93BD0B2FEC9D846EA20 /* Masonry */,
 				5CA995E36D2AF738F29363D77150CDF2 /* Pods-LLVideoPlayer_Example */,
 				7FB18107CF9284E7F20C9EBE2BB19DF4 /* Pods-LLVideoPlayer_Tests */,
 			);
@@ -526,35 +520,17 @@
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		2CE997AA76D4F3B004DD80F053CD9514 /* Sources */ = {
+		6DA4524CBBED48E2F439E733FE9B2547 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E575910D8FC6D75566FA8D61DC15ED3 /* MASCompositeConstraint.m in Sources */,
-				8982EE9DFBBB52672F5E3DF515E1542F /* MASConstraint.m in Sources */,
-				1EDB1D5A35CD68DD93CC95ADD1976105 /* MASConstraintMaker.m in Sources */,
-				98E8AFD1E82B6C90DC560281AC7DED91 /* MASLayoutConstraint.m in Sources */,
-				6165E6A9948A89A2F018E6F8E419EEFE /* Masonry-dummy.m in Sources */,
-				AABF546235D647C1496F2418DECEE158 /* MASViewAttribute.m in Sources */,
-				2CECF86F54A3C1F6C0BE646877F39424 /* MASViewConstraint.m in Sources */,
-				D56DC520D97C15362386F5A0354C0F74 /* NSArray+MASAdditions.m in Sources */,
-				0ADAFCE0C296958EF93B903F24DF5067 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
-				0D1A9BCCFFC026E3A068D6E6D24B83A5 /* View+MASAdditions.m in Sources */,
-				009ABFD0FE8D157A1042B970F659A7B2 /* ViewController+MASAdditions.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		720046A1D29A6704E4CEF5DF668B8EA3 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				948802F04A1FB3818AA520E19F2F3A87 /* AVPlayer+LLPlayer.m in Sources */,
-				B8B9A7A5F419D55F03E5CFAAFADD7C46 /* LLVideoPlayer-dummy.m in Sources */,
-				8C4980B6B4A9D0160CEA23CAE02D11F9 /* LLVideoPlayer.m in Sources */,
-				AAD74AC68312BF7D501CFC60DE9E044C /* LLVideoPlayerHelper.m in Sources */,
-				BBD20D70E79DAFA8092805CD85946E99 /* LLVideoPlayerLayerView.m in Sources */,
-				244600C786AE87C73D5712E4D92FE79E /* LLVideoPlayerView.m in Sources */,
-				B3279DCAC272B135A1D20BD6949FEBB7 /* LLVideoTrack.m in Sources */,
+				AE6F05CF7F7E20A342D00257AC5E1021 /* AVPlayer+LLPlayer.m in Sources */,
+				80A04F245A20E7E62B913FEAF27D32A6 /* LLVideoPlayer-dummy.m in Sources */,
+				005BB4AFC2267EB79C92A2B7CD19DD48 /* LLVideoPlayer.m in Sources */,
+				124B0D00A773F0B8D6988B72CF6BD527 /* LLVideoPlayerHelper.m in Sources */,
+				C202AEA464956A26A8D74A768AEDE048 /* LLVideoPlayerLayerView.m in Sources */,
+				7147CB849CE262EB09577B80D54BF79D /* LLVideoPlayerView.m in Sources */,
+				07EA57F1988412E98C8DF42048027069 /* LLVideoTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -574,25 +550,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C4BE2DC1E815E7367562323223772531 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61CCEA01CBE8EFFA5515E7A0D8635AAE /* MASCompositeConstraint.m in Sources */,
+				89450A58FD91E5B227171FC75160E4EA /* MASConstraint.m in Sources */,
+				DF7F88B58B564EDF169EC0C9CF8E5124 /* MASConstraintMaker.m in Sources */,
+				955BE39896CA35F2A585DC3309E5FDA5 /* MASLayoutConstraint.m in Sources */,
+				68F98758BA84B8EC3472A8C6FD646D16 /* Masonry-dummy.m in Sources */,
+				13635B78121B99E5C03C92506A161607 /* MASViewAttribute.m in Sources */,
+				2DBB74B8B5DDB1F621433DD12BF35102 /* MASViewConstraint.m in Sources */,
+				7BDDE51AF16FA53A09506EDB91E1C3C2 /* NSArray+MASAdditions.m in Sources */,
+				3E8E6916C563B9CB12AA417275FC6EB3 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
+				A1FA046FDFC42676D17FEC387B10D24A /* View+MASAdditions.m in Sources */,
+				D7CE05A743B7ACD50796191FA442814C /* ViewController+MASAdditions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		025DD67485E651B691F2F7A87FCB5387 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Masonry;
-			target = 7E5DAEE7BCA46EBEE52C072DC4884271 /* Masonry */;
+			target = 9DC8D9E02903E93BD0B2FEC9D846EA20 /* Masonry */;
 			targetProxy = 9892A4ED60CD5F1F040CC39D292A6A1E /* PBXContainerItemProxy */;
-		};
-		1617CBBF57245228331CEEEF3F0024D7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Masonry;
-			target = 7E5DAEE7BCA46EBEE52C072DC4884271 /* Masonry */;
-			targetProxy = C9DE16A0B97632DDC6C42BD659029B81 /* PBXContainerItemProxy */;
 		};
 		31A932D66646314D2255943B1578660B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LLVideoPlayer;
-			target = 593AA6D3D2D50804B2F2D9FBF3A144A4 /* LLVideoPlayer */;
+			target = 5CB9D331D844DA10E036E51A6B9DA508 /* LLVideoPlayer */;
 			targetProxy = 15E245169E7D7025D174EE7995042F86 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -621,29 +609,6 @@
 			};
 			name = Debug;
 		};
-		3ABCF82A4B836A948D193B6DBA4FAE2C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7882AB8492CA4F59F730C76CC3BBF57A /* Masonry.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 		52B603B245A8750B1634D6935D100EBF /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DEA505522FB70FA4EDE272F3C15332E3 /* Pods-LLVideoPlayer_Example.release.xcconfig */;
@@ -662,6 +627,52 @@
 				PODS_ROOT = "$(SRCROOT)";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		5A6ACE61C4D128598EA7472C87982601 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7882AB8492CA4F59F730C76CC3BBF57A /* Masonry.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		6CA42F62CE0652819ED46936FE31E065 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7882AB8492CA4F59F730C76CC3BBF57A /* Masonry.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
@@ -707,32 +718,9 @@
 			};
 			name = Release;
 		};
-		8A5C864D1C2C433CBBBC0821B6EA7321 /* Debug */ = {
+		9E4F766EA5B962690096C4277F9ED49C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7882AB8492CA4F59F730C76CC3BBF57A /* Masonry.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Masonry/Masonry-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		99D014E66E34D1CB2AA0C1BEFC1DE664 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F0C05A2F0697848D9A99F62E9BDD06E1 /* LLVideoPlayer.xcconfig */;
+			baseConfigurationReference = EED9C930FD1E86C299A838DC6251680D /* LLVideoPlayer.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -752,6 +740,29 @@
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
+		};
+		C03C89DDAC02FCD4DFD588919499EE52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EED9C930FD1E86C299A838DC6251680D /* LLVideoPlayer.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/LLVideoPlayer/LLVideoPlayer-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
 		};
 		CF7953F66E785E8876EB4D370D777D50 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -843,32 +854,18 @@
 			};
 			name = Release;
 		};
-		EC5C02ABEE85BC8975143EDAED114AA7 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F0C05A2F0697848D9A99F62E9BDD06E1 /* LLVideoPlayer.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/LLVideoPlayer/LLVideoPlayer-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1158B4037591031CC798BA16A1EDD8E9 /* Build configuration list for PBXNativeTarget "LLVideoPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E4F766EA5B962690096C4277F9ED49C /* Debug */,
+				C03C89DDAC02FCD4DFD588919499EE52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -878,20 +875,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		380A0D366BA04F9C58DBA43500341C63 /* Build configuration list for PBXNativeTarget "LLVideoPlayer" */ = {
+		34CAE1CB89EDBF2E53735CC5D4E5E69F /* Build configuration list for PBXNativeTarget "Masonry" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				99D014E66E34D1CB2AA0C1BEFC1DE664 /* Debug */,
-				EC5C02ABEE85BC8975143EDAED114AA7 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		730667CE39F49A35EAA1CB62D3627B91 /* Build configuration list for PBXNativeTarget "Masonry" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8A5C864D1C2C433CBBBC0821B6EA7321 /* Debug */,
-				3ABCF82A4B836A948D193B6DBA4FAE2C /* Release */,
+				5A6ACE61C4D128598EA7472C87982601 /* Debug */,
+				6CA42F62CE0652819ED46936FE31E065 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

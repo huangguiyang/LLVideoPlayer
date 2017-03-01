@@ -1,6 +1,6 @@
 {
   "name": "LLVideoPlayer",
-  "version": "0.1.0",
+  "version": "0.1.10",
   "summary": "A Low Level Video Player.",
   "description": "LLVideoPlayer is a low level video player which is simple and easy to extend.",
   "homepage": "https://github.com/huangguiyang/LLVideoPlayer",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/huangguiyang/LLVideoPlayer.git",
-    "tag": "0.1.0"
+    "tag": "0.1.10"
   },
   "platforms": {
     "ios": "7.0"
@@ -24,10 +24,5 @@
     "QuartzCore",
     "MediaPlayer",
     "AVFoundation"
-  ],
-  "dependencies": {
-    "Masonry": [
-
-    ]
-  }
+  ]
 }

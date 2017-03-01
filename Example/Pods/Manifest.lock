@@ -1,6 +1,5 @@
 PODS:
-  - LLVideoPlayer (0.1.0):
-    - Masonry
+  - LLVideoPlayer (0.1.10)
   - Masonry (1.0.2)
 
 DEPENDENCIES:
@@ -12,9 +11,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  LLVideoPlayer: 2cb82151db209368a141ea1b6869077ed4520d73
+  LLVideoPlayer: 49f5e75937575e2e9c7a557e3bde622a6cdbc0d3
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
 
 PODFILE CHECKSUM: 289a91acec905046731ba5121b487bbd8471f826
 
-COCOAPODS: 1.2.0.beta.1
+COCOAPODS: 1.1.1
