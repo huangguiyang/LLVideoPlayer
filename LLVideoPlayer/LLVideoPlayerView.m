@@ -8,7 +8,6 @@
 
 #import "LLVideoPlayerView.h"
 #import "LLVideoPlayerInternal.h"
-#import "Masonry.h"
 
 @implementation LLVideoPlayerView
 
@@ -21,16 +20,14 @@
         self.backgroundColor = [UIColor blackColor];
         self.playerLayerView = [LLVideoPlayerLayerView new];
         [self addSubview:self.playerLayerView];
-        [self.playerLayerView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self).with.insets(UIEdgeInsetsMake(0, 0, 0, 0));
-        }];
     }
     return self;
 }
 
-- (void)dealloc
+- (void)layoutSubviews
 {
-    
+    [super layoutSubviews];
+    self.playerLayerView.frame = self.bounds;
 }
 
 @end

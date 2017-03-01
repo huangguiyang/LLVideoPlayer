@@ -18,5 +18,4 @@ LLVideoPlayer is a low level video player which is simple and easy to extend.
   s.source_files = 'LLVideoPlayer/*.{m,h}'
 
   s.frameworks = 'QuartzCore', 'MediaPlayer', 'AVFoundation'
-  s.dependency 'Masonry'
 end

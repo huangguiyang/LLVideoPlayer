@@ -625,8 +625,8 @@ typedef void (^VoidBlock) (void);
 - (void)handleErrorCode:(LLVideoPlayerError)errorCode track:(LLVideoTrack *)track
 {
     LLLog(@"[ERROR] %@: %@", [LLVideoPlayerHelper errorCodeToString:errorCode], track);
-    if ([self.delegate respondsToSelector:@selector(videoPlayer:didFailWithError:track:)]) {
-        [self.delegate videoPlayer:self didFailWithError:[NSError errorWithDomain:@"LLVideoPlayer" code:errorCode userInfo:nil] track:track];
+    if ([self.delegate respondsToSelector:@selector(videoPlayer:didFailWithError:)]) {
+        [self.delegate videoPlayer:self didFailWithError:[NSError errorWithDomain:@"LLVideoPlayer" code:errorCode userInfo:@{@"track":track}]];
     }
 }
 
