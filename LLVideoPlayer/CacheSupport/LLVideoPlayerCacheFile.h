@@ -1,5 +1,5 @@
 //
-//  LLPlayerItemCacheFile.h
+//  LLVideoPlayerCacheFile.h
 //  Pods
 //
 //  Created by mario on 2017/2/23.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface LLPlayerItemCacheFile : NSObject
+@interface LLVideoPlayerCacheFile : NSObject
 
 + (instancetype)cacheFileWithFilePath:(NSString *)filePath;
 

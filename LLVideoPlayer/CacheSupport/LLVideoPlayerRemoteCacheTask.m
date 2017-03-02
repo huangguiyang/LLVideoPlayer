@@ -1,19 +1,19 @@
 //
-//  LLPlayerItemRemoteCacheTask.m
+//  LLVideoPlayerRemoteCacheTask.m
 //  Pods
 //
 //  Created by mario on 2017/2/23.
 //
 //
 
-#import "LLPlayerItemRemoteCacheTask.h"
+#import "LLVideoPlayerRemoteCacheTask.h"
 #import <AVFoundation/AVFoundation.h>
 #import "NSURL+LLVideoPlayer.h"
-#import "LLPlayerItemCacheFile.h"
+#import "LLVideoPlayerCacheFile.h"
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 
-@interface LLPlayerItemRemoteCacheTask () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
+@interface LLVideoPlayerRemoteCacheTask () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
 @property (nonatomic, strong) NSURLConnection *connection;
 @property (assign, nonatomic, getter = isExecuting) BOOL executing;
@@ -25,7 +25,7 @@
 
 @end
 
-@implementation LLPlayerItemRemoteCacheTask
+@implementation LLVideoPlayerRemoteCacheTask
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 

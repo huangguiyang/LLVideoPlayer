@@ -25,6 +25,7 @@
 @property (nonatomic, strong) AVPlayer *avPlayer;
 @property (nonatomic, strong) AVPlayerItem *avPlayerItem;
 @property (nonatomic, strong) NSString *videoGravity;
+@property (nonatomic, assign) BOOL cacheSupportEnabled;
 
 - (instancetype)initWithVideoPlayerView:(LLVideoPlayerView *)videoPlayerView;
 

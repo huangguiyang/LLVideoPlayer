@@ -1,14 +1,14 @@
 //
-//  LLPlayerItemCachePolicy.m
+//  LLVideoPlayerCachePolicy.m
 //  Pods
 //
 //  Created by mario on 2017/2/23.
 //
 //
 
-#import "LLPlayerItemCachePolicy.h"
+#import "LLVideoPlayerCachePolicy.h"
 
-@implementation LLPlayerItemCachePolicy
+@implementation LLVideoPlayerCachePolicy
 
 + (instancetype)defaultPolicy
 {

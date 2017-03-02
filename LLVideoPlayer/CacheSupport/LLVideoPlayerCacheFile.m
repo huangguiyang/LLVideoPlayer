@@ -1,16 +1,16 @@
 //
-//  LLPlayerItemCacheFile.m
+//  LLVideoPlayerCacheFile.m
 //  Pods
 //
 //  Created by mario on 2017/2/23.
 //
 //
 
-#import "LLPlayerItemCacheFile.h"
+#import "LLVideoPlayerCacheFile.h"
 
 #define kIndexFileExtension @".idx!"
 
-@implementation LLPlayerItemCacheFile
+@implementation LLVideoPlayerCacheFile
 
 + (instancetype)cacheFileWithFilePath:(NSString *)filePath
 {

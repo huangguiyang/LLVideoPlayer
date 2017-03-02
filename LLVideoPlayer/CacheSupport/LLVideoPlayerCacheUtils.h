@@ -1,5 +1,5 @@
 //
-//  LLPlayerItemCacheUtils.h
+//  LLVideoPlayerCacheUtils.h
 //  Pods
 //
 //  Created by mario on 2017/2/23.
@@ -10,7 +10,7 @@
 
 FOUNDATION_EXTERN const NSRange LLInvalidRange;
 
-@interface LLPlayerItemCacheUtils : NSObject
+@interface LLVideoPlayerCacheUtils : NSObject
 
 + (NSString *)cacheDirectoryPath;
 

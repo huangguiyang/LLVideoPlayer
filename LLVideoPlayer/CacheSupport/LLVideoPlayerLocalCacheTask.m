@@ -1,23 +1,23 @@
 //
-//  LLPlayerItemLocalCacheTask.m
+//  LLVideoPlayerLocalCacheTask.m
 //  Pods
 //
 //  Created by mario on 2017/2/23.
 //
 //
 
-#import "LLPlayerItemLocalCacheTask.h"
-#import "LLPlayerItemCacheFile.h"
+#import "LLVideoPlayerLocalCacheTask.h"
+#import "LLVideoPlayerCacheFile.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface LLPlayerItemLocalCacheTask ()
+@interface LLVideoPlayerLocalCacheTask ()
 
 @property (assign, nonatomic, getter = isExecuting) BOOL executing;
 @property (assign, nonatomic, getter = isFinished) BOOL finished;
 
 @end
 
-@implementation LLPlayerItemLocalCacheTask
+@implementation LLVideoPlayerLocalCacheTask
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 

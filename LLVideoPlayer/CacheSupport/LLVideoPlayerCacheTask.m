@@ -1,25 +1,25 @@
 //
-//  LLPlayerItemCacheTask.m
+//  LLVideoPlayerCacheTask.m
 //  Pods
 //
 //  Created by mario on 2017/2/23.
 //
 //
 
-#import "LLPlayerItemCacheTask.h"
+#import "LLVideoPlayerCacheTask.h"
 
-@interface LLPlayerItemCacheTask ()
+@interface LLVideoPlayerCacheTask ()
 
 @property (nonatomic, assign, getter=isExecuting) BOOL executing;
 @property (nonatomic, assign, getter=isFinished) BOOL finished;
 
 @end
 
-@implementation LLPlayerItemCacheTask
+@implementation LLVideoPlayerCacheTask
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
-- (instancetype)initWithCacheFilePath:(LLPlayerItemCacheFile *)cacheFile loadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range
+- (instancetype)initWithCacheFilePath:(LLVideoPlayerCacheFile *)cacheFile loadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range
 {
     self = [super init];
     if (self) {

@@ -1,37 +1,38 @@
 //
-//  LLPlayerItemCacheLoader.m
+//  LLVideoPlayerCacheLoader.m
 //  Pods
 //
 //  Created by mario on 2017/2/23.
 //
 //
 
-#import "LLPlayerItemCacheLoader.h"
-#import "LLPlayerItemCacheFile.h"
-#import "LLPlayerItemCacheUtils.h"
-#import "LLPlayerItemCacheTask.h"
-#import "LLPlayerItemCachePolicy.h"
+#import "LLVideoPlayerCacheLoader.h"
+#import "LLVideoPlayerCacheFile.h"
+#import "LLVideoPlayerCacheUtils.h"
+#import "LLVideoPlayerCacheTask.h"
+#import "LLVideoPlayerCachePolicy.h"
+#import "LLVideoPlayerInternal.h"
 
-@interface LLPlayerItemCacheLoader ()
+@interface LLVideoPlayerCacheLoader ()
 
-@property (nonatomic, strong) LLPlayerItemCacheFile *cacheFile;
-@property (nonatomic, strong) NSOperationQueue *cacheQueue;
+@property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 @property (nonatomic, strong) NSMutableArray<AVAssetResourceLoadingRequest *> *pendingRequests;
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *currentRequest;
 @property (nonatomic, assign) NSRange currentDataRange;
 
 @end
 
-@implementation LLPlayerItemCacheLoader
+@implementation LLVideoPlayerCacheLoader
 
 #pragma mark - Initialize
 
 - (void)dealloc
 {
-    [self.cacheQueue cancelAllOperations];
+    [self.operationQueue cancelAllOperations];
 }
 
-+ (instancetype)cacheLoaderWithCacheFilePath:(NSString *)filePath
++ (instancetype)loaderWithCacheFilePath:(NSString *)filePath
 {
     return [[self alloc] initWithCacheFilePath:filePath];
 }
@@ -40,12 +41,13 @@
 {
     self = [super init];
     if (self) {
-        self.cacheFile = [LLPlayerItemCacheFile cacheFileWithFilePath:filePath];
-        self.cacheQueue = [[NSOperationQueue alloc] init];
-        self.cacheQueue.maxConcurrentOperationCount = 1;
-        self.cacheQueue.name = @"com.avplayeritem.llcache";
+        self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:filePath];
+        self.operationQueue = [[NSOperationQueue alloc] init];
+        self.operationQueue.maxConcurrentOperationCount = 1;
+        self.operationQueue.name = @"com.avplayeritem.llcache";
         self.pendingRequests = [NSMutableArray array];
         self.currentDataRange = LLInvalidRange;
+        LLLog(@"[CacheSupport] cache file path: %@", filePath);
     }
     return self;
 }
@@ -59,9 +61,17 @@
     self.currentDataRange = LLInvalidRange;
 }
 
-- (void)cancelCurrentRequest
+- (void)cancelCurrentRequest:(BOOL)finish
 {
+    [self.operationQueue cancelAllOperations];
     
+    if (finish) {
+        if (NO == self.currentRequest.isFinished) {
+            [self finishCurrentRequestWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+        }
+    } else {
+        [self cleanupCurrentRequest];
+    }
 }
 
 - (void)finishCurrentRequestWithError:(NSError *)error
@@ -100,10 +110,10 @@
 
 - (void)addTaskWithRange:(NSRange)range cached:(BOOL)cached
 {
-    LLPlayerItemCacheTask *task = [[LLPlayerItemCacheTask alloc] initWithCacheFilePath:self.cacheFile loadingRequest:self.currentRequest range:range];
+    LLVideoPlayerCacheTask *task = [[LLVideoPlayerCacheTask alloc] initWithCacheFilePath:self.cacheFile loadingRequest:self.currentRequest range:range];
     
     __weak typeof(self) weakSelf = self;
-    [task setFinishBlock:^(LLPlayerItemCacheTask *task, NSError *error) {
+    [task setFinishBlock:^(LLVideoPlayerCacheTask *task, NSError *error) {
         if (task.cancelled || error.code == NSURLErrorCancelled) {
             return;
         }
@@ -113,20 +123,20 @@
         if (error) {
             [strongSelf finishCurrentRequestWithError:error];
         } else {
-            if (strongSelf.cacheQueue.operationCount == 1) {
+            if (strongSelf.operationQueue.operationCount == 1) {
                 [strongSelf finishCurrentRequestWithError:nil];
             }
         }
     }];
     
-    [self.cacheQueue addOperation:task];
+    [self.operationQueue addOperation:task];
 }
 
 #pragma mark - AVAssetResourceLoaderDelegate
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    [self cancelCurrentRequest];
+    [self cancelCurrentRequest:YES];
     [self.pendingRequests addObject:loadingRequest];
     [self startNextRequest];
     return YES;
@@ -135,7 +145,7 @@
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     if (loadingRequest == self.currentRequest) {
-        [self cancelCurrentRequest];
+        [self cancelCurrentRequest:NO];
     } else {
         [self.pendingRequests removeObject:loadingRequest];
     }
