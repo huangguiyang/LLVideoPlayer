@@ -14,30 +14,22 @@ static char originalSchemeKey;
 
 @implementation NSURL (LLVideoPlayer)
 
-- (void)setOriginalScheme:(NSString *)scheme
-{
-    objc_setAssociatedObject(self, &originalSchemeKey, scheme, OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
-- (NSString *)originalScheme
-{
-    return objc_getAssociatedObject(self, &originalSchemeKey);
-}
-
 - (NSURL *)ll_customSchemeURL
 {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:self resolvingAgainstBaseURL:NO];
-    components.scheme = @"streaming";
-    NSURL *url = [components URL];
-    url.originalScheme = self.scheme;
-    return url;
+    NSRange range = [components.scheme rangeOfString:@"streaming" options:NSBackwardsSearch];
+    if (range.location == NSNotFound) {
+        components.scheme = [NSString stringWithFormat:@"%@streaming", components.scheme];
+    }
+    return [components URL];
 }
 
 - (NSURL *)ll_originalSchemeURL
 {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:self resolvingAgainstBaseURL:NO];
-    if (self.originalScheme) {
-        components.scheme = self.originalScheme;
+    NSRange range = [components.scheme rangeOfString:@"streaming" options:NSBackwardsSearch];
+    if (range.location != NSNotFound) {
+        components.scheme = [components.scheme substringToIndex:range.location];
     }
     return [components URL];
 }

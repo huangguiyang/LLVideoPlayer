@@ -10,16 +10,23 @@
 #import "LLVideoPlayerCacheFile.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "LLVideoPlayerCacheTask.h"
+#import "LLVideoPlayerLocalCacheTask.h"
+#import "LLVideoPlayerRemoteCacheTask.h"
 #import "LLVideoPlayerCachePolicy.h"
 #import "LLVideoPlayerInternal.h"
+#import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 
 @interface LLVideoPlayerCacheLoader ()
+{
+    @private
+    NSRange _currentDataRange;
+}
 
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 @property (nonatomic, strong) NSMutableArray<AVAssetResourceLoadingRequest *> *pendingRequests;
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *currentRequest;
-@property (nonatomic, assign) NSRange currentDataRange;
+@property (nonatomic, strong) NSHTTPURLResponse *currentResponse;
 
 @end
 
@@ -46,7 +53,7 @@
         self.operationQueue.maxConcurrentOperationCount = 1;
         self.operationQueue.name = @"com.avplayeritem.llcache";
         self.pendingRequests = [NSMutableArray array];
-        self.currentDataRange = LLInvalidRange;
+        _currentDataRange = LLInvalidRange;
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
     }
     return self;
@@ -58,7 +65,8 @@
 {
     [self.pendingRequests removeObject:self.currentRequest];
     self.currentRequest = nil;
-    self.currentDataRange = LLInvalidRange;
+    _currentDataRange = LLInvalidRange;
+    self.currentResponse = nil;
 }
 
 - (void)cancelCurrentRequest:(BOOL)finish
@@ -66,7 +74,7 @@
     [self.operationQueue cancelAllOperations];
     
     if (finish) {
-        if (NO == self.currentRequest.isFinished) {
+        if (self.currentRequest && NO == self.currentRequest.isFinished) {
             [self finishCurrentRequestWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
         }
     } else {
@@ -85,11 +93,6 @@
     [self startNextRequest];
 }
 
-- (void)startCurrentRequest
-{
-    
-}
-
 - (void)startNextRequest
 {
     if (self.currentRequest || self.pendingRequests.count == 0) {
@@ -100,17 +103,81 @@
     
     if ([self.currentRequest.dataRequest respondsToSelector:@selector(requestsAllDataToEndOfResource)] &&
         self.currentRequest.dataRequest.requestsAllDataToEndOfResource) {
-        self.currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, NSIntegerMax);
+        _currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, NSUIntegerMax);
     } else {
-        self.currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, self.currentRequest.dataRequest.requestedLength);
+        _currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, self.currentRequest.dataRequest.requestedLength);
+    }
+    
+    if (nil == self.currentResponse && self.cacheFile.responseHeaders.count > 0) {
+        if (_currentDataRange.length == NSUIntegerMax) {
+            _currentDataRange.length = [self.cacheFile fileLength] - _currentDataRange.location;
+        }
+        
+        NSMutableDictionary *responseHeaders = [_cacheFile.responseHeaders mutableCopy];
+        NSString *contentRangeKey = @"Content-Range";
+        BOOL supportRange = responseHeaders[contentRangeKey] != nil;
+        
+        if (supportRange && LLValidByteRange(_currentDataRange)) {
+            responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(_currentDataRange, [self.cacheFile fileLength]);
+        } else {
+            [responseHeaders removeObjectForKey:contentRangeKey];
+        }
+        
+        responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu",_currentDataRange.length];
+        NSInteger statusCode = supportRange ? 206 : 200;
+        self.currentResponse = [[NSHTTPURLResponse alloc] initWithURL:self.currentRequest.request.URL statusCode:statusCode HTTPVersion:@"HTTP/1.1" headerFields:responseHeaders];
+        [self.currentRequest ll_fillContentInformation:self.currentResponse];
     }
     
     [self startCurrentRequest];
 }
 
+- (void)startCurrentRequest
+{
+    self.operationQueue.suspended = YES;
+    
+    if (_currentDataRange.length == NSUIntegerMax) {
+        [self addTaskWithRange:NSMakeRange(_currentDataRange.location, NSUIntegerMax) cached:NO];
+    } else {
+        NSUInteger start = _currentDataRange.location;
+        NSUInteger end = NSMaxRange(_currentDataRange);
+        
+        while (start < end) {
+            NSRange firstNotCachedRange = [self.cacheFile firstNotCachedRangeFromPosition:start];
+            if (NO == LLValidFileRange(firstNotCachedRange)) {
+                [self addTaskWithRange:NSMakeRange(start, end - start) cached:[self.cacheFile maxCachedLength] > 0];
+                start = end;
+            } else if (firstNotCachedRange.location >= end) {
+                [self addTaskWithRange:NSMakeRange(start, end - start) cached:YES];
+                start = end;
+            } else if (firstNotCachedRange.location >= start) {
+                if (firstNotCachedRange.location > start) {
+                    [self addTaskWithRange:NSMakeRange(start, firstNotCachedRange.location) cached:YES];
+                }
+                
+                NSUInteger notCachedEnd = MIN(NSMaxRange(firstNotCachedRange), end);
+                [self addTaskWithRange:NSMakeRange(firstNotCachedRange.location, notCachedEnd - firstNotCachedRange.location) cached:NO];
+                start = notCachedEnd;
+            } else {
+                [self addTaskWithRange:NSMakeRange(start, end - start) cached:YES];
+                start = end;
+            }
+        }
+    }
+    
+    self.operationQueue.suspended = NO;
+}
+
 - (void)addTaskWithRange:(NSRange)range cached:(BOOL)cached
 {
-    LLVideoPlayerCacheTask *task = [[LLVideoPlayerCacheTask alloc] initWithCacheFilePath:self.cacheFile loadingRequest:self.currentRequest range:range];
+    LLVideoPlayerCacheTask *task;
+    
+    if (cached) {
+       task = [[LLVideoPlayerLocalCacheTask alloc] initWithCacheFilePath:self.cacheFile loadingRequest:self.currentRequest range:range];
+    } else {
+        task = [[LLVideoPlayerRemoteCacheTask alloc] initWithCacheFilePath:self.cacheFile loadingRequest:self.currentRequest range:range];
+        [(LLVideoPlayerRemoteCacheTask *)task setResponse:self.currentResponse];
+    }
     
     __weak typeof(self) weakSelf = self;
     [task setFinishBlock:^(LLVideoPlayerCacheTask *task, NSError *error) {

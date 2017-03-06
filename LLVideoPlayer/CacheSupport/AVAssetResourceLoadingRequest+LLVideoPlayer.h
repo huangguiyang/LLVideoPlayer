@@ -10,6 +10,6 @@
 
 @interface AVAssetResourceLoadingRequest (LLVideoPlayer)
 
-- (void)ll_fillContentInfomation:(NSHTTPURLResponse *)response;
+- (void)ll_fillContentInformation:(NSHTTPURLResponse *)response;
 
 @end

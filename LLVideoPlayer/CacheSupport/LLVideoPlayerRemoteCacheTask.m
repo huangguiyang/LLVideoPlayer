@@ -12,14 +12,15 @@
 #import "LLVideoPlayerCacheFile.h"
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheUtils.h"
 
 @interface LLVideoPlayerRemoteCacheTask () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
 @property (nonatomic, strong) NSURLConnection *connection;
 @property (assign, nonatomic, getter = isExecuting) BOOL executing;
 @property (assign, nonatomic, getter = isFinished) BOOL finished;
-@property (nonatomic, assign) NSInteger offset;
-@property (nonatomic, assign) NSInteger requestLength;
+@property (nonatomic, assign) NSUInteger offset;
+@property (nonatomic, assign) NSUInteger requestLength;
 @property (nonatomic, strong) NSError *error;
 @property (nonatomic, assign) CFRunLoopRef runloop;
 
@@ -81,12 +82,18 @@
     self.offset = 0;
     self.requestLength = 0;
     
-    if (nil == self.response) {
-        
+    if (nil == self.response || [self.response ll_supportRange]) {
+        NSString *rangeValue = LLRangeToHTTPRangeHeader(range);
+        if (rangeValue) {
+            [urlRequest setValue:rangeValue forHTTPHeaderField:@"Range"];
+            self.offset = range.location;
+            self.requestLength = range.length;
+        }
     }
     
-    self.connection = [[NSURLConnection alloc] initWithRequest:loadingRequest delegate:self startImmediately:NO];
+    self.connection = [[NSURLConnection alloc] initWithRequest:urlRequest delegate:self startImmediately:NO];
     [self.connection start];
+    [self startRunLoop];
 }
 
 - (void)startRunLoop
@@ -129,13 +136,13 @@
     
     if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
         self.response = (NSHTTPURLResponse *)response;
-        [_loadingRequest ll_fillContentInfomation:self.response];
+        [_loadingRequest ll_fillContentInformation:self.response];
     }
     
     if (NO == [self.response ll_supportRange]) {
         self.offset = 0;
     }
-    if (self.offset == NSIntegerMax) {
+    if (self.offset == NSUIntegerMax) {
         self.offset = self.response.ll_contentLength - self.requestLength;
     }
 }
