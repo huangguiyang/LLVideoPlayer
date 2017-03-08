@@ -21,27 +21,12 @@ const NSRange LLInvalidRange = { NSNotFound, 0 };
 
 @end
 
-BOOL LLValidByteRange(NSRange range)
-{
-    return range.location != NSNotFound || range.length > 0;
-}
-
-BOOL LLValidFileRange(NSRange range)
-{
-    return range.location != NSNotFound && range.length > 0 && range.length != NSUIntegerMax;
-}
-
-BOOL LLRangeCanMerge(NSRange range1, NSRange range2)
-{
-    return NSMaxRange(range1) == range2.location || NSMaxRange(range2) == range1.location || NSIntersectionRange(range1, range2).length > 0;
-}
-
 NSString *LLRangeToHTTPRangeHeader(NSRange range)
 {
     if (LLValidByteRange(range)) {
         if (range.location == NSNotFound) {
             return [NSString stringWithFormat:@"bytes=-%tu", range.length];
-        } else if (range.length == NSUIntegerMax) {
+        } else if (range.length == NSIntegerMax) {
             return [NSString stringWithFormat:@"bytes=%tu-", range.location];
         } else {
             return [NSString stringWithFormat:@"bytes=%tu-%tu", range.location, NSMaxRange(range) - 1];
@@ -58,7 +43,7 @@ NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length)
         NSUInteger end = NSMaxRange(range) - 1;
         if (range.location == NSNotFound) {
             start = range.location;
-        } else if (range.length == NSUIntegerMax) {
+        } else if (range.length == NSIntegerMax) {
             start = length - range.length;
             end = start + range.length - 1;
         }

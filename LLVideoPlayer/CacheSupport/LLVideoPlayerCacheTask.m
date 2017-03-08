@@ -19,6 +19,11 @@
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@> { %@ }", NSStringFromClass([self class]), _loadingRequest];
+}
+
 - (instancetype)initWithCacheFilePath:(LLVideoPlayerCacheFile *)cacheFile loadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range
 {
     self = [super init];

@@ -10,7 +10,7 @@
 
 typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
     LLCacheFileSaveFlagsNone,
-    LLCacheFileSaveFlagsSyncIndex,
+    LLCacheFileSaveFlagsSync,
 };
 
 @interface LLVideoPlayerCacheFile : NSObject
@@ -33,5 +33,7 @@ typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
 - (BOOL)setResponse:(NSHTTPURLResponse *)response;
 
 - (NSUInteger)maxCachedLength;
+
+- (BOOL)synchronize;
 
 @end

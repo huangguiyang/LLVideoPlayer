@@ -13,16 +13,20 @@
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
+#import "LLVideoPlayerInternal.h"
 
 @interface LLVideoPlayerRemoteCacheTask () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
+{
+    @private
+    NSURLConnection *_connection;
+    NSUInteger _offset;
+    NSUInteger _requestLength;
+    NSError *_error;
+    CFRunLoopRef _runloop;
+}
 
-@property (nonatomic, strong) NSURLConnection *connection;
 @property (assign, nonatomic, getter = isExecuting) BOOL executing;
 @property (assign, nonatomic, getter = isFinished) BOOL finished;
-@property (nonatomic, assign) NSUInteger offset;
-@property (nonatomic, assign) NSUInteger requestLength;
-@property (nonatomic, strong) NSError *error;
-@property (nonatomic, assign) CFRunLoopRef runloop;
 
 @end
 
@@ -48,7 +52,7 @@
 - (void)cancel
 {
     [super cancel];
-    [self.connection cancel];
+    [_connection cancel];
 }
 
 - (void)setFinished:(BOOL)finished
@@ -68,7 +72,7 @@
 - (void)handleFinished
 {
     if (self.finishBlock) {
-        self.finishBlock(self, self.error);
+        self.finishBlock(self, _error);
     }
     [self setExecuting:NO];
     [self setFinished:YES];
@@ -79,41 +83,47 @@
     NSMutableURLRequest *urlRequest = [loadingRequest.request mutableCopy];
     urlRequest.URL = [loadingRequest.request.URL ll_originalSchemeURL];
     urlRequest.cachePolicy = NSURLRequestReloadIgnoringCacheData;
-    self.offset = 0;
-    self.requestLength = 0;
+    _offset = 0;
+    _requestLength = 0;
     
     if (nil == self.response || [self.response ll_supportRange]) {
         NSString *rangeValue = LLRangeToHTTPRangeHeader(range);
         if (rangeValue) {
             [urlRequest setValue:rangeValue forHTTPHeaderField:@"Range"];
-            self.offset = range.location;
-            self.requestLength = range.length;
+            _offset = range.location;
+            _requestLength = range.length;
         }
     }
     
-    self.connection = [[NSURLConnection alloc] initWithRequest:urlRequest delegate:self startImmediately:NO];
-    [self.connection start];
+    _connection = [[NSURLConnection alloc] initWithRequest:urlRequest delegate:self startImmediately:NO];
+    [_connection start];
     [self startRunLoop];
 }
 
 - (void)startRunLoop
 {
-    self.runloop = CFRunLoopGetCurrent();
+    _runloop = CFRunLoopGetCurrent();
     CFRunLoopRun();
 }
 
 - (void)stopRunLoop
 {
-    if (self.runloop) {
-        CFRunLoopStop(self.runloop);
+    if (_runloop) {
+        CFRunLoopStop(_runloop);
     }
+}
+
+- (void)syncCacheFile
+{
+    [_cacheFile synchronize];
 }
 
 #pragma mark - NSURLConnectionDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    self.error = error;
+    [self syncCacheFile];
+    _error = error;
     [self stopRunLoop];
 }
 
@@ -136,27 +146,29 @@
     
     if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
         self.response = (NSHTTPURLResponse *)response;
+        [_cacheFile setResponse:self.response];
         [_loadingRequest ll_fillContentInformation:self.response];
     }
     
     if (NO == [self.response ll_supportRange]) {
-        self.offset = 0;
+        _offset = 0;
     }
-    if (self.offset == NSUIntegerMax) {
-        self.offset = self.response.ll_contentLength - self.requestLength;
+    if (_offset == NSIntegerMax) {
+        _offset = self.response.ll_contentLength - _requestLength;
     }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    if (data.bytes && [_cacheFile saveData:data offset:self.offset flags:0]) {
-        self.offset += [data length];
+    if (data.bytes && [_cacheFile saveData:data offset:_offset flags:0]) {
+        _offset += [data length];
         [_loadingRequest.dataRequest respondWithData:data];
     }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    [self syncCacheFile];
     [self stopRunLoop];
 }
 

@@ -103,13 +103,13 @@
     
     if ([self.currentRequest.dataRequest respondsToSelector:@selector(requestsAllDataToEndOfResource)] &&
         self.currentRequest.dataRequest.requestsAllDataToEndOfResource) {
-        _currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, NSUIntegerMax);
+        _currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, NSIntegerMax);
     } else {
         _currentDataRange = NSMakeRange(self.currentRequest.dataRequest.requestedOffset, self.currentRequest.dataRequest.requestedLength);
     }
     
     if (nil == self.currentResponse && self.cacheFile.responseHeaders.count > 0) {
-        if (_currentDataRange.length == NSUIntegerMax) {
+        if (_currentDataRange.length == NSIntegerMax) {
             _currentDataRange.length = [self.cacheFile fileLength] - _currentDataRange.location;
         }
         
@@ -123,7 +123,7 @@
             [responseHeaders removeObjectForKey:contentRangeKey];
         }
         
-        responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu",_currentDataRange.length];
+        responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu", _currentDataRange.length];
         NSInteger statusCode = supportRange ? 206 : 200;
         self.currentResponse = [[NSHTTPURLResponse alloc] initWithURL:self.currentRequest.request.URL statusCode:statusCode HTTPVersion:@"HTTP/1.1" headerFields:responseHeaders];
         [self.currentRequest ll_fillContentInformation:self.currentResponse];
@@ -136,8 +136,16 @@
 {
     self.operationQueue.suspended = YES;
     
-    if (_currentDataRange.length == NSUIntegerMax) {
-        [self addTaskWithRange:NSMakeRange(_currentDataRange.location, NSUIntegerMax) cached:NO];
+    if (_currentDataRange.length == NSIntegerMax) {
+        NSUInteger start = _currentDataRange.location;
+        
+        NSRange firstNotCachedRange = [self.cacheFile firstNotCachedRangeFromPosition:start];
+        if (NO == LLValidFileRange(firstNotCachedRange)) {
+            [self addTaskWithRange:NSMakeRange(_currentDataRange.location, NSIntegerMax) cached:NO];
+        } else {
+            [self addTaskWithRange:NSMakeRange(_currentDataRange.location, firstNotCachedRange.location) cached:YES];
+            [self addTaskWithRange:NSMakeRange(firstNotCachedRange.location, NSIntegerMax) cached:NO];
+        }
     } else {
         NSUInteger start = _currentDataRange.location;
         NSUInteger end = NSMaxRange(_currentDataRange);
@@ -152,7 +160,7 @@
                 start = end;
             } else if (firstNotCachedRange.location >= start) {
                 if (firstNotCachedRange.location > start) {
-                    [self addTaskWithRange:NSMakeRange(start, firstNotCachedRange.location) cached:YES];
+                    [self addTaskWithRange:NSMakeRange(start, firstNotCachedRange.location - start) cached:YES];
                 }
                 
                 NSUInteger notCachedEnd = MIN(NSMaxRange(firstNotCachedRange), end);

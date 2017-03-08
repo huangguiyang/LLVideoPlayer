@@ -16,8 +16,20 @@ FOUNDATION_EXTERN const NSRange LLInvalidRange;
 
 @end
 
-FOUNDATION_EXTERN BOOL LLValidByteRange(NSRange range);
-FOUNDATION_EXTERN BOOL LLValidFileRange(NSRange range);
-FOUNDATION_EXTERN BOOL LLRangeCanMerge(NSRange range1, NSRange range2);
+NS_INLINE BOOL LLValidByteRange(NSRange range)
+{
+    return range.location != NSNotFound || range.length > 0;
+}
+
+NS_INLINE BOOL LLValidFileRange(NSRange range)
+{
+    return range.location != NSNotFound && range.length > 0 && range.length != NSIntegerMax;
+}
+
+NS_INLINE BOOL LLRangeCanMerge(NSRange range1, NSRange range2)
+{
+    return NSMaxRange(range1) == range2.location || NSMaxRange(range2) == range1.location || NSIntersectionRange(range1, range2).length > 0;
+}
+
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeHeader(NSRange range);
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length);

@@ -9,6 +9,7 @@
 #import "LLVideoPlayerCacheFile.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "LLVideoPlayerInternal.h"
 
 @interface LLVideoPlayerCacheFile ()
 
@@ -88,7 +89,7 @@
 
 - (BOOL)unserializeIndex:(NSDictionary *)dict
 {
-    if ([dict isKindOfClass:[NSDictionary class]]) {
+    if (NO == [dict isKindOfClass:[NSDictionary class]]) {
         return NO;
     }
     
@@ -142,6 +143,7 @@
         return NO;
     }
     
+    self.fileLength = length;
     @try {
         [self.writeFileHandle truncateFileAtOffset:length];
         unsigned long long end = [self.writeFileHandle seekToEndOfFile];
@@ -158,6 +160,7 @@
 - (void)addRange:(NSRange)range
 {
     if (range.length == 0 || range.location >= self.fileLength) {
+        LLLog(@"[ERR] addRange failed: %@ (file length: %lu)", NSStringFromRange(range), self.fileLength);
         return;
     }
     
@@ -203,6 +206,11 @@
     } else {
         self.complete = NO;
     }
+#ifdef DEBUG
+    if (self.complete) {
+        NSLog(@"cache complete!!!");
+    }
+#endif
 }
 
 - (NSRange)cachedRangeForRange:(NSRange)range
@@ -232,7 +240,7 @@
     return LLInvalidRange;
 }
 
-- (BOOL)saveIndexFile
+- (BOOL)synchronize
 {
     NSString *indexStr = [self serializeIndex];
     return [indexStr writeToFile:self.indexFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
@@ -255,8 +263,8 @@
     
     [self addRange:NSMakeRange(offset, data.length)];
     
-    if (flags & LLCacheFileSaveFlagsSyncIndex) {
-        [self saveIndexFile];
+    if (flags & LLCacheFileSaveFlagsSync) {
+        [self synchronize];
     }
     
     return YES;
@@ -270,8 +278,12 @@
         return nil;
     }
     
-    NSData *data = [self.readFileHandle readDataOfLength:range.length];
-    return data;
+#ifdef DEBUG
+    if (length != range.length) {
+        NSLog(@"[ERR] read length mismatch: expect %ld, but got %ld", length, range.length);
+    }
+#endif
+    return [self.readFileHandle readDataOfLength:range.length];
 }
 
 - (NSData *)dataWithRange:(NSRange)range
@@ -357,7 +369,7 @@
         success = [self truncateFileToLength:response.ll_contentLength];
     }
     self.responseHeaders = [[response allHeaderFields] copy];
-    success = success && [self saveIndexFile];
+    success = success && [self synchronize];
     
     return success;
 }

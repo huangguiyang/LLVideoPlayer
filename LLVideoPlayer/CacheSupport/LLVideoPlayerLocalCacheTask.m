@@ -54,7 +54,7 @@
 - (void)handleFinished
 {
     if (self.finishBlock) {
-        self.finishBlock(self,nil);
+        self.finishBlock(self, nil);
     }
     
     [self setExecuting:NO];

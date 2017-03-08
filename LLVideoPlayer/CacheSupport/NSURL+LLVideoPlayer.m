@@ -17,9 +17,8 @@ static char originalSchemeKey;
 - (NSURL *)ll_customSchemeURL
 {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:self resolvingAgainstBaseURL:NO];
-    NSRange range = [components.scheme rangeOfString:@"streaming" options:NSBackwardsSearch];
-    if (range.location == NSNotFound) {
-        components.scheme = [NSString stringWithFormat:@"%@streaming", components.scheme];
+    if (NO == [components.scheme hasPrefix:@"streaming"]) {
+        components.scheme = [NSString stringWithFormat:@"streaming%@", components.scheme];
     }
     return [components URL];
 }
@@ -27,9 +26,8 @@ static char originalSchemeKey;
 - (NSURL *)ll_originalSchemeURL
 {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:self resolvingAgainstBaseURL:NO];
-    NSRange range = [components.scheme rangeOfString:@"streaming" options:NSBackwardsSearch];
-    if (range.location != NSNotFound) {
-        components.scheme = [components.scheme substringToIndex:range.location];
+    if ([components.scheme hasPrefix:@"streaming"]) {
+        components.scheme = [components.scheme substringFromIndex:@"streaming".length];
     }
     return [components URL];
 }
