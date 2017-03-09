@@ -9,11 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "LLVideoPlayerCachePolicy.h"
 
-typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
-    LLCacheFileSaveFlagsNone,
-    LLCacheFileSaveFlagsSync,
-};
-
 @interface LLVideoPlayerCacheFile : NSObject
 
 @property (nonatomic, strong) NSDictionary *responseHeaders;
@@ -23,19 +18,19 @@ typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
 
 - (instancetype)initWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
-- (BOOL)saveData:(NSData *)data offset:(NSUInteger)offset flags:(LLCacheFileSaveFlags)flags;
+- (BOOL)saveData:(NSData *)data atOffset:(NSUInteger)offset synchronize:(BOOL)synchronize;
 
 - (NSData *)dataWithRange:(NSRange)range;
 
 - (NSRange)firstNotCachedRangeFromPosition:(NSUInteger)position;
-
-- (void)removeCache;
 
 - (BOOL)setResponse:(NSHTTPURLResponse *)response;
 
 - (NSUInteger)maxCachedLength;
 
 - (BOOL)synchronize;
+
+- (BOOL)isCompleted;
 
 + (NSString *)cacheDirectory;
 

@@ -20,24 +20,11 @@
 @property (nonatomic, strong) NSMutableArray *ranges;
 @property (nonatomic, assign) NSUInteger fileLength;
 @property (nonatomic, assign) BOOL complete;
-@property (nonatomic, assign) NSUInteger readOffset;
 @property (nonatomic, strong) LLVideoPlayerCachePolicy *cachePolicy;
 
 @end
 
 @implementation LLVideoPlayerCacheFile
-
-+ (NSString *)cacheDirectory
-{
-    NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    NSString *dir = [cache stringByAppendingPathComponent:@"com.ll.vplayer"];
-    return dir;
-}
-
-+ (NSString *)indexFileExtension
-{
-    return @".idx!";
-}
 
 - (void)dealloc
 {
@@ -96,6 +83,11 @@
 }
 
 #pragma mark - Private
+
++ (NSString *)indexFileExtension
+{
+    return @".idx!";
+}
 
 + (void)removeCacheAtPath:(NSString *)path
 {
@@ -325,7 +317,13 @@
 
 #pragma mark - Public
 
-- (BOOL)saveData:(NSData *)data offset:(NSUInteger)offset flags:(LLCacheFileSaveFlags)flags
++ (NSString *)cacheDirectory
+{
+    NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    return [cache stringByAppendingPathComponent:@"com.ll.vplayer"];
+}
+
+- (BOOL)saveData:(NSData *)data atOffset:(NSUInteger)offset synchronize:(BOOL)synchronize
 {
     if (nil == self.writeFileHandle) {
         return NO;
@@ -340,27 +338,11 @@
     
     [self addRange:NSMakeRange(offset, data.length)];
     
-    if (flags & LLCacheFileSaveFlagsSync) {
+    if (synchronize) {
         [self synchronize];
     }
     
     return YES;
-}
-
-- (NSData *)readDataWithOffset:(NSUInteger)offset length:(NSUInteger)length
-{
-    [self seekToPosition:offset];
-    NSRange range = [self cachedRangeForRange:NSMakeRange(offset, length)];
-    if (NO == LLValidFileRange(range)) {
-        return nil;
-    }
-    
-#ifdef DEBUG
-    if (length != range.length) {
-        NSLog(@"[ERR] read length mismatch: expect %ld, but got %ld", length, range.length);
-    }
-#endif
-    return [self.readFileHandle readDataOfLength:range.length];
 }
 
 - (NSData *)dataWithRange:(NSRange)range
@@ -369,7 +351,20 @@
         return nil;
     }
     
-    return [self readDataWithOffset:range.location length:range.length];
+    NSRange cachedRange = [self cachedRangeForRange:range];
+    if (NO == LLValidFileRange(cachedRange)) {
+        return nil;
+    }
+    
+#ifdef DEBUG
+    if (NO == NSEqualRanges(range, cachedRange)) {
+        NSLog(@"[ERR] read ranges mismatch: expect %@, but got %@",
+              NSStringFromRange(range), NSStringFromRange(cachedRange));
+    }
+#endif
+    
+    [self.readFileHandle seekToFileOffset:range.location];
+    return [self.readFileHandle readDataOfLength:cachedRange.length];
 }
 
 - (NSRange)firstNotCachedRangeFromPosition:(NSUInteger)position
@@ -399,12 +394,6 @@
     return LLInvalidRange;
 }
 
-- (void)removeCache
-{
-    [[NSFileManager defaultManager] removeItemAtPath:self.cacheFilePath error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:self.indexFilePath error:nil];
-}
-
 - (NSUInteger)maxCachedLength
 {
     if (self.ranges.count > 0) {
@@ -417,26 +406,6 @@
 - (BOOL)isCompleted
 {
     return self.complete;
-}
-
-- (BOOL)isEOF
-{
-    if (self.readOffset + 1 >= self.fileLength) {
-        return YES;
-    }
-    return NO;
-}
-
-- (void)seekToPosition:(NSUInteger)position
-{
-    [self.readFileHandle seekToFileOffset:position];
-    self.readOffset = self.readFileHandle.offsetInFile;
-}
-
-- (void)seekToEnd
-{
-    [self.readFileHandle seekToEndOfFile];
-    self.readOffset = self.readFileHandle.offsetInFile;
 }
 
 - (BOOL)setResponse:(NSHTTPURLResponse *)response

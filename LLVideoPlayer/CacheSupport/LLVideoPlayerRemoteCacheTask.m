@@ -160,7 +160,7 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    if (data.bytes && [_cacheFile saveData:data offset:_offset flags:0]) {
+    if (data.bytes && [_cacheFile saveData:data atOffset:_offset synchronize:NO]) {
         _offset += [data length];
         [_loadingRequest.dataRequest respondWithData:data];
     }
