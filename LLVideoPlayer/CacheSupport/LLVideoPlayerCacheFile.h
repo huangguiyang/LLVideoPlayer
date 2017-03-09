@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LLVideoPlayerCachePolicy.h"
 
 typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
     LLCacheFileSaveFlagsNone,
@@ -18,9 +19,9 @@ typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
 @property (nonatomic, strong) NSDictionary *responseHeaders;
 @property (nonatomic, assign, readonly) NSUInteger fileLength;
 
-+ (instancetype)cacheFileWithFilePath:(NSString *)filePath;
++ (instancetype)cacheFileWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
-- (instancetype)initWithFilePath:(NSString *)filePath;
+- (instancetype)initWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 - (BOOL)saveData:(NSData *)data offset:(NSUInteger)offset flags:(LLCacheFileSaveFlags)flags;
 
@@ -35,5 +36,7 @@ typedef NS_ENUM(NSInteger, LLCacheFileSaveFlags) {
 - (NSUInteger)maxCachedLength;
 
 - (BOOL)synchronize;
+
++ (NSString *)cacheDirectory;
 
 @end

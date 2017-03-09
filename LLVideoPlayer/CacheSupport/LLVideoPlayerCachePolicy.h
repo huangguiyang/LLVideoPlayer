@@ -12,4 +12,7 @@
 
 + (instancetype)defaultPolicy;
 
+@property (nonatomic, assign) NSUInteger diskCapacity;   // in bytes
+@property (nonatomic, assign) NSUInteger outdatedHours;  // in hours
+
 @end

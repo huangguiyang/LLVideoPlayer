@@ -21,10 +21,23 @@
 @property (nonatomic, assign) NSUInteger fileLength;
 @property (nonatomic, assign) BOOL complete;
 @property (nonatomic, assign) NSUInteger readOffset;
+@property (nonatomic, strong) LLVideoPlayerCachePolicy *cachePolicy;
 
 @end
 
 @implementation LLVideoPlayerCacheFile
+
++ (NSString *)cacheDirectory
+{
+    NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *dir = [cache stringByAppendingPathComponent:@"com.ll.vplayer"];
+    return dir;
+}
+
++ (NSString *)indexFileExtension
+{
+    return @".idx!";
+}
 
 - (void)dealloc
 {
@@ -32,12 +45,12 @@
     [self.writeFileHandle closeFile];
 }
 
-+ (instancetype)cacheFileWithFilePath:(NSString *)filePath
++ (instancetype)cacheFileWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
-    return [[self alloc] initWithFilePath:filePath];
+    return [[self alloc] initWithFilePath:filePath cachePolicy:cachePolicy];
 }
 
-- (instancetype)initWithFilePath:(NSString *)filePath
+- (instancetype)initWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
     self = [super init];
     if (self) {
@@ -61,6 +74,7 @@
             return nil;
         }
         
+        self.cachePolicy = cachePolicy ?: [LLVideoPlayerCachePolicy defaultPolicy];
         self.cacheFilePath = cacheFilePath;
         self.indexFilePath = indexFilePath;
         self.ranges = [NSMutableArray array];
@@ -76,15 +90,80 @@
         }
         
         [self checkComplete];
+        [self checkCacheDirectory:[LLVideoPlayerCacheFile cacheDirectory]];
     }
     return self;
 }
 
 #pragma mark - Private
 
-+ (NSString *)indexFileExtension
++ (void)removeCacheAtPath:(NSString *)path
 {
-    return @".idx!";
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    NSString *index = [path stringByAppendingPathComponent:[LLVideoPlayerCacheFile indexFileExtension]];
+    [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+    LLLog(@"cache deleted: %@", path);
+}
+
+- (void)checkCacheDirectory:(NSString *)directory
+{
+    NSError *error;
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:&error];
+    if (error) {
+        LLLog(@"[ERR] can't get contents of directory: %@, error: %@", directory, error);
+        return;
+    }
+    
+    NSUInteger totalSize = 0;
+    NSDate *now = [NSDate date];
+    NSMutableArray *paths = [NSMutableArray array];
+    
+    for (NSString *name in contents) {
+        if ([name hasSuffix:[LLVideoPlayerCacheFile indexFileExtension]]) {
+            continue;
+        }
+        
+        NSString *path = [directory stringByAppendingPathComponent:name];
+        error = nil;
+        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+        if (error) {
+            LLLog(@"[ERR] can't get attributes of file: %@, error: %@", path, error);
+            continue;
+        }
+        if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {
+            continue;
+        }
+        
+        NSDate *date = [attr fileCreationDate];
+        NSInteger hours = [now timeIntervalSinceDate:date] / 3600;
+        if (hours >= self.cachePolicy.outdatedHours) {
+            [LLVideoPlayerCacheFile removeCacheAtPath:path];
+            continue;
+        }
+        
+        [paths addObject:path];
+        totalSize += [attr fileSize];
+    }
+    
+    if (totalSize < self.cachePolicy.diskCapacity) {
+        return;
+    }
+    
+    [paths sortUsingComparator:^NSComparisonResult(NSString *obj1, NSString *obj2) {
+        NSDictionary *attr1 = [[NSFileManager defaultManager] attributesOfItemAtPath:obj1 error:nil];
+        NSDictionary *attr2 = [[NSFileManager defaultManager] attributesOfItemAtPath:obj2 error:nil];
+        NSDate *date1 = [attr1 fileCreationDate];
+        NSDate *date2 = [attr2 fileCreationDate];
+        return [date1 compare:date2];
+    }];
+    
+    while (paths.count > 0 && totalSize < self.cachePolicy.diskCapacity) {
+        NSString *path = [paths firstObject];
+        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        [LLVideoPlayerCacheFile removeCacheAtPath:path];
+        totalSize -= [attr fileSize];
+        [paths removeObject:path];
+    }
 }
 
 - (BOOL)unserializeIndex:(NSDictionary *)dict
@@ -206,11 +285,9 @@
     } else {
         self.complete = NO;
     }
-#ifdef DEBUG
     if (self.complete) {
-        NSLog(@"cache complete!!!");
+        LLLog(@"cache complete!!!");
     }
-#endif
 }
 
 - (NSRange)cachedRangeForRange:(NSRange)range

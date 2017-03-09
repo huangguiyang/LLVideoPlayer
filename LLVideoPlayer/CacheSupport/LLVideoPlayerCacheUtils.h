@@ -10,12 +10,6 @@
 
 FOUNDATION_EXTERN const NSRange LLInvalidRange;
 
-@interface LLVideoPlayerCacheUtils : NSObject
-
-+ (NSString *)cacheDirectoryPath;
-
-@end
-
 NS_INLINE BOOL LLValidByteRange(NSRange range)
 {
     return range.location != NSNotFound || range.length > 0;

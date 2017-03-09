@@ -8,13 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import "LLVideoPlayerCachePolicy.h"
 
 @interface LLVideoPlayerCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
 @property (nonatomic, strong, readonly) NSString *cacheFilePath;
 
-+ (instancetype)loaderWithCacheFilePath:(NSString *)filePath;
++ (instancetype)loaderWithCacheFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
-- (instancetype)initWithCacheFilePath:(NSString *)filePath;
+- (instancetype)initWithCacheFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 @end

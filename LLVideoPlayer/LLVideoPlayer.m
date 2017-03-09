@@ -11,7 +11,10 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AVPlayer+LLPlayer.h"
 #import "LLVideoPlayerInternal.h"
-#import "LLVideoPlayer+CacheSupport.h"
+#import "LLVideoPlayerCacheLoader.h"
+#import "NSURL+LLVideoPlayer.h"
+#import "NSString+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheFile.h"
 
 typedef void (^VoidBlock) (void);
 
@@ -295,8 +298,8 @@ typedef void (^VoidBlock) (void);
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL]
                                         options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES}];
         NSString *name = [streamURL.absoluteString ll_md5];
-        NSString *path = [[LLVideoPlayerCacheUtils cacheDirectoryPath] stringByAppendingPathComponent:name];
-        self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithCacheFilePath:path];
+        NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+        self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithCacheFilePath:path cachePolicy:self.cachePolicy];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
     } else {
         asset = [[AVURLAsset alloc] initWithURL:streamURL

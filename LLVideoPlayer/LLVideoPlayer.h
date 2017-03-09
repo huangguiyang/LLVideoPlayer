@@ -12,6 +12,7 @@
 #import "LLVideoTrack.h"
 #import "LLVideoPlayerHelper.h"
 #import "LLVideoPlayerDelegate.h"
+#import "LLVideoPlayerCachePolicy.h"
 
 
 /// LLVideoPlayer: Low Level Video Player
@@ -26,6 +27,7 @@
 @property (nonatomic, strong) AVPlayerItem *avPlayerItem;
 @property (nonatomic, strong) NSString *videoGravity;
 @property (nonatomic, assign) BOOL cacheSupportEnabled;
+@property (nonatomic, strong) LLVideoPlayerCachePolicy *cachePolicy;
 
 - (instancetype)initWithVideoPlayerView:(LLVideoPlayerView *)videoPlayerView;
 
