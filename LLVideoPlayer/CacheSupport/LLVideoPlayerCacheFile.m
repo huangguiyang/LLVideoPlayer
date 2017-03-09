@@ -125,6 +125,9 @@
         if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {
             continue;
         }
+        if ([path isEqualToString:self.cacheFilePath]) {
+            continue;
+        }
         
         NSDate *date = [attr fileCreationDate];
         NSInteger hours = [now timeIntervalSinceDate:date] / 3600;
