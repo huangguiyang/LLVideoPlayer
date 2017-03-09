@@ -7,6 +7,7 @@
 //
 
 @import XCTest;
+#import <NSURL+LLVideoPlayer.h>
 
 @interface Tests : XCTestCase
 
@@ -29,6 +30,14 @@
 - (void)testExample
 {
     XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+}
+
+- (void)testCustomSchemeURL
+{
+    NSURL *url = [NSURL URLWithString:@"http://www.baidu.com"];
+    NSURL *url2 = [url ll_customSchemeURL];
+    XCTAssert([url2.scheme isEqualToString:@"streaming"]);
+    XCTAssert([url2.ll_originalSchemeURL isEqual:url]);
 }
 
 @end

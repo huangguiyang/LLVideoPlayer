@@ -11,6 +11,10 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AVPlayer+LLPlayer.h"
 #import "LLVideoPlayerInternal.h"
+#import "LLVideoPlayerCacheLoader.h"
+#import "NSURL+LLVideoPlayer.h"
+#import "NSString+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheFile.h"
 
 typedef void (^VoidBlock) (void);
 
@@ -18,6 +22,7 @@ typedef void (^VoidBlock) (void);
 
 @property (nonatomic, strong) id avTimeObserver;
 @property (nonatomic, strong) AVURLAsset *loadingAsset;
+@property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
 
 @end
 
@@ -287,9 +292,20 @@ typedef void (^VoidBlock) (void);
 {
     static NSString *kTracksKey = @"tracks";
     static NSString *kPlayableKey = @"playable";
+    AVURLAsset *asset;
     
-    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:streamURL
-                                                options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES}];
+    if (self.cacheSupportEnabled) {
+        asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL]
+                                        options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES}];
+        NSString *name = [streamURL.absoluteString ll_md5];
+        NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+        self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithCacheFilePath:path cachePolicy:self.cachePolicy];
+        [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
+    } else {
+        asset = [[AVURLAsset alloc] initWithURL:streamURL
+                                        options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES}];
+    }
+    
     [asset loadValuesAsynchronouslyForKeys:@[kTracksKey, kPlayableKey] completionHandler:^{
         ll_run_on_ui_thread(^{
             if (NO == [streamURL isEqual:self.track.streamURL]) {

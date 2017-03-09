@@ -17,6 +17,7 @@
 @property (nonatomic, strong) UILabel *currentTimeLabel;
 @property (nonatomic, strong) UILabel *totalTimeLabel;
 @property (nonatomic, strong) UISlider *slider;
+@property (nonatomic, strong) UISwitch *cacheSwitch;
 
 @end
 
@@ -26,10 +27,20 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    BOOL cacheSupport = YES;
+    
     self.player = [[LLVideoPlayer alloc] init];
     [self.view addSubview:self.player.view];
     self.player.view.frame = CGRectMake(10, 80, 300, 200);
     self.player.delegate = self;
+    self.player.cacheSupportEnabled = cacheSupport;
+    
+    {
+        self.cacheSwitch = [UISwitch new];
+        [self.view addSubview:self.cacheSwitch];
+        self.cacheSwitch.frame = CGRectMake(10, 30, self.cacheSwitch.frame.size.width, self.cacheSwitch.frame.size.height);
+        self.cacheSwitch.on = cacheSupport;
+    }
     
     {
         self.stateLabel = [UILabel new];
@@ -106,7 +117,7 @@
 - (void)loadAction:(id)sender
 {
     NSURL *url = [NSURL URLWithString:@"http://baobab.wdjcdn.com/1456665467509qingshu.mp4"];
-    
+    self.player.cacheSupportEnabled = self.cacheSwitch.on;
     [self.player loadVideoWithStreamURL:url];
     //    LLVideoTrack *track = [[LLVideoTrack alloc] initWithStreamURL:url];
     //    track.lastWatchedDuration = @(40);
@@ -175,7 +186,7 @@
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(LLVideoTrack *)track time:(NSTimeInterval)time
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
     self.currentTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:time];
     self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[track.totalDuration floatValue]];
     self.slider.value = time / [track.totalDuration doubleValue];
