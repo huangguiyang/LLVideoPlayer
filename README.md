@@ -72,6 +72,22 @@ NSURL *url = [NSURL URLWithString:@"<your stream url>"];
 
 LLVideoPlayer comes without any UI controls for flexibility. Your can add your custom contols to the container view `LLVideoPlayerView`.
 
+## Customize Cache Support
+
+LLVideoPlayer supports customize cache policy. To enable the cache support (default is disable):
+
+```
+player.cacheSupportEnabled = YES;
+```
+
+To set your customize cache policy:
+
+```
+player.cachePolicy = your_policy;
+```
+
+See `LLVideoPlayerCachePolicy` for more details.
+
 ## Requirements
 
 iOS 7 or above
