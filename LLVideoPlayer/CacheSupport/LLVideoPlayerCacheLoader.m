@@ -15,6 +15,7 @@
 #import "LLVideoPlayerCachePolicy.h"
 #import "LLVideoPlayerInternal.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
+#import "NSString+LLVideoPlayer.h"
 
 @interface LLVideoPlayerCacheLoader ()
 {
@@ -38,22 +39,24 @@
     [_operationQueue cancelAllOperations];
 }
 
-+ (instancetype)loaderWithCacheFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
++ (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
-    return [[self alloc] initWithCacheFilePath:filePath cachePolicy:cachePolicy];
+    return [[self alloc] initWithURL:url cachePolicy:cachePolicy];
 }
 
-- (instancetype)initWithCacheFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
+- (instancetype)initWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
     self = [super init];
     if (self) {
-        _cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:filePath cachePolicy:cachePolicy];
+        NSString *name = [url.absoluteString ll_md5];
+        NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+        _cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
         _operationQueue = [[NSOperationQueue alloc] init];
         _operationQueue.maxConcurrentOperationCount = 1;
         _operationQueue.name = @"com.avplayeritem.llcache";
         _pendingRequests = [NSMutableArray array];
         _currentDataRange = LLInvalidRange;
-        LLLog(@"[CacheSupport] cache file path: %@", filePath);
+        LLLog(@"[CacheSupport] cache file path: %@", path);
     }
     return self;
 }
@@ -95,7 +98,7 @@
 }
 
 - (void)startNextRequest
-{    
+{
     if (_currentRequest || _pendingRequests.count == 0) {
         return;
     }
@@ -224,6 +227,7 @@
 {
     if (loadingRequest == _currentRequest) {
         [self cancelCurrentRequest:NO];
+        [self startNextRequest];
     } else {
         [_pendingRequests removeObject:loadingRequest];
     }

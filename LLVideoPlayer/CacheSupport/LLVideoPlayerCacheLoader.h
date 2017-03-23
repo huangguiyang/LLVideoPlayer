@@ -12,10 +12,8 @@
 
 @interface LLVideoPlayerCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
-@property (nonatomic, strong, readonly) NSString *cacheFilePath;
++ (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
-+ (instancetype)loaderWithCacheFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
-
-- (instancetype)initWithCacheFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
+- (instancetype)initWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 @end
