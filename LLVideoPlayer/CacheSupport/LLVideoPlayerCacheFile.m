@@ -332,17 +332,19 @@
         return NO;
     }
     
-    @try {
-        [self.writeFileHandle seekToFileOffset:offset];
-        [self.writeFileHandle writeData:data];
-    } @catch (NSException *exception) {
-        return NO;
-    }
-    
-    [self addRange:NSMakeRange(offset, data.length)];
-    
-    if (synchronize) {
-        [self synchronize];
+    @synchronized (self) {
+        @try {
+            [self.writeFileHandle seekToFileOffset:offset];
+            [self.writeFileHandle writeData:data];
+        } @catch (NSException *exception) {
+            return NO;
+        }
+        
+        [self addRange:NSMakeRange(offset, data.length)];
+        
+        if (synchronize) {
+            [self synchronize];
+        }
     }
     
     return YES;
@@ -354,20 +356,22 @@
         return nil;
     }
     
-    NSRange cachedRange = [self cachedRangeForRange:range];
-    if (NO == LLValidFileRange(cachedRange)) {
-        return nil;
-    }
-    
+    @synchronized (self) {
+        NSRange cachedRange = [self cachedRangeForRange:range];
+        if (NO == LLValidFileRange(cachedRange)) {
+            return nil;
+        }
+        
 #ifdef DEBUG
-    if (NO == NSEqualRanges(range, cachedRange)) {
-        NSLog(@"[ERR] read ranges mismatch: expect %@, but got %@",
-              NSStringFromRange(range), NSStringFromRange(cachedRange));
-    }
+        if (NO == NSEqualRanges(range, cachedRange)) {
+            NSLog(@"[ERR] read ranges mismatch: expect %@, but got %@",
+                  NSStringFromRange(range), NSStringFromRange(cachedRange));
+        }
 #endif
-    
-    [self.readFileHandle seekToFileOffset:range.location];
-    return [self.readFileHandle readDataOfLength:cachedRange.length];
+        
+        [self.readFileHandle seekToFileOffset:range.location];
+        return [self.readFileHandle readDataOfLength:cachedRange.length];
+    }
 }
 
 - (NSRange)firstNotCachedRangeFromPosition:(NSUInteger)position

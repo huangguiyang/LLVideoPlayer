@@ -12,8 +12,6 @@
 @class AVAssetResourceLoadingRequest;
 @class LLVideoPlayerCacheTask;
 
-typedef void (^LLVideoPlayerCacheTaskFinishedBlock) (LLVideoPlayerCacheTask *, NSError *);
-
 @interface LLVideoPlayerCacheTask : NSOperation
 {
     @protected
@@ -22,8 +20,8 @@ typedef void (^LLVideoPlayerCacheTaskFinishedBlock) (LLVideoPlayerCacheTask *, N
     NSRange _range;
 }
 
-@property (nonatomic, copy) LLVideoPlayerCacheTaskFinishedBlock finishBlock;
-
 - (instancetype)initWithCacheFilePath:(LLVideoPlayerCacheFile *)cacheFile loadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range;
+
+@property (nonatomic, strong) NSError *error;
 
 @end
