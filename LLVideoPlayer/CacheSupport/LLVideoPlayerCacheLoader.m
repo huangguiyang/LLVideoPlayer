@@ -36,7 +36,7 @@
 
 - (void)dealloc
 {
-    [_operationQueue cancelAllOperations];
+    [self cleanupOperationQueue];
 }
 
 + (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
@@ -51,9 +51,7 @@
         NSString *name = [url.absoluteString ll_md5];
         NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
         _cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
-        _operationQueue = [[NSOperationQueue alloc] init];
-        _operationQueue.maxConcurrentOperationCount = 1;
-        _operationQueue.name = @"com.avplayeritem.llcache";
+        [self createOperationQueue];
         _pendingRequests = [NSMutableArray array];
         _currentDataRange = LLInvalidRange;
         LLLog(@"[CacheSupport] cache file path: %@", path);
@@ -63,6 +61,21 @@
 
 #pragma mark - Private
 
+- (void)createOperationQueue
+{
+    _operationQueue = [[NSOperationQueue alloc] init];
+    _operationQueue.maxConcurrentOperationCount = 1;
+    _operationQueue.name = @"com.avplayeritem.llcache";
+    [_operationQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)cleanupOperationQueue
+{
+    [_operationQueue removeObserver:self forKeyPath:@"operationCount"];
+    [_operationQueue cancelAllOperations];
+    _operationQueue = nil;
+}
+
 - (void)cleanupCurrentRequest
 {
     [_pendingRequests removeObject:_currentRequest];
@@ -71,19 +84,10 @@
     _currentResponse = nil;
 }
 
-- (void)cancelCurrentRequest:(BOOL)finish
+- (void)cancelCurrentRequest
 {
-    [_operationQueue cancelAllOperations];
-    
-    if (finish) {
-        if (_currentRequest && NO == _currentRequest.isFinished) {
-            [self finishCurrentRequestWithError:[NSError errorWithDomain:NSURLErrorDomain
-                                                                    code:NSURLErrorCancelled
-                                                                userInfo:nil]];
-        }
-    } else {
-        [self cleanupCurrentRequest];
-    }
+    [self cleanupOperationQueue];
+    [self cleanupCurrentRequest];
 }
 
 - (void)finishCurrentRequestWithError:(NSError *)error
@@ -138,6 +142,8 @@
 
 - (void)startCurrentRequest
 {
+    [self createOperationQueue];
+    
     _operationQueue.suspended = YES;
     
     if (_currentDataRange.length == NSIntegerMax) {
@@ -191,33 +197,60 @@
         [(LLVideoPlayerRemoteCacheTask *)task setResponse:_currentResponse];
     }
     
-    __weak typeof(self) weakSelf = self;
-    [task setFinishBlock:^(LLVideoPlayerCacheTask *task, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            
-            if (task.cancelled || error.code == NSURLErrorCancelled) {
-                return;
-            }
-            
-            if (error) {
-                [strongSelf finishCurrentRequestWithError:error];
-            } else {
-                if (_operationQueue.operationCount == 0) {
-                    [strongSelf finishCurrentRequestWithError:nil];
-                }
-            }
-        });
-    }];
+    [task addObserver:self forKeyPath:@"finished" options:NSKeyValueObservingOptionNew context:nil];
     
     [_operationQueue addOperation:task];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
+    if ([object isKindOfClass:[LLVideoPlayerCacheTask class]]) {
+        
+        if ([keyPath isEqualToString:@"finished"]) {
+            BOOL finished = [change[NSKeyValueChangeNewKey] boolValue];
+            if (finished) {                
+                __weak typeof(self) weakSelf = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    
+                    LLVideoPlayerCacheTask *task = (LLVideoPlayerCacheTask *)object;
+                    [task removeObserver:strongSelf forKeyPath:@"finished"];
+                    
+                    if (task.cancelled || task.error.code == NSURLErrorCancelled) {
+                        return;
+                    }
+                    
+                    if (task.error) {
+                        [strongSelf finishCurrentRequestWithError:task.error];
+                    }
+                });
+            }
+        }
+    } else if ([object isKindOfClass:[NSOperationQueue class]]) {
+        
+        if ([keyPath isEqualToString:@"operationCount"]) {
+            NSOperationQueue *queue = (NSOperationQueue *)object;
+            NSUInteger operationCount = [change[NSKeyValueChangeNewKey] integerValue];
+            if (operationCount == 0) {
+                // finished
+                __weak typeof(self) weakSelf = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    
+                    [strongSelf finishCurrentRequestWithError:nil];
+                });
+            }
+        }
+        
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 #pragma mark - AVAssetResourceLoaderDelegate
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    [self cancelCurrentRequest:YES];
     [_pendingRequests addObject:loadingRequest];
     [self startNextRequest];
     return YES;
@@ -226,8 +259,7 @@
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     if (loadingRequest == _currentRequest) {
-        [self cancelCurrentRequest:NO];
-        [self startNextRequest];
+        [self cancelCurrentRequest];
     } else {
         [_pendingRequests removeObject:loadingRequest];
     }

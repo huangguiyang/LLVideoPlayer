@@ -13,6 +13,7 @@
 #import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerCacheLoader.h"
 #import "NSURL+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheFile.h"
 
 typedef void (^VoidBlock) (void);
 
@@ -657,6 +658,13 @@ typedef void (^VoidBlock) (void);
 - (BOOL)isPlayingVideo
 {
     return self.avPlayer && self.avPlayer.rate != 0.0;
+}
+
+#pragma mark - Cache
+
++ (void)clearAllCachedData
+{
+    [[NSFileManager defaultManager] removeItemAtPath:[LLVideoPlayerCacheFile cacheDirectory] error:nil];
 }
 
 @end

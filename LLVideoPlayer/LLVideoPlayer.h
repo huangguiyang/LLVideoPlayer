@@ -49,4 +49,7 @@
 - (double)currentBitRateInKbps;
 - (NSTimeInterval)currentTime;
 
+#pragma mark - Cache
++ (void)clearAllCachedData;
+
 @end

@@ -10,6 +10,7 @@
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
 #import "LLVideoPlayerInternal.h"
+#include <pthread.h>
 
 @interface LLVideoPlayerCacheFile ()
 
@@ -54,11 +55,10 @@
                 [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:nil];
             }
             
-            fileExist = [[NSFileManager defaultManager] createFileAtPath:cacheFilePath contents:nil attributes:nil] && [[NSFileManager defaultManager] createFileAtPath:indexFilePath contents:nil attributes:nil];
-        }
-        
-        if (NO == fileExist) {
-            return nil;
+            if (NO == ([[NSFileManager defaultManager] createFileAtPath:cacheFilePath contents:nil attributes:nil] &&
+                       [[NSFileManager defaultManager] createFileAtPath:indexFilePath contents:nil attributes:nil])) {
+                return nil;
+            }
         }
         
         self.cachePolicy = cachePolicy ?: [LLVideoPlayerCachePolicy defaultPolicy];
@@ -68,14 +68,8 @@
         self.readFileHandle = [NSFileHandle fileHandleForReadingAtPath:cacheFilePath];
         self.writeFileHandle = [NSFileHandle fileHandleForWritingAtPath:cacheFilePath];
         
-        // sanity check
-        NSString *indexStr = [NSString stringWithContentsOfFile:indexFilePath encoding:NSUTF8StringEncoding error:nil];
-        NSData *indexData = [indexStr dataUsingEncoding:NSUTF8StringEncoding];
-        NSDictionary *indexDict = [NSJSONSerialization JSONObjectWithData:indexData options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers error:nil];
-        if (NO == [self unserializeIndex:indexDict]) {
-            [self truncateFileToLength:0];
-        }
-        
+        // load data && check
+        [self loadData];
         [self checkComplete];
         [self checkCacheDirectory:[LLVideoPlayerCacheFile cacheDirectory]];
     }
@@ -95,6 +89,16 @@
     NSString *index = [path stringByAppendingPathComponent:[LLVideoPlayerCacheFile indexFileExtension]];
     [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
     LLLog(@"cache deleted: %@", path);
+}
+
+- (void)loadData
+{
+    NSString *indexStr = [NSString stringWithContentsOfFile:self.indexFilePath encoding:NSUTF8StringEncoding error:nil];
+    NSData *indexData = [indexStr dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *indexDict = [NSJSONSerialization JSONObjectWithData:indexData options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers error:nil];
+    if (NO == [self unserializeIndex:indexDict]) {
+        [self truncateFileToLength:0];
+    }
 }
 
 - (void)checkCacheDirectory:(NSString *)directory
@@ -167,48 +171,53 @@
         return NO;
     }
     
-    NSNumber *fileSize = dict[@"size"];
-    if (fileSize && [fileSize isKindOfClass:[NSNumber class]]) {
-        self.fileLength = [fileSize integerValue];
+    @synchronized (self) {
+        NSNumber *fileSize = dict[@"size"];
+        if (fileSize && [fileSize isKindOfClass:[NSNumber class]]) {
+            self.fileLength = [fileSize integerValue];
+        }
+        
+        if (self.fileLength == 0) {
+            return NO;
+        }
+        
+        [self.ranges removeAllObjects];
+        NSMutableArray *ranges = dict[@"ranges"];
+        for (NSString *rangeStr in ranges) {
+            NSRange range = NSRangeFromString(rangeStr);
+            [self.ranges addObject:[NSValue valueWithRange:range]];
+        }
+        
+        self.responseHeaders = dict[@"responseHeaders"];
     }
-    
-    if (self.fileLength == 0) {
-        return NO;
-    }
-    
-    [self.ranges removeAllObjects];
-    NSMutableArray *ranges = dict[@"ranges"];
-    for (NSString *rangeStr in ranges) {
-        NSRange range = NSRangeFromString(rangeStr);
-        [self.ranges addObject:[NSValue valueWithRange:range]];
-    }
-    
-    self.responseHeaders = dict[@"responseHeaders"];
     
     return YES;
 }
 
-- (NSString *)serializeIndex
+- (BOOL)serializeIndex
 {
     NSMutableArray *ranges = [NSMutableArray array];
     
-    for (NSValue *range in self.ranges) {
-        [ranges addObject:NSStringFromRange([range rangeValue])];
+    @synchronized (self) {
+        for (NSValue *range in self.ranges) {
+            [ranges addObject:NSStringFromRange([range rangeValue])];
+        }
+        
+        NSMutableDictionary *dict = [@{@"size": @(self.fileLength),
+                                       @"ranges": ranges} mutableCopy];
+        
+        if (self.responseHeaders) {
+            dict[@"responseHeaders"] = self.responseHeaders;
+        }
+        
+        NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
+        if (nil == data) {
+            return nil;
+        }
+        
+        NSString *indexStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        return [indexStr writeToFile:self.indexFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     }
-    
-    NSMutableDictionary *dict = [@{@"size": @(self.fileLength),
-                                  @"ranges": ranges} mutableCopy];
-    
-    if (self.responseHeaders) {
-        dict[@"responseHeaders"] = self.responseHeaders;
-    }
-    
-    NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    if (nil == data) {
-        return nil;
-    }
-    
-    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 }
 
 - (BOOL)truncateFileToLength:(NSInteger)length
@@ -217,15 +226,17 @@
         return NO;
     }
     
-    self.fileLength = length;
-    @try {
-        [self.writeFileHandle truncateFileAtOffset:length];
-        unsigned long long end = [self.writeFileHandle seekToEndOfFile];
-        if (end != length) {
+    @synchronized (self) {
+        self.fileLength = length;
+        @try {
+            [self.writeFileHandle truncateFileAtOffset:length];
+            unsigned long long end = [self.writeFileHandle seekToEndOfFile];
+            if (end != length) {
+                return NO;
+            }
+        } @catch (NSException *exception) {
             return NO;
         }
-    } @catch (NSException *exception) {
-        return NO;
     }
     
     return YES;
@@ -274,14 +285,16 @@
 
 - (void)checkComplete
 {
-    if (self.ranges.count == 1) {
-        NSRange range = [self.ranges[0] rangeValue];
-        self.complete = range.location == 0 && range.length == self.fileLength;
-    } else {
-        self.complete = NO;
-    }
-    if (self.complete) {
-        LLLog(@"cache complete!!!");
+    @synchronized (self) {
+        if (self.ranges.count == 1) {
+            NSRange range = [self.ranges[0] rangeValue];
+            self.complete = range.location == 0 && range.length == self.fileLength;
+        } else {
+            self.complete = NO;
+        }
+        if (self.complete) {
+            LLLog(@"cache complete!!!");
+        }
     }
 }
 
@@ -312,12 +325,6 @@
     return LLInvalidRange;
 }
 
-- (BOOL)synchronize
-{
-    NSString *indexStr = [self serializeIndex];
-    return [indexStr writeToFile:self.indexFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-}
-
 #pragma mark - Public
 
 + (NSString *)cacheDirectory
@@ -326,20 +333,27 @@
     return [cache stringByAppendingPathComponent:@"com.ll.vplayer"];
 }
 
+- (BOOL)synchronize
+{
+    return [self serializeIndex];
+}
+
 - (BOOL)saveData:(NSData *)data atOffset:(NSUInteger)offset synchronize:(BOOL)synchronize
 {
     if (nil == self.writeFileHandle) {
         return NO;
     }
     
-    @try {
-        [self.writeFileHandle seekToFileOffset:offset];
-        [self.writeFileHandle writeData:data];
-    } @catch (NSException *exception) {
-        return NO;
+    @synchronized (self) {
+        @try {
+            [self.writeFileHandle seekToFileOffset:offset];
+            [self.writeFileHandle writeData:data];
+        } @catch (NSException *exception) {
+            return NO;
+        }
+        
+        [self addRange:NSMakeRange(offset, data.length)];
     }
-    
-    [self addRange:NSMakeRange(offset, data.length)];
     
     if (synchronize) {
         [self synchronize];
@@ -354,20 +368,22 @@
         return nil;
     }
     
-    NSRange cachedRange = [self cachedRangeForRange:range];
-    if (NO == LLValidFileRange(cachedRange)) {
-        return nil;
-    }
-    
+    @synchronized (self) {
+        NSRange cachedRange = [self cachedRangeForRange:range];
+        if (NO == LLValidFileRange(cachedRange)) {
+            return nil;
+        }
+        
 #ifdef DEBUG
-    if (NO == NSEqualRanges(range, cachedRange)) {
-        NSLog(@"[ERR] read ranges mismatch: expect %@, but got %@",
-              NSStringFromRange(range), NSStringFromRange(cachedRange));
-    }
+        if (NO == NSEqualRanges(range, cachedRange)) {
+            NSLog(@"[ERR] read ranges mismatch: expect %@, but got %@",
+                  NSStringFromRange(range), NSStringFromRange(cachedRange));
+        }
 #endif
-    
-    [self.readFileHandle seekToFileOffset:range.location];
-    return [self.readFileHandle readDataOfLength:cachedRange.length];
+        
+        [self.readFileHandle seekToFileOffset:range.location];
+        return [self.readFileHandle readDataOfLength:cachedRange.length];
+    }
 }
 
 - (NSRange)firstNotCachedRangeFromPosition:(NSUInteger)position
@@ -376,22 +392,24 @@
         return LLInvalidRange;
     }
     
-    NSUInteger start = position;
-    for (int i = 0; i < self.ranges.count; i++) {
-        NSRange range = [self.ranges[i] rangeValue];
-        if (NSLocationInRange(start, range)) {
-            start = NSMaxRange(range);
-        } else {
-            if (start >= NSMaxRange(range)) {
-                continue;
+    @synchronized (self) {
+        NSUInteger start = position;
+        for (int i = 0; i < self.ranges.count; i++) {
+            NSRange range = [self.ranges[i] rangeValue];
+            if (NSLocationInRange(start, range)) {
+                start = NSMaxRange(range);
             } else {
-                return NSMakeRange(start, range.location - start);
+                if (start >= NSMaxRange(range)) {
+                    continue;
+                } else {
+                    return NSMakeRange(start, range.location - start);
+                }
             }
         }
-    }
-    
-    if (start < self.fileLength) {
-        return NSMakeRange(start, self.fileLength - start);
+        
+        if (start < self.fileLength) {
+            return NSMakeRange(start, self.fileLength - start);
+        }
     }
     
     return LLInvalidRange;
@@ -399,28 +417,34 @@
 
 - (NSUInteger)maxCachedLength
 {
-    if (self.ranges.count > 0) {
-        NSRange range = [[self.ranges lastObject] rangeValue];
-        return NSMaxRange(range);
+    @synchronized (self) {
+        if (self.ranges.count > 0) {
+            NSRange range = [[self.ranges lastObject] rangeValue];
+            return NSMaxRange(range);
+        }
+        return 0;
     }
-    return 0;
 }
 
 - (BOOL)isCompleted
 {
-    return self.complete;
+    @synchronized (self) {
+        return self.complete;
+    }
 }
 
 - (BOOL)setResponse:(NSHTTPURLResponse *)response
 {
-    BOOL success = YES;
-    if (self.fileLength == 0) {
-        success = [self truncateFileToLength:response.ll_contentLength];
+    @synchronized (self) {
+        BOOL success = YES;
+        if (self.fileLength == 0) {
+            success = [self truncateFileToLength:response.ll_contentLength];
+        }
+        self.responseHeaders = [[response allHeaderFields] copy];
+        success = success && [self synchronize];
+        
+        return success;
     }
-    self.responseHeaders = [[response allHeaderFields] copy];
-    success = success && [self synchronize];
-    
-    return success;
 }
 
 @end

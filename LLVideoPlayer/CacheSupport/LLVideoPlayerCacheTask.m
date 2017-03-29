@@ -40,9 +40,7 @@
     @autoreleasepool {
         [self setFinished:NO];
         [self setExecuting:YES];
-        if (self.finishBlock) {
-            self.finishBlock(self, nil);
-        }
+
         [self setExecuting:NO];
         [self setFinished:YES];
     }

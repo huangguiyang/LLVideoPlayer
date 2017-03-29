@@ -21,7 +21,6 @@
     NSURLConnection *_connection;
     NSUInteger _offset;
     NSUInteger _requestLength;
-    NSError *_error;
     CFRunLoopRef _runloop;
 }
 
@@ -51,8 +50,8 @@
 
 - (void)cancel
 {
-    [super cancel];
     [_connection cancel];
+    [super cancel];
 }
 
 - (void)setFinished:(BOOL)finished
@@ -71,9 +70,6 @@
 
 - (void)handleFinished
 {
-    if (self.finishBlock) {
-        self.finishBlock(self, _error);
-    }
     [self setExecuting:NO];
     [self setFinished:YES];
 }
@@ -123,7 +119,7 @@
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     [self syncCacheFile];
-    _error = error;
+    self.error = error;
     [self stopRunLoop];
 }
 
