@@ -208,9 +208,7 @@
         
         if ([keyPath isEqualToString:@"finished"]) {
             BOOL finished = [change[NSKeyValueChangeNewKey] boolValue];
-            if (finished) {
-                LLLog(@"observeValueForKeyPath: finished, %@", object);
-                
+            if (finished) {                
                 __weak typeof(self) weakSelf = self;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -235,7 +233,6 @@
             NSUInteger operationCount = [change[NSKeyValueChangeNewKey] integerValue];
             if (operationCount == 0) {
                 // finished
-                LLLog(@"observeValueForKeyPath: operationCount == 0");
                 __weak typeof(self) weakSelf = self;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -254,7 +251,6 @@
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLLog(@"shouldWaitForLoadingOfRequestedResource: %@", loadingRequest);
     [_pendingRequests addObject:loadingRequest];
     [self startNextRequest];
     return YES;
@@ -262,7 +258,6 @@
 
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLLog(@"didCancelLoadingRequest: %@", loadingRequest);
     if (loadingRequest == _currentRequest) {
         [self cancelCurrentRequest];
     } else {

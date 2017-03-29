@@ -50,8 +50,8 @@
 
 - (void)cancel
 {
-    [super cancel];
     [_connection cancel];
+    [super cancel];
 }
 
 - (void)setFinished:(BOOL)finished
