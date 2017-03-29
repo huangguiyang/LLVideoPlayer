@@ -6,6 +6,13 @@
 
 A Low Level Video Player inspired by [VKVideoPlayer](https://github.com/viki-org/VKVideoPlayer).
 
+
+
+- [x] simple and flexible
+- [x] customize cache support
+- [ ] AirPlay support
+
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
