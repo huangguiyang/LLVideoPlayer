@@ -156,7 +156,7 @@
         return [date1 compare:date2];
     }];
     
-    while (paths.count > 0 && totalSize < self.cachePolicy.diskCapacity) {
+    while (paths.count > 0 && totalSize >= self.cachePolicy.diskCapacity) {
         NSString *path = [paths firstObject];
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         [LLVideoPlayerCacheFile removeCacheAtPath:path];
