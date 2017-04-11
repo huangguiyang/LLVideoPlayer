@@ -14,5 +14,7 @@
 
 @property (nonatomic, assign) NSUInteger diskCapacity;   // in bytes
 @property (nonatomic, assign) NSUInteger outdatedHours;  // in hours
+@property (nonatomic, assign) CGFloat diskAvailableRate; // value between (0,1)
+
 
 @end

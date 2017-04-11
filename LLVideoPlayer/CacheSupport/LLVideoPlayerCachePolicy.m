@@ -22,6 +22,7 @@
         // default
         self.diskCapacity = 200 << 20;
         self.outdatedHours = 7 * 24;
+        self.diskAvailableRate = 0.1;
     }
     return self;
 }
