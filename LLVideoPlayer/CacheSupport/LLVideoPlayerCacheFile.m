@@ -150,8 +150,9 @@
         int64_t diskSpaceSize = [self diskSpace];
         int64_t diskSpaceFreeSize = [self diskSpaceFree];
         if (-1 != diskSpaceSize && -1 != diskSpaceFreeSize) {
-             currentDiskAvailableRate = (CGFloat)(diskSpaceFreeSize / diskSpaceSize);
+             currentDiskAvailableRate = (CGFloat)diskSpaceFreeSize / (CGFloat)diskSpaceSize;
         }
+
         if (currentDiskAvailableRate >= self.cachePolicy.diskAvailableRate) {
             return;
         }
