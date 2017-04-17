@@ -144,8 +144,18 @@
         totalSize += [attr fileSize];
     }
     
+    CGFloat currentDiskAvailableRate = self.cachePolicy.diskAvailableRate;
+    
     if (totalSize < self.cachePolicy.diskCapacity) {
-        return;
+        int64_t diskSpaceSize = [self diskSpace];
+        int64_t diskSpaceFreeSize = [self diskSpaceFree];
+        if (-1 != diskSpaceSize && -1 != diskSpaceFreeSize) {
+             currentDiskAvailableRate = (CGFloat)diskSpaceFreeSize / (CGFloat)diskSpaceSize;
+        }
+
+        if (currentDiskAvailableRate >= self.cachePolicy.diskAvailableRate) {
+            return;
+        }
     }
     
     [paths sortUsingComparator:^NSComparisonResult(NSString *obj1, NSString *obj2) {
@@ -156,7 +166,7 @@
         return [date1 compare:date2];
     }];
     
-    while (paths.count > 0 && totalSize < self.cachePolicy.diskCapacity) {
+    while (paths.count > 0 && (totalSize  >= self.cachePolicy.diskCapacity || currentDiskAvailableRate < self.cachePolicy.diskAvailableRate)) {
         NSString *path = [paths firstObject];
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         [LLVideoPlayerCacheFile removeCacheAtPath:path];
@@ -323,6 +333,35 @@
     }
     
     return LLInvalidRange;
+}
+
+#pragma mark - disk space
+- (int64_t)diskSpaceFree
+{
+    NSError *error = nil;
+    NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
+    if (error) {
+        return -1;
+    }
+    int64_t space = [attrs[NSFileSystemFreeSize] longLongValue];
+    if (space < 0) {
+        space = -1;
+    }
+    return space;
+}
+
+- (int64_t)diskSpace
+{
+    NSError *error = nil;
+    NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
+    if (error) {
+        return -1;
+    }
+    int64_t space = [attrs[NSFileSystemSize] longLongValue];
+    if (space < 0) {
+        space = -1;
+    }
+    return space;
 }
 
 #pragma mark - Public
