@@ -26,9 +26,7 @@
 
 - (instancetype)init
 {
-    @throw [NSException exceptionWithName:@"LLVideoTrack"
-                                   reason:NSInternalInconsistencyException
-                                 userInfo:@{NSLocalizedDescriptionKey : @"use initWithStreamURL: instead"}];
+    return [self initWithStreamURL:nil];
 }
 
 - (instancetype)initWithStreamURL:(NSURL *)streamURL
