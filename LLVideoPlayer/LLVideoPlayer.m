@@ -346,6 +346,7 @@ typedef void (^VoidBlock) (void);
         _avPlayer = avPlayer;
         if (avPlayer) {
             __weak __typeof(self) weakSelf = self;
+            avPlayer.volume = [AVAudioSession sharedInstance].outputVolume;
             [avPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
             self.avTimeObserver = [avPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
                 [weakSelf periodicTimeObserver:time];
