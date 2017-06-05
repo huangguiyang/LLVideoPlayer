@@ -107,6 +107,15 @@ typedef void (^VoidBlock) (void);
 
 #pragma mark - Control
 
+- (void)startContent
+{
+    ll_run_on_ui_thread(^{
+        if (self.state == LLVideoPlayerStateContentLoading) {
+            self.state = LLVideoPlayerStateContentPlaying;
+        }
+    });
+}
+
 - (void)playContent
 {
     ll_run_on_ui_thread(^{
@@ -163,13 +172,16 @@ typedef void (^VoidBlock) (void);
             case LLVideoPlayerStateError:
                 LLLog(@"Trying to pause content but LLVideoPlayerStateError");
                 // fall through
-            case LLVideoPlayerStateContentLoading:
             case LLVideoPlayerStateContentPlaying:
             case LLVideoPlayerStateContentPaused:
                 self.state = LLVideoPlayerStateContentPaused;
                 if (completionHandler) {
                     completionHandler();
                 }
+                break;
+                
+            case LLVideoPlayerStateContentLoading:
+                LLLog(@"Trying to pause content but LLVideoPlayerStateContentLoading");
                 break;
                 
             case LLVideoPlayerStateDismissed:
@@ -462,7 +474,13 @@ typedef void (^VoidBlock) (void);
         
         if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
             LLLog(@"playbackLikelyToKeepUp: %@", self.avPlayerItem.playbackLikelyToKeepUp ? @"YES" : @"NO");
-            if (self.state == LLVideoPlayerStateContentPlaying) {
+            if (self.state == LLVideoPlayerStateContentLoading) {
+                if (self.avPlayerItem.playbackLikelyToKeepUp &&
+                    (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay ||
+                     self.avPlayer.status == AVPlayerStatusReadyToPlay)) {
+                        [self handlePlayItemLikelyToKeepUpAndStart];
+                }
+            } else if (self.state == LLVideoPlayerStateContentPlaying) {
                 if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:track:)]) {
                     [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.avPlayerItem.playbackLikelyToKeepUp track:self.track];
                 }
@@ -485,34 +503,35 @@ typedef void (^VoidBlock) (void);
 
 - (void)handlePlayerItemReadyToPlay
 {
+    // this method is discarded, just do nothing
+}
+
+- (void)handlePlayItemLikelyToKeepUpAndStart
+{
     ll_run_on_ui_thread(^{
+        LLLog(@"handlePlayItemLikelyToKeepUpAndStart");
         switch (self.state) {
-            case LLVideoPlayerStateContentPaused:
-                // paused, do nothing
-                break;
             case LLVideoPlayerStateContentLoading:
             case LLVideoPlayerStateError: {
-                // save
-                NSNumber *lastWatchDuration = self.track.lastWatchedDuration;
+                if ([self.delegate respondsToSelector:@selector(videoPlayer:willStartVideo:)]) {
+                    [self.delegate videoPlayer:self willStartVideo:self.track];
+                }
                 
-                [self pauseContent:NO completionHandler:^{
-                    if ([self.delegate respondsToSelector:@selector(videoPlayer:willStartVideo:)]) {
-                        [self.delegate videoPlayer:self willStartVideo:self.track];
-                    }
-                    
-                    // restore
-                    self.track.lastWatchedDuration = lastWatchDuration;
-                    [self seekToLastWatchedDuration:^(BOOL finished) {
-                        if (finished) {
-                            [self playContent];
-                        }
+                [self seekToLastWatchedDuration:^(BOOL finished) {
+                    if (finished) {
+                        [self startContent];
+                        
                         if ([self.delegate respondsToSelector:@selector(videoPlayer:didStartVideo:)]) {
                             [self.delegate videoPlayer:self didStartVideo:self.track];
                         }
-                    }];
+                    }
                 }];
             }
                 break;
+                
+            case LLVideoPlayerStateContentPaused:
+                break;
+                
             case LLVideoPlayerStateContentPlaying:
             case LLVideoPlayerStateDismissed:
             case LLVideoPlayerStateUnknown:
