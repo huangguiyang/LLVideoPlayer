@@ -476,13 +476,7 @@ typedef void (^VoidBlock) (void);
         
         if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
             LLLog(@"playbackLikelyToKeepUp: %@", self.avPlayerItem.playbackLikelyToKeepUp ? @"YES" : @"NO");
-            if (self.state == LLVideoPlayerStateContentLoading) {
-                if (self.avPlayerItem.playbackLikelyToKeepUp &&
-                    (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay ||
-                     self.avPlayer.status == AVPlayerStatusReadyToPlay)) {
-                        [self handlePlayItemLikelyToKeepUpAndStart];
-                }
-            } else if (self.state == LLVideoPlayerStateContentPlaying) {
+            if (self.state == LLVideoPlayerStateContentPlaying) {
                 if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:track:)]) {
                     [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.avPlayerItem.playbackLikelyToKeepUp track:self.track];
                 }
@@ -505,13 +499,7 @@ typedef void (^VoidBlock) (void);
 
 - (void)handlePlayerItemReadyToPlay
 {
-    // this method is discarded, just do nothing
-}
-
-- (void)handlePlayItemLikelyToKeepUpAndStart
-{
     ll_run_on_ui_thread(^{
-        LLLog(@"handlePlayItemLikelyToKeepUpAndStart");
         switch (self.state) {
             case LLVideoPlayerStateContentLoading:
             case LLVideoPlayerStateError: {

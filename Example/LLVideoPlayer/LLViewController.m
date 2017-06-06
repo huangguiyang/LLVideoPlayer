@@ -43,6 +43,14 @@
     }
     
     {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [button setTitle:@"force play" forState:UIControlStateNormal];
+        [self.view addSubview:button];
+        button.frame = CGRectMake(100, 30, 80, 40);
+        [button addTarget:self action:@selector(forcePlayAction:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    {
         self.stateLabel = [UILabel new];
         self.stateLabel.backgroundColor = [UIColor clearColor];
         self.stateLabel.font = [UIFont systemFontOfSize:14];
@@ -144,6 +152,11 @@
     float sec = [self.player.track.totalDuration floatValue] * sender.value;
     
     [self.player seekToTimeInSecond:sec userAction:YES completionHandler:nil];
+}
+
+- (void)forcePlayAction:(id)sender
+{
+    self.player.state = LLVideoPlayerStateContentPlaying;
 }
 
 #pragma mark - LLVideoPlayerDelegate
