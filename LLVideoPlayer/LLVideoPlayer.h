@@ -48,6 +48,7 @@
 #pragma mark - Data
 - (double)currentBitRateInKbps;
 - (NSTimeInterval)currentTime;
+- (BOOL)stalling;
 
 #pragma mark - Cache
 + (void)clearAllCachedData;

@@ -12,7 +12,7 @@
 
 - (void)ll_seekToTimeInSeconds:(float)time completionHandler:(void (^)(BOOL))completionHandler
 {
-    [self seekToTime:CMTimeMakeWithSeconds(time, 1) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:completionHandler];
+    [self seekToTime:CMTimeMakeWithSeconds(time, 1) completionHandler:completionHandler];
 }
 
 - (NSTimeInterval)ll_currentItemDuration
