@@ -14,10 +14,11 @@ LLVideoPlayer is a low level video player which is simple and easy to extend.
 
   s.ios.deployment_target = '7.0'
 
-  s.public_header_files = 'LLVideoPlayer/**/*.h'
+  s.public_header_files = 'LLVideoPlayer/*.h'
   s.source_files = 'LLVideoPlayer/*.{m,h}'
 
   s.subspec 'CacheSupport' do |ss|
+    ss.public_header_files = 'LLVideoPlayer/*.h'
 	ss.source_files = 'LLVideoPlayer/CacheSupport/*.{m,h}'
   end
 
