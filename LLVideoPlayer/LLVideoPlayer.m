@@ -327,7 +327,7 @@ typedef void (^VoidBlock) (void);
                 return;
             }
             NSError *error = nil;
-            AVKeyValueStatus status = [asset statusOfValueForKey:kTracksKey error:&error];
+            AVKeyValueStatus status = [asset statusOfValueForKey:kPlayableKey error:&error];
             if (status == AVKeyValueStatusLoaded) {
                 LLLog(@"AVURLAsset loaded. [OK]");
                 self.avPlayerItem = [AVPlayerItem playerItemWithAsset:asset];
