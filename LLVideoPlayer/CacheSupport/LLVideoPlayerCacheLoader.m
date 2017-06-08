@@ -14,18 +14,6 @@
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheOperation.h"
-#include <sys/sysctl.h>
-
-static unsigned int numberOfCores(void)
-{
-    size_t len;
-    unsigned int ncpu;
-    
-    len = sizeof(ncpu);
-    sysctlbyname("hw.ncpu", &ncpu, &len, NULL, 0);
-    
-    return ncpu;
-}
 
 @interface LLVideoPlayerCacheLoader ()
 {
@@ -62,7 +50,6 @@ static unsigned int numberOfCores(void)
         _operationQueue = [[NSOperationQueue alloc] init];
         _operationQueue.name = @"com.llvideoplayer.cache";
         _operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        _operationQueue.maxConcurrentOperationCount = numberOfCores();
         [_operationQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
         TLog(@"[CacheSupport] cache file path: %@", path);
     }
