@@ -10,15 +10,15 @@
 #import <objc/runtime.h>
 #import <CommonCrypto/CommonDigest.h>
 
-static char originalSchemeKey;
+static NSString *const kCustomSchemePrefix = @"ll-";
 
 @implementation NSURL (LLVideoPlayer)
 
 - (NSURL *)ll_customSchemeURL
 {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:self resolvingAgainstBaseURL:NO];
-    if (NO == [components.scheme hasPrefix:@"streaming"]) {
-        components.scheme = [NSString stringWithFormat:@"streaming%@", components.scheme];
+    if (NO == [components.scheme hasPrefix:kCustomSchemePrefix]) {
+        components.scheme = [NSString stringWithFormat:@"%@%@", kCustomSchemePrefix, components.scheme];
     }
     return [components URL];
 }
@@ -26,8 +26,8 @@ static char originalSchemeKey;
 - (NSURL *)ll_originalSchemeURL
 {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:self resolvingAgainstBaseURL:NO];
-    if ([components.scheme hasPrefix:@"streaming"]) {
-        components.scheme = [components.scheme substringFromIndex:@"streaming".length];
+    if ([components.scheme hasPrefix:kCustomSchemePrefix]) {
+        components.scheme = [components.scheme substringFromIndex:kCustomSchemePrefix.length];
     }
     return [components URL];
 }

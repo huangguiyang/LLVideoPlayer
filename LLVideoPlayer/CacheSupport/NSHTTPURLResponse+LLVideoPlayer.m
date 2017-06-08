@@ -17,9 +17,12 @@
 
 - (NSInteger)ll_contentLength
 {
-    NSString *range = self.allHeaderFields[@"Content-Range"];
-    if (range) {
-        NSArray *ranges = [range componentsSeparatedByString:@"/"];
+    // Get total content length
+    
+    // For example: "Content-Range" = "bytes 57933824-57999359/65904318"
+    NSString *contentRange = self.allHeaderFields[@"Content-Range"];
+    if (contentRange) {
+        NSArray *ranges = [contentRange componentsSeparatedByString:@"/"];
         if (ranges.count > 0) {
             NSString *lengthString = [[ranges lastObject] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             return [lengthString integerValue];

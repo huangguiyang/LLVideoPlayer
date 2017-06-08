@@ -346,6 +346,13 @@ typedef void (^VoidBlock) (void);
     if ([player respondsToSelector:@selector(setAllowsExternalPlayback:)]) {
         player.allowsExternalPlayback = NO;
     }
+    if ([player respondsToSelector:@selector(setAutomaticallyWaitsToMinimizeStalling:)]) {
+        if (self.cacheSupportEnabled) {
+            [player setAutomaticallyWaitsToMinimizeStalling:NO];
+        } else {
+            [player setAutomaticallyWaitsToMinimizeStalling:YES];
+        }
+    }
     return player;
 }
 

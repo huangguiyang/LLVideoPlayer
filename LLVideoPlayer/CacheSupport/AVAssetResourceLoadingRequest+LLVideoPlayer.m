@@ -12,7 +12,7 @@
 
 @implementation AVAssetResourceLoadingRequest (LLVideoPlayer)
 
-- (void)ll_fillContentInformation:(NSHTTPURLResponse *)response
+- (void)ll_fillContentInformation:(NSURLResponse *)response
 {
     if (nil == response) {
         return;
@@ -26,9 +26,14 @@
     
     NSString *mimeType = [response MIMEType];
     CFStringRef contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef)(mimeType), NULL);
-    self.contentInformationRequest.byteRangeAccessSupported = [response ll_supportRange];
     self.contentInformationRequest.contentType = CFBridgingRelease(contentType);
-    self.contentInformationRequest.contentLength = [response ll_contentLength];
+    
+    if (NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
+        return;
+    }
+    
+    self.contentInformationRequest.byteRangeAccessSupported = [(NSHTTPURLResponse *)response ll_supportRange];
+    self.contentInformationRequest.contentLength = [(NSHTTPURLResponse *)response ll_contentLength];
 }
 
 @end
