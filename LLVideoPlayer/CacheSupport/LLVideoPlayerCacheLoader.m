@@ -16,12 +16,9 @@
 #import "LLVideoPlayerCacheOperation.h"
 
 @interface LLVideoPlayerCacheLoader ()
-{
-    @private
-    LLVideoPlayerCacheFile *_cacheFile;
-    NSOperationQueue *_operationQueue;
-    NSHTTPURLResponse *_currentResponse;
-}
+
+@property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 @end
 
@@ -31,8 +28,7 @@
 
 - (void)dealloc
 {
-    [_operationQueue removeObserver:self forKeyPath:@"operationCount"];
-    [_operationQueue cancelAllOperations];
+    [self.operationQueue cancelAllOperations];
 }
 
 + (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
@@ -46,37 +42,25 @@
     if (self) {
         NSString *name = [url.absoluteString ll_md5];
         NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
-        _cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
-        _operationQueue = [[NSOperationQueue alloc] init];
-        _operationQueue.name = @"com.llvideoplayer.cache";
-        _operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        [_operationQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
-        LLLog(@"[CacheSupport] cache file path: %@", path);
+        self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
+        self.operationQueue = [[NSOperationQueue alloc] init];
+        self.operationQueue.name = @"com.LLVideoPlayer.cache";
+        self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
     }
     return self;
 }
 
 #pragma mark - Private
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:@"operationCount"]) {
-        NSInteger count = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
-        LLLog(@"observeValueForKeyPath: %@ == %ld", keyPath, count);
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-    }
-}
-
 - (void)startLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLVideoPlayerCacheOperation *operation = [LLVideoPlayerCacheOperation operationWithLoadingRequest:loadingRequest cacheFile:_cacheFile];
-    [_operationQueue addOperation:operation];
+    LLVideoPlayerCacheOperation *operation = [LLVideoPlayerCacheOperation operationWithLoadingRequest:loadingRequest cacheFile:self.cacheFile];
+    [self.operationQueue addOperation:operation];
 }
 
 - (void)cancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    NSArray<LLVideoPlayerCacheOperation *> *operations = _operationQueue.operations;
+    NSArray<LLVideoPlayerCacheOperation *> *operations = self.operationQueue.operations;
     for (LLVideoPlayerCacheOperation *operation in operations) {
         if (operation.loadingRequest == loadingRequest) {
             [operation cancel];

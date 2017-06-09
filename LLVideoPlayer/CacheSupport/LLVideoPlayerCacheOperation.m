@@ -11,15 +11,17 @@
 #import "NSURL+LLVideoPlayer.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
+#import "LLVideoPlayerCacheLocalTask.h"
+#import "LLVideoPlayerCacheRemoteTask.h"
 
-@interface LLVideoPlayerCacheOperation () <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
+@interface LLVideoPlayerCacheOperation () {
     CFRunLoopRef _runloop;
 }
 
 @property (nonatomic, getter = isFinished, readwrite)  BOOL finished;
 @property (nonatomic, getter = isExecuting, readwrite) BOOL executing;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
-@property (nonatomic, strong) NSURLConnection *connection;
+@property (nonatomic, strong) NSMutableArray *tasks;
 
 @end
 
@@ -29,7 +31,7 @@
 
 - (void)dealloc
 {
-    LLLog(@"LLVideoPlayerCacheOperation dealloc");
+    LLLog(@"LLVideoPlayerCacheOperation dealloc: %p", self);
 }
 
 - (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
@@ -37,8 +39,9 @@
 {
     self = [super init];
     if (self) {
-        _loadingRequest = loadingRequest;
-        _cacheFile = cacheFile;
+        self.loadingRequest = loadingRequest;
+        self.cacheFile = cacheFile;
+        self.tasks = [NSMutableArray array];
     }
     return self;
 }
@@ -51,7 +54,7 @@
 
 - (void)main
 {
-    LLLog(@"main: %@", [NSThread currentThread]);
+    LLLog(@"operation main: %p", self);
     
     @autoreleasepool {
         if ([self isCancelled]) {
@@ -67,20 +70,23 @@
 
 - (void)completeOperation
 {
-    LLLog(@"operation will complete...");
+    LLLog(@"operation will complete... %p", self);
     self.executing = NO;
     self.finished = YES;
-    LLLog(@"operation complete!!!");
+    LLLog(@"operation complete: %p", self);
 }
 
 #pragma mark - Cancel
 
 - (void)cancel
 {
-    LLLog(@"LLVideoPlayerCacheOperation cancel");
-    [self.connection cancel];
-    self.connection = nil;
+    LLLog(@"operation will cancel... %p", self);
+    for (LLVideoPlayerCacheTask *task in self.tasks) {
+        [task cancel];
+    }
+    [self.tasks removeAllObjects];
     [super cancel];
+    LLLog(@"operation cancelled: %p", self);
 }
 
 #pragma mark - Executing && Finished
@@ -140,70 +146,46 @@
 
 - (void)startOperation
 {
-    NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
-    request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
-    request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
-    
     // range
     NSRange range;
     if ([self.loadingRequest.dataRequest respondsToSelector:@selector(requestsAllDataToEndOfResource)] &&
         self.loadingRequest.dataRequest.requestsAllDataToEndOfResource) {
         range = NSMakeRange(self.loadingRequest.dataRequest.requestedOffset, NSIntegerMax);
     } else {
-        range = NSMakeRange(self.loadingRequest.dataRequest.requestedOffset, self.loadingRequest.dataRequest.requestedLength);
+        range = NSMakeRange(self.loadingRequest.dataRequest.requestedOffset,
+                            self.loadingRequest.dataRequest.requestedLength);
     }
-    NSString *rangeString = LLRangeToHTTPRangeHeader(range);
-    [request setValue:rangeString forHTTPHeaderField:@"Range"];
     
-    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-    [self.connection start];
+    LLVideoPlayerCacheRemoteTask *task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range userInfo:nil];
+    
+    __weak typeof(self) wself = self;
+    [task setDidReceiveResponseBlock:^(LLVideoPlayerCacheTask *task, NSURLResponse *response){
+        __strong typeof(wself) self = wself;
+        [self.loadingRequest ll_fillContentInformation:response];
+    }];
+    [task setCompletionBlock:^(LLVideoPlayerCacheTask *task, NSError *error){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(wself) self = wself;
+            
+            if ([self isCancelled] || error.code == NSUserCancelledError) {
+                return;
+            }
+            
+            [self.tasks removeObject:task];
+            
+            if (self.tasks.count == 0) {
+                if (nil == error) {
+                    [self.loadingRequest finishLoading];
+                } else {
+                    [self.loadingRequest finishLoadingWithError:error];
+                }
+            }
+        });
+    }];
+    [self.tasks addObject:task];
+    [task resume];
+    
     [self startRunLoop];
-}
-
-- (void)requestDidFinishWithResponse:(NSURLResponse *)response data:(NSData *)data error:(NSError *)error
-{
-    LLLog(@"Request Complete: %@, %@, %ld", response, error, data.length);
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __strong typeof(weakSelf) self = weakSelf;
-        if (nil == error) {
-            [self.loadingRequest ll_fillContentInformation:response];
-            [self.loadingRequest.dataRequest respondWithData:data];
-            [self.loadingRequest finishLoading];
-        } else {
-            [self.loadingRequest finishLoadingWithError:error];
-        }
-    });
-}
-
-#pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    LLLog(@"didFailWithError: %@", error);
-    [self.loadingRequest finishLoadingWithError:error];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    LLLog(@"connectionDidFinishLoading");
-    [self.loadingRequest finishLoading];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
-    [self.loadingRequest ll_fillContentInformation:response];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-    [self.loadingRequest.dataRequest respondWithData:data];
-}
-
-- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response
-{
-    self.loadingRequest.redirect = request;
-    return request;
 }
 
 @end
