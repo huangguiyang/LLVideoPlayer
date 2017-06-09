@@ -155,35 +155,36 @@
                             self.loadingRequest.dataRequest.requestedLength);
     }
     
-    LLVideoPlayerCacheRemoteTask *task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile userInfo:nil];
+    self.tasks = [self mapOperationToTasksWithRange:range];
     
-    __weak typeof(self) wself = self;
-    [task setCompletionBlock:^(LLVideoPlayerCacheTask *task, NSError *error){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            __strong typeof(wself) self = wself;
-            [self.tasks removeObject:task];
-            
-            if ([self isCancelled] || error.code == NSUserCancelledError) {
-                if (self.tasks.count == 0) {
-                    [self stopRunLoop];
+    for (LLVideoPlayerCacheTask *task in self.tasks) {
+        __weak typeof(self) wself = self;
+        [task setCompletionBlock:^(LLVideoPlayerCacheTask *task, NSError *error){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                __strong typeof(wself) self = wself;
+                [self.tasks removeObject:task];
+                
+                if ([self isCancelled] || error.code == NSUserCancelledError) {
+                    if (self.tasks.count == 0) {
+                        [self stopRunLoop];
+                    }
+                    return;
                 }
-                return;
-            }
-            
-            if (error) {
-                [self cancel];
-                [self finishOperationWithError:error];
-                return;
-            }
-            
-            if (self.tasks.count == 0) {
-                [self finishOperationWithError:error];
-            }
-        });
-    }];
-    
-    [self.tasks addObject:task];
-    [task resume];
+                
+                if (error) {
+                    [self cancel];
+                    [self finishOperationWithError:error];
+                    return;
+                }
+                
+                if (self.tasks.count == 0) {
+                    [self finishOperationWithError:error];
+                }
+            });
+        }];
+        
+        [task resume];
+    }
     
     [self startRunLoop];
 }
@@ -197,6 +198,16 @@
     }
     
     [self stopRunLoop];
+}
+
+- (NSMutableArray<LLVideoPlayerCacheTask *> *)mapOperationToTasksWithRange:(NSRange)range
+{
+    NSMutableArray *array = [NSMutableArray array];
+    
+    LLVideoPlayerCacheRemoteTask *task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile userInfo:nil];
+    [array addObject:task];
+    
+    return array;
 }
 
 @end
