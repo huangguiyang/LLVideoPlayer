@@ -8,24 +8,28 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import "LLVideoPlayerCacheFile.h"
 
 @interface LLVideoPlayerCacheTask : NSObject
 
 - (instancetype)initWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                           range:(NSRange)range
+                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile
                        userInfo:(NSDictionary *)userInfo;
 
 + (instancetype)taskWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                           range:(NSRange)range
+                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile
                        userInfo:(NSDictionary *)userInfo;
 
 @property (nonatomic, strong) NSDictionary *userInfo;
 @property (nonatomic, assign) NSRange range;
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
+@property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, copy) void (^completionBlock)(LLVideoPlayerCacheTask *task, NSError *error);
-@property (nonatomic, copy) void (^didReceiveResponseBlock)(LLVideoPlayerCacheTask *task, NSURLResponse *response);
 
 - (void)resume;
 - (void)cancel;
+- (BOOL)isCancelled;
 
 @end

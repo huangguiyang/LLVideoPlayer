@@ -17,4 +17,6 @@
 
 + (NSString *)cacheDirectory;
 
+- (NSData *)dataWithRange:(NSRange)range error:(NSError **)error;
+
 @end

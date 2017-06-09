@@ -8,22 +8,35 @@
 
 #import "LLVideoPlayerCacheTask.h"
 
+@interface LLVideoPlayerCacheTask () {
+    BOOL _cancel;
+}
+
+@end
+
 @implementation LLVideoPlayerCacheTask
 
-- (instancetype)initWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range userInfo:(NSDictionary *)userInfo
+- (instancetype)initWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
+                          range:(NSRange)range
+                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile
+                       userInfo:(NSDictionary *)userInfo
 {
     self = [super init];
     if (self) {
         self.loadingRequest = loadingRequest;
         self.range = range;
         self.userInfo = userInfo;
+        self.cacheFile = cacheFile;
     }
     return self;
 }
 
-+ (instancetype)taskWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range userInfo:(NSDictionary *)userInfo
++ (instancetype)taskWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
+                          range:(NSRange)range
+                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile
+                       userInfo:(NSDictionary *)userInfo
 {
-    return [[self alloc] initWithRequest:loadingRequest range:range userInfo:userInfo];
+    return [[self alloc] initWithRequest:loadingRequest range:range cacheFile:cacheFile userInfo:userInfo];
 }
 
 - (void)resume
@@ -33,16 +46,21 @@
 
 - (void)cancel
 {
-    if (self.completionBlock) {
-        self.completionBlock(self, [NSError errorWithDomain:@"LLVideoPlayerCacheTask"
-                                                       code:NSURLErrorCancelled
-                                                   userInfo:nil]);
+    @synchronized (self) {
+        _cancel = YES;
+        if (self.completionBlock) {
+            self.completionBlock(self, [NSError errorWithDomain:@"LLVideoPlayerCacheTask"
+                                                           code:NSURLErrorCancelled
+                                                       userInfo:nil]);
+        }
     }
 }
 
-- (void)complete
+- (BOOL)isCancelled
 {
-    
+    @synchronized (self) {
+        return _cancel;
+    }
 }
 
 @end

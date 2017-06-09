@@ -151,7 +151,11 @@
 {
     float sec = [self.player.track.totalDuration floatValue] * sender.value;
     
-    [self.player seekToTimeInSecond:sec userAction:YES completionHandler:nil];
+    [self.player pauseContent:YES completionHandler:^{
+        [self.player seekToTimeInSecond:sec userAction:YES completionHandler:^(BOOL finished) {
+            [self.player playContent];
+        }];
+    }];
 }
 
 - (void)forcePlayAction:(id)sender

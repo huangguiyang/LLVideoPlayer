@@ -28,6 +28,8 @@
 
 - (void)resume
 {
+    [super resume];
+    
     NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
     request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
     request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
@@ -67,9 +69,7 @@
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
     LLLog(@"didReceiveResponse: %@, %p", response, self);
-    if (self.didReceiveResponseBlock) {
-        self.didReceiveResponseBlock(self, response);
-    }
+    [self.loadingRequest ll_fillContentInformation:response];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data

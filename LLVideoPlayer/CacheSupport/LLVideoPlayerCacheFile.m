@@ -74,4 +74,14 @@ static NSString *kIndexFileExtension = @".idx";
     
 }
 
+#pragma mark - Public
+
+- (NSData *)dataWithRange:(NSRange)range error:(NSError **)error
+{
+    if (error) {
+        *error = [NSError errorWithDomain:@"LLVideoPlayerCacheFile" code:-1 userInfo:nil];
+    }
+    return nil;
+}
+
 @end
