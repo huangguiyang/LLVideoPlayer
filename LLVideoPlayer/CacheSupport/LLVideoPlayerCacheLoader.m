@@ -51,7 +51,7 @@
         _operationQueue.name = @"com.llvideoplayer.cache";
         _operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         [_operationQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
-        TLog(@"[CacheSupport] cache file path: %@", path);
+        LLLog(@"[CacheSupport] cache file path: %@", path);
     }
     return self;
 }
@@ -62,7 +62,7 @@
 {
     if ([keyPath isEqualToString:@"operationCount"]) {
         NSInteger count = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
-        TLog(@"observeValueForKeyPath: %@ == %ld", keyPath, count);
+        LLLog(@"observeValueForKeyPath: %@ == %ld", keyPath, count);
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
@@ -89,14 +89,14 @@
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    TLog(@"[Comming] %@", loadingRequest);
+    LLLog(@"[Comming] %@", loadingRequest);
     [self startLoadingRequest:loadingRequest];
     return YES;
 }
 
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    TLog(@"[Cancel] %@", loadingRequest);
+    LLLog(@"[Cancel] %@", loadingRequest);
     [self cancelLoadingRequest:loadingRequest];
 }
 

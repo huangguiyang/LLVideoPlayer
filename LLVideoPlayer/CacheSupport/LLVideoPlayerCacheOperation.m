@@ -29,7 +29,7 @@
 
 - (void)dealloc
 {
-    TLog(@"LLVideoPlayerCacheOperation dealloc");
+    LLLog(@"LLVideoPlayerCacheOperation dealloc");
 }
 
 - (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
@@ -51,7 +51,7 @@
 
 - (void)main
 {
-    TLog(@"main: %@", [NSThread currentThread]);
+    LLLog(@"main: %@", [NSThread currentThread]);
     
     @autoreleasepool {
         if ([self isCancelled]) {
@@ -67,17 +67,17 @@
 
 - (void)completeOperation
 {
-    TLog(@"operation will complete...");
+    LLLog(@"operation will complete...");
     self.executing = NO;
     self.finished = YES;
-    TLog(@"operation complete!!!");
+    LLLog(@"operation complete!!!");
 }
 
 #pragma mark - Cancel
 
 - (void)cancel
 {
-    TLog(@"LLVideoPlayerCacheOperation cancel");
+    LLLog(@"LLVideoPlayerCacheOperation cancel");
     [self.connection cancel];
     self.connection = nil;
     [super cancel];
@@ -162,7 +162,7 @@
 
 - (void)requestDidFinishWithResponse:(NSURLResponse *)response data:(NSData *)data error:(NSError *)error
 {
-    TLog(@"Request Complete: %@, %@, %ld", response, error, data.length);
+    LLLog(@"Request Complete: %@, %@, %ld", response, error, data.length);
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(weakSelf) self = weakSelf;
@@ -180,13 +180,13 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    TLog(@"didFailWithError: %@", error);
+    LLLog(@"didFailWithError: %@", error);
     [self.loadingRequest finishLoadingWithError:error];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    TLog(@"connectionDidFinishLoading");
+    LLLog(@"connectionDidFinishLoading");
     [self.loadingRequest finishLoading];
 }
 

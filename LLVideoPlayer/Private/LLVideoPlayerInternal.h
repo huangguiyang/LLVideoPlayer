@@ -15,10 +15,4 @@
 #define LLLog(...)
 #endif
 
-#if defined(DEBUG) && defined(LL_TRACK_CACHE)
-#define TLog(...)  NSLog(__VA_ARGS__)
-#else
-#define TLog(...)
-#endif
-
 #endif /* LLVideoPlayerInternal_h */
