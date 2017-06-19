@@ -14,17 +14,18 @@
 
 static NSString *kIndexFileExtension = @".idx";
 
-@interface LLVideoPlayerCacheFile ()
+@interface LLVideoPlayerCacheFile () {
+    NSInteger _fileLength;
+    NSURLResponse *_response;
+}
 
 @property (nonatomic, strong) LLVideoPlayerCachePolicy *cachePolicy;
 @property (nonatomic, strong) NSString *cacheFilePath;
 @property (nonatomic, strong) NSString *indexFilePath;
 @property (nonatomic, strong) NSMutableArray<NSValue *> *ranges;
-@property (nonatomic, assign) NSInteger fileLength;
 @property (nonatomic, strong) NSDictionary *allHeaderFields;
 @property (nonatomic, strong) NSFileHandle *writeFileHandle;
 @property (nonatomic, strong) NSFileHandle *readFileHandle;
-@property (nonatomic, strong) NSURLResponse *response;
 
 @end
 
@@ -83,7 +84,7 @@ static NSString *kIndexFileExtension = @".idx";
         [self loadIndexFileAtStartup];
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
         LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
-              self.fileLength, self.ranges, self.allHeaderFields);
+              _fileLength, self.ranges, self.allHeaderFields);
     }
     return self;
 }
@@ -112,7 +113,7 @@ static NSString *kIndexFileExtension = @".idx";
         return NO;
     }
     
-    self.fileLength = [dict[@"size"] integerValue];
+    _fileLength = [dict[@"size"] integerValue];
     
     NSMutableArray *ranges = dict[@"ranges"];
     [self.ranges removeAllObjects];
@@ -140,7 +141,7 @@ static NSString *kIndexFileExtension = @".idx";
     }
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    dict[@"size"] = @(self.fileLength);
+    dict[@"size"] = @(_fileLength);
     dict[@"ranges"] = ranges;
     dict[@"allHeaderFields"] = headers;
     
@@ -173,7 +174,7 @@ static NSString *kIndexFileExtension = @".idx";
         if (end != length) {
             return NO;
         }
-        self.fileLength = length;
+        _fileLength = length;
     } @catch (NSException *exception) {
         return NO;
     }
@@ -183,8 +184,8 @@ static NSString *kIndexFileExtension = @".idx";
 
 - (void)addRange:(NSRange)range
 {
-    if (range.length == 0 || range.location >= self.fileLength) {
-        LLLog(@"[ERR] addRange failed: %@ (file length: %lu)", NSStringFromRange(range), self.fileLength);
+    if (range.length == 0 || range.location >= _fileLength) {
+        LLLog(@"[ERR] addRange failed: %@ (file length: %lu)", NSStringFromRange(range), _fileLength);
         return;
     }
     
@@ -225,12 +226,12 @@ static NSString *kIndexFileExtension = @".idx";
                                  userInfo:@{NSLocalizedDescriptionKey:message}];
     }
     LLLog(@"{fileLength: %lu, ranges: %@, headers: %@}",
-          self.fileLength, self.ranges, self.allHeaderFields);
+          _fileLength, self.ranges, self.allHeaderFields);
 }
 
 - (NSRange)cachedRangeForRange:(NSRange)requestRange
 {
-    if (requestRange.location >= self.fileLength) {
+    if (requestRange.location >= _fileLength) {
         return LLInvalidRange;
     }
     
@@ -298,7 +299,7 @@ static NSString *kIndexFileExtension = @".idx";
     }
     
     if (range.length == NSIntegerMax) {
-        range.length = self.fileLength - range.location;
+        range.length = _fileLength - range.location;
     }
     
     NSMutableDictionary *responseHeaders = [self.allHeaderFields mutableCopy];
@@ -306,7 +307,7 @@ static NSString *kIndexFileExtension = @".idx";
     BOOL supportRange = responseHeaders[contentRangeKey] != nil;
     
     if (supportRange && LLValidByteRange(range)) {
-        responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, self.fileLength);
+        responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, _fileLength);
     } else {
         [responseHeaders removeObjectForKey:contentRangeKey];
     }
@@ -322,14 +323,14 @@ static NSString *kIndexFileExtension = @".idx";
 
 - (BOOL)hasCachedHTTPURLResponse
 {
-    return self.fileLength > 0 && self.allHeaderFields.count > 0;
+    return _fileLength > 0 && self.allHeaderFields.count > 0;
 }
 
 
 - (BOOL)writeResponse:(NSHTTPURLResponse *)response
 {
     BOOL success = YES;
-    if (self.fileLength == 0) {
+    if (_fileLength == 0) {
         success = [self truncateFileToLength:[response ll_totalLength]];
     }
     success = success && [self saveAllHeaderFields:[response allHeaderFields]];
@@ -338,6 +339,20 @@ static NSString *kIndexFileExtension = @".idx";
 }
 
 #pragma mark - Read/Write
+
+- (NSInteger)fileLength
+{
+    @synchronized (self) {
+        return _fileLength;
+    }
+}
+
+- (NSArray<NSValue *> *)cachedRanges
+{
+    @synchronized (self) {
+        return [NSArray arrayWithArray:_ranges];
+    }
+}
 
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error
 {
@@ -366,11 +381,11 @@ static NSString *kIndexFileExtension = @".idx";
 - (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     @synchronized (self) {
-        if (nil == self.response) {
+        if (nil == _response) {
             [loadingRequest ll_fillContentInformation:response];
             // save local
             [self writeResponse:(NSHTTPURLResponse *)response];
-            self.response = response;
+            _response = response;
         }
     }
 }
@@ -378,11 +393,13 @@ static NSString *kIndexFileExtension = @".idx";
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange
 {
     @synchronized (self) {
-        if (nil == self.response && [self hasCachedHTTPURLResponse]) {
+        if (nil == _response && [self hasCachedHTTPURLResponse]) {
             NSHTTPURLResponse *respone = [self constructHTTPURLResponseForURL:loadingRequest.request.URL
                                                                      andRange:requestRange];
-            [loadingRequest ll_fillContentInformation:respone];
-            self.response = respone;
+            if (respone) {
+                [loadingRequest ll_fillContentInformation:respone];
+                _response = respone;
+            }
         }
     }
 }

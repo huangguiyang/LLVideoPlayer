@@ -27,8 +27,7 @@
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
 
 #pragma mark - Property
-@property (nonatomic, strong, readonly) NSDictionary *allHeaderFields;
-@property (nonatomic, strong, readonly) NSMutableArray<NSValue *> *ranges;
+- (NSArray<NSValue *> *)cachedRanges;
 @property (nonatomic, assign, readonly) NSInteger fileLength;
 
 @end

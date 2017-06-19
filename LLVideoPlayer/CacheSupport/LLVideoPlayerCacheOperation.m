@@ -18,6 +18,7 @@
     CFRunLoopRef _runLoop;
 }
 
+@property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, getter = isFinished, readwrite)  BOOL finished;
 @property (nonatomic, getter = isExecuting, readwrite) BOOL executing;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
@@ -233,7 +234,7 @@
     NSInteger start = requestRange.location;
     NSInteger end = requestRange.length == NSIntegerMax ? NSIntegerMax : NSMaxRange(requestRange);
     
-    NSArray<NSValue *> *ranges = [self.cacheFile ranges];
+    NSArray<NSValue *> *ranges = [self.cacheFile cachedRanges];
     for (NSValue *value in ranges) {
         NSRange range = [value rangeValue];
         

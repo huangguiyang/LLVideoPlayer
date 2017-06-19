@@ -18,6 +18,6 @@
 + (instancetype)operationWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                                   cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
 
-@property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
+@property (nonatomic, strong, readonly) AVAssetResourceLoadingRequest *loadingRequest;
 
 @end
