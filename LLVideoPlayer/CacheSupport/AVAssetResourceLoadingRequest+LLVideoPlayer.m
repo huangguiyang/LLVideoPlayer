@@ -9,11 +9,14 @@
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "LLVideoPlayerInternal.h"
 
 @implementation AVAssetResourceLoadingRequest (LLVideoPlayer)
 
 - (void)ll_fillContentInformation:(NSURLResponse *)response
 {
+    LLLog(@"ll_fillContentInformation");
+    
     if (nil == response) {
         return;
     }
@@ -33,7 +36,7 @@
     }
     
     self.contentInformationRequest.byteRangeAccessSupported = [(NSHTTPURLResponse *)response ll_supportRange];
-    self.contentInformationRequest.contentLength = [(NSHTTPURLResponse *)response ll_contentLength];
+    self.contentInformationRequest.contentLength = [(NSHTTPURLResponse *)response ll_totalLength];
 }
 
 @end

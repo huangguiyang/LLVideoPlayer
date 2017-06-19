@@ -7,6 +7,7 @@
 //
 
 #import "LLVideoPlayerCacheTask.h"
+#import "LLVideoPlayerInternal.h"
 
 @interface LLVideoPlayerCacheTask () {
     BOOL _cancel;
@@ -19,13 +20,11 @@
 - (instancetype)initWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                           range:(NSRange)range
                       cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-                       userInfo:(NSDictionary *)userInfo
 {
     self = [super init];
     if (self) {
         self.loadingRequest = loadingRequest;
         self.range = range;
-        self.userInfo = userInfo;
         self.cacheFile = cacheFile;
     }
     return self;
@@ -34,24 +33,22 @@
 + (instancetype)taskWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                           range:(NSRange)range
                       cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-                       userInfo:(NSDictionary *)userInfo
 {
-    return [[self alloc] initWithRequest:loadingRequest range:range cacheFile:cacheFile userInfo:userInfo];
+    return [[self alloc] initWithRequest:loadingRequest range:range cacheFile:cacheFile];
 }
 
 - (void)resume
 {
-    
 }
 
 - (void)cancel
 {
     @synchronized (self) {
         _cancel = YES;
-        if (self.completionBlock) {
-            self.completionBlock(self, [NSError errorWithDomain:@"LLVideoPlayerCacheTask"
-                                                           code:NSURLErrorCancelled
-                                                       userInfo:nil]);
+        if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
+            [self.delegate task:self didCompleteWithError:[NSError errorWithDomain:@"LLVideoPlayerCacheTask"
+                                                                              code:NSURLErrorCancelled
+                                                                          userInfo:nil]];
         }
     }
 }
@@ -61,6 +58,12 @@
     @synchronized (self) {
         return _cancel;
     }
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@<%p>: %@",
+            NSStringFromClass([self class]), self, NSStringFromRange(self.range)];
 }
 
 @end

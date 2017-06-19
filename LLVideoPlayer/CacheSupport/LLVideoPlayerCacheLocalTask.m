@@ -39,13 +39,17 @@
             if (error) {
                 break;
             }
+            if (nil == data) {
+                error = [NSError errorWithDomain:@"LLVideoPlayerCacheLocalTask" code:NSURLErrorUnknown userInfo:nil];
+                break;
+            }
             
             [self.loadingRequest.dataRequest respondWithData:data];
             offset = NSMaxRange(range);
         }
         
-        if (self.completionBlock) {
-            self.completionBlock(self, error);
+        if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
+            [self.delegate task:self didCompleteWithError:error];
         }
     });
 }

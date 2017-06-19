@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 #import "LLVideoPlayerCachePolicy.h"
 
 @interface LLVideoPlayerCacheFile : NSObject
@@ -17,6 +18,17 @@
 
 + (NSString *)cacheDirectory;
 
+#pragma mark - Read/Write
+
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error;
+- (BOOL)writeData:(NSData *)data atOffset:(NSInteger)offset;
+
+- (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest;
+- (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
+
+#pragma mark - Property
+@property (nonatomic, strong, readonly) NSDictionary *allHeaderFields;
+@property (nonatomic, strong, readonly) NSMutableArray<NSValue *> *ranges;
+@property (nonatomic, assign, readonly) NSInteger fileLength;
 
 @end

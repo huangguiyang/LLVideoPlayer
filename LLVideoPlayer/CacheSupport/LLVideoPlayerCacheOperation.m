@@ -9,13 +9,13 @@
 #import "LLVideoPlayerCacheOperation.h"
 #import "LLVideoPlayerInternal.h"
 #import "NSURL+LLVideoPlayer.h"
-#import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "LLVideoPlayerCacheLocalTask.h"
 #import "LLVideoPlayerCacheRemoteTask.h"
 
-@interface LLVideoPlayerCacheOperation () {
-    CFRunLoopRef _runloop;
+@interface LLVideoPlayerCacheOperation () <LLVideoPlayerCacheTaskDelegate>
+{
+    CFRunLoopRef _runLoop;
 }
 
 @property (nonatomic, getter = isFinished, readwrite)  BOOL finished;
@@ -129,15 +129,17 @@
 
 - (void)startRunLoop
 {
-    _runloop = CFRunLoopGetCurrent();
-    CFRunLoopRun();
+    NSRunLoop *runloop = [NSRunLoop currentRunLoop];
+    [runloop addPort:[NSPort port] forMode:NSDefaultRunLoopMode];
+    _runLoop = runloop.getCFRunLoop;
+    [runloop run];
 }
 
 - (void)stopRunLoop
 {
-    if (_runloop) {
-        CFRunLoopStop(_runloop);
-        _runloop = NULL;
+    if (_runLoop) {
+        CFRunLoopStop(_runLoop);
+        _runLoop = nil;
     }
 }
 
@@ -155,34 +157,9 @@
                             self.loadingRequest.dataRequest.requestedLength);
     }
     
-    self.tasks = [self mapOperationToTasksWithRange:range];
+    [self mapOperationToTasksWithRange:range];
     
     for (LLVideoPlayerCacheTask *task in self.tasks) {
-        __weak typeof(self) wself = self;
-        [task setCompletionBlock:^(LLVideoPlayerCacheTask *task, NSError *error){
-            dispatch_async(dispatch_get_main_queue(), ^{
-                __strong typeof(wself) self = wself;
-                [self.tasks removeObject:task];
-                
-                if ([self isCancelled] || error.code == NSUserCancelledError) {
-                    if (self.tasks.count == 0) {
-                        [self stopRunLoop];
-                    }
-                    return;
-                }
-                
-                if (error) {
-                    [self cancel];
-                    [self finishOperationWithError:error];
-                    return;
-                }
-                
-                if (self.tasks.count == 0) {
-                    [self finishOperationWithError:error];
-                }
-            });
-        }];
-        
         [task resume];
     }
     
@@ -200,14 +177,91 @@
     [self stopRunLoop];
 }
 
-- (NSMutableArray<LLVideoPlayerCacheTask *> *)mapOperationToTasksWithRange:(NSRange)range
+#pragma mark - LLVideoPlayerCacheTaskDelegate
+
+- (void)task:(LLVideoPlayerCacheTask *)task didCompleteWithError:(NSError *)error
 {
-    NSMutableArray *array = [NSMutableArray array];
+    __weak typeof(self) wself = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(wself) self = wself;
+        LLLog(@"[COMPLETE] task %@, error: %@", task, error);
+        [self.tasks removeObject:task];
+        
+        if ([self isCancelled] || error.code == NSUserCancelledError) {
+            if (self.tasks.count == 0) {
+                [self stopRunLoop];
+            }
+            return;
+        }
+        
+        if (error) {
+            [self cancel];
+            [self finishOperationWithError:error];
+            return;
+        }
+        
+        if (self.tasks.count == 0) {
+            [self finishOperationWithError:error];
+        }
+    });
+}
+
+#pragma mark - Private
+
+- (void)addTaskWithRange:(NSRange)range fromCache:(BOOL)fromCache
+{
+    LLVideoPlayerCacheTask *task;
     
-    LLVideoPlayerCacheRemoteTask *task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile userInfo:nil];
-    [array addObject:task];
+    if (fromCache) {
+        task = [LLVideoPlayerCacheLocalTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile];
+    } else {
+        task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile];
+    }
     
-    return array;
+    [task setDelegate:self];
+    [self.tasks addObject:task];
+    
+    LLLog(@"[ADD] %@ with range: %@", NSStringFromClass([task class]), NSStringFromRange(task.range));
+}
+
+- (void)mapOperationToTasksWithRange:(NSRange)requestRange
+{
+    [self.tasks removeAllObjects];
+    
+    [self.cacheFile tryResponseForLoadingRequest:self.loadingRequest withRange:requestRange];
+    
+    NSInteger start = requestRange.location;
+    NSInteger end = requestRange.length == NSIntegerMax ? NSIntegerMax : NSMaxRange(requestRange);
+    
+    NSArray<NSValue *> *ranges = [self.cacheFile ranges];
+    for (NSValue *value in ranges) {
+        NSRange range = [value rangeValue];
+        
+        if (start >= NSMaxRange(range)) {
+            continue;
+        }
+        
+        if (start < range.location) {
+            [self addTaskWithRange:NSMakeRange(start, range.location - start) fromCache:NO];
+            start = range.location;
+        }
+        
+        // in range
+        NSAssert(NSLocationInRange(start, range), @"Oops!!!");
+        
+        if (end <= NSMaxRange(range)) {
+            [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:YES];
+            start = end;
+            break;
+        }
+        
+        [self addTaskWithRange:NSMakeRange(start, NSMaxRange(range) - start) fromCache:YES];
+        start = NSMaxRange(range);
+    }
+    
+    if (end > start && (self.cacheFile.fileLength == 0 || start < self.cacheFile.fileLength)) {
+        [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:NO];
+    }
 }
 
 @end

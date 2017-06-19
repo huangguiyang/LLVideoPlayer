@@ -12,6 +12,6 @@
 
 - (BOOL)ll_supportRange;
 
-- (NSInteger)ll_contentLength;
+- (NSInteger)ll_totalLength;
 
 @end

@@ -15,7 +15,7 @@
     return self.allHeaderFields[@"Content-Range"] != nil;
 }
 
-- (NSInteger)ll_contentLength
+- (NSInteger)ll_totalLength
 {
     // Get total content length
     

@@ -10,23 +10,31 @@
 #import <AVFoundation/AVFoundation.h>
 #import "LLVideoPlayerCacheFile.h"
 
+@class LLVideoPlayerCacheTask;
+
+
+@protocol LLVideoPlayerCacheTaskDelegate <NSObject>
+
+@optional
+- (void)task:(LLVideoPlayerCacheTask *)task didCompleteWithError:(NSError *)error;
+
+@end
+
+
 @interface LLVideoPlayerCacheTask : NSObject
 
 - (instancetype)initWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                           range:(NSRange)range
-                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-                       userInfo:(NSDictionary *)userInfo;
+                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
 
 + (instancetype)taskWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                           range:(NSRange)range
-                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-                       userInfo:(NSDictionary *)userInfo;
+                      cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
 
-@property (nonatomic, strong) NSDictionary *userInfo;
 @property (nonatomic, assign) NSRange range;
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
-@property (nonatomic, copy) void (^completionBlock)(LLVideoPlayerCacheTask *task, NSError *error);
+@property (nonatomic, weak) id<LLVideoPlayerCacheTaskDelegate> delegate;
 
 - (void)resume;
 - (void)cancel;
