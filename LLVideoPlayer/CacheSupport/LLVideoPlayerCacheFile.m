@@ -415,10 +415,12 @@
             [self.writeFileHandle seekToFileOffset:data.offset];
             [self.writeFileHandle writeData:data.data];
             
-            // Add/Remove
-            [self addRange:NSMakeRange(data.offset, data.data.length)];
+            // Remove
             [self.data removeObject:data];
             self.memDataSize -= data.data.length;
+            
+            // Add Range
+            [self addRange:NSMakeRange(data.offset, data.data.length)];
         } @catch (NSException *exception) {
             LLLog(@"write exception: %@", exception);
         }
