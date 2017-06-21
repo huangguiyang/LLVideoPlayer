@@ -13,7 +13,7 @@
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile+CachePolicy.h"
 
-#define MAX_MEM_DATA_SIZE (10 * 1024 * 1024)
+#define MAX_MEM_DATA_SIZE (5 * 1024 * 1024)
 
 @interface LLOffsetData : NSObject
 
@@ -243,10 +243,10 @@
 
 - (void)addRange:(NSRange)range
 {
-    NSUInteger index = NSNotFound;
-    for (NSUInteger i = 0; i < self.ranges.count; i++) {
+    NSInteger index = NSNotFound;
+    for (NSInteger i = self.ranges.count - 1; i >= 0; i--) {
         NSRange r = [self.ranges[i] rangeValue];
-        if (r.location >= range.location) {
+        if (r.location < range.location) {
             index = i;
             break;
         }
@@ -259,7 +259,7 @@
     }
     
     // merge ranges if possible
-    for (NSUInteger i = 0; i < self.ranges.count; i++) {
+    for (NSInteger i = 0; i < self.ranges.count; i++) {
         if ((i + 1) < self.ranges.count) {
             NSRange currentRange = [self.ranges[i] rangeValue];
             NSRange nextRange = [self.ranges[i+1] rangeValue];
@@ -357,6 +357,50 @@
     }
 }
 
+- (void)appendMemData:(NSData *)data atOffset:(NSInteger)offset
+{
+    NSInteger index = NSNotFound;
+    for (NSInteger i = self.data.count - 1; i >= 0; i--) {
+        LLOffsetData *data = self.data[i];
+        if (offset < data.offset) {
+            index = i;
+            break;
+        }
+    }
+    
+    LLOffsetData *offsetData = [LLOffsetData dataWithData:data atOffset:offset];
+    
+    if (index == NSNotFound) {
+        [self.data addObject:offsetData];
+    } else {
+        [self.data insertObject:offsetData atIndex:index];
+    }
+    
+    self.memDataSize += data.length;
+    
+    // merge ranges if possible
+    for (NSUInteger i = 0; i < self.data.count; i++) {
+        if ((i + 1) < self.data.count) {
+            NSInteger currentOffset = self.data[i].offset;
+            NSInteger currentLength = self.data[i].data.length;
+            NSInteger nextOffset = self.data[i+1].offset;
+            if (currentOffset + currentLength == nextOffset) {
+                if ([self.data[i] isKindOfClass:[NSMutableData class]]) {
+                    NSMutableData *mutableData = (NSMutableData *)self.data[i].data;
+                    [mutableData appendData:self.data[i+1].data];
+                } else {
+                    NSMutableData *mutableData = [NSMutableData data];
+                    [mutableData appendData:self.data[i].data];
+                    [mutableData appendData:self.data[i+1].data];
+                    self.data[i].data = mutableData;
+                }
+                [self.data removeObjectAtIndex:(i+1)];
+                i -= 1;
+            }
+        }
+    }
+}
+
 - (void)syncMemData
 {
     if (nil == self.writeFileHandle) {
@@ -364,7 +408,7 @@
     }
     
     LLLog(@"Synchronizing mem data... #%lu, %lu bytes", self.data.count, self.memDataSize);
-    
+
     NSArray *array = [NSArray arrayWithArray:self.data];
     for (LLOffsetData *data in array) {
         @try {
@@ -381,12 +425,6 @@
     }
     
     LLLog(@"Synchronized. #%lu, %lu bytes", self.data.count, self.memDataSize);
-}
-
-- (BOOL)isRangeDuplicated:(NSRange)range
-{
-    NSRange resultRange = [self cachedRangeForRange:range];
-    return NSEqualRanges(range, resultRange);
 }
 
 #pragma mark - Read/Write
@@ -453,14 +491,7 @@
             return;
         }
         
-        NSRange range = NSMakeRange(offset, data.length);
-        if (NO == [self isRangeDuplicated:range]) {
-            LLOffsetData *offsetData = [LLOffsetData dataWithData:data atOffset:offset];
-            [self.data addObject:offsetData];
-            self.memDataSize += data.length;
-        } else {
-            LLLog(@"[DUPLICATE] discard %@", NSStringFromRange(range));
-        }
+        [self appendMemData:data atOffset:offset];
         
         if (self.memDataSize >= MAX_MEM_DATA_SIZE) {
             [self syncMemData];
