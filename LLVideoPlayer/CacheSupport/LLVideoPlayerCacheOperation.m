@@ -23,6 +23,7 @@
 @property (nonatomic, getter = isExecuting, readwrite) BOOL executing;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, strong) NSMutableArray *tasks;
+@property (nonatomic, strong) NSThread *operationThread;
 
 @end
 
@@ -51,6 +52,7 @@
 - (void)main
 {
     LLLog(@"operation main: %@", self.loadingRequest);
+    self.operationThread = [NSThread currentThread];
     
     @autoreleasepool {
         if ([self isCancelled]) {
@@ -177,6 +179,12 @@
     [self stopRunLoop];
 }
 
+// resume task on NSOperation Thread
+- (void)resumeTask:(LLVideoPlayerCacheTask *)task
+{
+    [task resume];
+}
+
 #pragma mark - LLVideoPlayerCacheTaskDelegate
 
 - (void)task:(LLVideoPlayerCacheTask *)task didCompleteWithError:(NSError *)error
@@ -196,8 +204,17 @@
         
         if (error) {
             LLLog(@"[FAILED] %@, error: %@", task, error);
-            [self cancel];
-            [self finishOperationWithError:error];
+            if ([task isKindOfClass:[LLVideoPlayerCacheLocalTask class]]) {
+                LLLog(@"LocalTask failed, try to transfer to RemoteTask...");
+                LLVideoPlayerCacheTask *remoteTask = [self addTaskWithRange:task.range fromCache:NO];
+                [self performSelector:@selector(resumeTask:)
+                             onThread:self.operationThread
+                           withObject:remoteTask
+                        waitUntilDone:NO];
+            } else {
+                [self cancel];
+                [self finishOperationWithError:error];
+            }
             return;
         }
         
@@ -210,7 +227,7 @@
 
 #pragma mark - Private
 
-- (void)addTaskWithRange:(NSRange)range fromCache:(BOOL)fromCache
+- (LLVideoPlayerCacheTask *)addTaskWithRange:(NSRange)range fromCache:(BOOL)fromCache
 {
     LLVideoPlayerCacheTask *task;
     
@@ -224,6 +241,8 @@
     [self.tasks addObject:task];
     
     LLLog(@"[ADD] %@<%p> with range: %@", NSStringFromClass([task class]), task, NSStringFromRange(task.range));
+    
+    return task;
 }
 
 - (void)mapOperationToTasksWithRange:(NSRange)requestRange
