@@ -72,14 +72,14 @@
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLLog(@"[Comming] %@", loadingRequest);
+    LLLog(@"[Comming] %@", LLLoadingRequestToString(loadingRequest));
     [self startLoadingRequest:loadingRequest];
     return YES;
 }
 
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLLog(@"[Cancel] %@", loadingRequest);
+    LLLog(@"[Cancel] %@", LLLoadingRequestToString(loadingRequest));
     [self cancelLoadingRequest:loadingRequest];
 }
 

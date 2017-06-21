@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 
 FOUNDATION_EXTERN const NSRange LLInvalidRange;
 
@@ -27,3 +28,5 @@ NS_INLINE BOOL LLRangeCanMerge(NSRange range1, NSRange range2)
 
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeHeader(NSRange range);
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length);
+
+FOUNDATION_EXTERN NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest);

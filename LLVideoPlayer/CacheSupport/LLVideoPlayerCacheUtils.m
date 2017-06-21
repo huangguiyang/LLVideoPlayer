@@ -42,3 +42,19 @@ NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length)
         return nil;
     }
 }
+
+NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest)
+{
+    if ([loadingRequest.dataRequest respondsToSelector:@selector(requestsAllDataToEndOfResource)]) {
+        return [NSString stringWithFormat:@"<%p: %@, ToEnd: %@>",
+                loadingRequest,
+                NSStringFromRange(NSMakeRange(loadingRequest.dataRequest.requestedOffset,
+                                              loadingRequest.dataRequest.requestedLength)),
+                [loadingRequest.dataRequest requestsAllDataToEndOfResource] ? @"YES" : @"NO"];
+    } else {
+        return [NSString stringWithFormat:@"<%p: %@>",
+                loadingRequest,
+                NSStringFromRange(NSMakeRange(loadingRequest.dataRequest.requestedOffset,
+                                              loadingRequest.dataRequest.requestedLength))];
+    }
+}

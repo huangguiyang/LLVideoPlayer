@@ -244,9 +244,9 @@
 - (void)addRange:(NSRange)range
 {
     NSInteger index = NSNotFound;
-    for (NSInteger i = self.ranges.count - 1; i >= 0; i--) {
+    for (NSInteger i = 0; i < self.ranges.count; i++) {
         NSRange r = [self.ranges[i] rangeValue];
-        if (r.location < range.location) {
+        if (r.location >= range.location) {
             index = i;
             break;
         }
@@ -360,9 +360,8 @@
 - (void)appendMemData:(NSData *)data atOffset:(NSInteger)offset
 {
     NSInteger index = NSNotFound;
-    for (NSInteger i = self.data.count - 1; i >= 0; i--) {
-        LLOffsetData *data = self.data[i];
-        if (offset < data.offset) {
+    for (NSInteger i = 0; i < self.data.count; i++) {
+        if (self.data[i].offset >= offset) {
             index = i;
             break;
         }
@@ -407,7 +406,7 @@
         return;
     }
     
-    LLLog(@"Synchronizing mem data... #%lu, %lu bytes", self.data.count, self.memDataSize);
+    LLLog(@"Synchronizing... #%lu, %lu bytes", self.data.count, self.memDataSize);
 
     NSArray *array = [NSArray arrayWithArray:self.data];
     for (LLOffsetData *data in array) {

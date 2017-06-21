@@ -51,7 +51,7 @@
 
 - (void)main
 {
-    LLLog(@"operation main: %@", self.loadingRequest);
+    LLLog(@"operation main: %p: %@", self, LLLoadingRequestToString(self.loadingRequest));
     self.operationThread = [NSThread currentThread];
     
     @autoreleasepool {
@@ -143,7 +143,6 @@
     if (_runLoop) {
         CFRunLoopStop(_runLoop);
         _runLoop = nil;
-        LLLog(@"RUNLOOP STOPPED: %@", self.loadingRequest);
     }
 }
 
@@ -240,7 +239,7 @@
     [task setDelegate:self];
     [self.tasks addObject:task];
     
-    LLLog(@"[ADD] %@<%p> with range: %@", NSStringFromClass([task class]), task, NSStringFromRange(task.range));
+    LLLog(@"[ADD] %@", task);
     
     return task;
 }
