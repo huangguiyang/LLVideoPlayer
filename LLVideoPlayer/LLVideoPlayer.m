@@ -277,6 +277,7 @@ typedef void (^VoidBlock) (void);
     self.avPlayer = nil;
     self.avPlayerItem = nil;
     self.loadingAsset = nil;
+    self.resourceLoader = nil;
 }
 
 - (void)playVideoTrack:(LLVideoTrack *)track
@@ -632,8 +633,7 @@ typedef void (^VoidBlock) (void);
                 [self.avPlayer pause];
                 break;
             case LLVideoPlayerStateDismissed:
-                self.avPlayer = nil;
-                self.avPlayerItem = nil;
+                [self clearPlayer];
                 break;
             case LLVideoPlayerStateUnknown:
             default:

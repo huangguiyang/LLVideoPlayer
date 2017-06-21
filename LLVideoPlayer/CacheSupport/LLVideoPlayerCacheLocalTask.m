@@ -13,16 +13,11 @@
 
 @implementation LLVideoPlayerCacheLocalTask
 
-- (void)dealloc
-{
-    LLLog(@"LLVideoPlayerCacheLocalTask dealloc: %p", self);
-}
-
 - (void)resume
 {
     [super resume];
     
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSInteger offset = self.range.location;
         NSInteger lengthPerRead = 10000;
         NSError *error = nil;

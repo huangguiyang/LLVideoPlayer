@@ -30,11 +30,6 @@
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
-- (void)dealloc
-{
-    LLLog(@"operation dealloc: %p", self);
-}
-
 - (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                              cacheFile:(LLVideoPlayerCacheFile *)cacheFile
 {
@@ -55,7 +50,7 @@
 
 - (void)main
 {
-    LLLog(@"operation main: %@, %p", [NSThread currentThread], self);
+    LLLog(@"operation main: %@", self.loadingRequest);
     
     @autoreleasepool {
         if ([self isCancelled]) {
@@ -63,8 +58,12 @@
             return;
         }
         
-        self.executing = YES;
-        [self startOperation];
+        @synchronized (self) {
+            self.executing = YES;
+            [self startOperation];
+        }
+        
+        [self startRunLoop];
         [self completeOperation];
     }
 }
@@ -80,10 +79,11 @@
 
 - (void)cancel
 {
-    for (LLVideoPlayerCacheTask *task in self.tasks) {
-        [task cancel];
+    @synchronized (self) {
+        for (LLVideoPlayerCacheTask *task in self.tasks) {
+            [task cancel];
+        }
     }
-    [self.tasks removeAllObjects];
     [super cancel];
     LLLog(@"operation cancelled: %p", self);
 }
@@ -141,6 +141,7 @@
     if (_runLoop) {
         CFRunLoopStop(_runLoop);
         _runLoop = nil;
+        LLLog(@"RUNLOOP STOPPED: %@", self.loadingRequest);
     }
 }
 
@@ -163,8 +164,6 @@
     for (LLVideoPlayerCacheTask *task in self.tasks) {
         [task resume];
     }
-    
-    [self startRunLoop];
 }
 
 - (void)finishOperationWithError:(NSError *)error
@@ -185,10 +184,10 @@
     __weak typeof(self) wself = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(wself) self = wself;
-        LLLog(@"[COMPLETE] task %@, error: %@", task, error);
         [self.tasks removeObject:task];
         
         if ([self isCancelled] || error.code == NSUserCancelledError) {
+            LLLog(@"[CANCEL] %@", task);
             if (self.tasks.count == 0) {
                 [self stopRunLoop];
             }
@@ -196,11 +195,13 @@
         }
         
         if (error) {
+            LLLog(@"[FAILED] %@, error: %@", task, error);
             [self cancel];
             [self finishOperationWithError:error];
             return;
         }
         
+        LLLog(@"[COMPLETE] %@", task);
         if (self.tasks.count == 0) {
             [self finishOperationWithError:error];
         }
@@ -222,7 +223,7 @@
     [task setDelegate:self];
     [self.tasks addObject:task];
     
-    LLLog(@"[ADD] %@ with range: %@", NSStringFromClass([task class]), NSStringFromRange(task.range));
+    LLLog(@"[ADD] %@<%p> with range: %@", NSStringFromClass([task class]), task, NSStringFromRange(task.range));
 }
 
 - (void)mapOperationToTasksWithRange:(NSRange)requestRange
@@ -261,7 +262,11 @@
     }
     
     if (end > start && (self.cacheFile.fileLength == 0 || start < self.cacheFile.fileLength)) {
-        [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:NO];
+        if (end == NSIntegerMax) {
+            [self addTaskWithRange:NSMakeRange(start, NSIntegerMax) fromCache:NO];
+        } else {
+            [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:NO];
+        }
     }
 }
 

@@ -11,8 +11,47 @@
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
 #import "LLVideoPlayerInternal.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheFile+CachePolicy.h"
 
-static NSString *kIndexFileExtension = @".idx";
+#define MAX_MEM_DATA_SIZE (10 * 1024 * 1024)
+
+@interface LLOffsetData : NSObject
+
+@property (nonatomic, assign) NSInteger offset;
+@property (nonatomic, strong) NSData *data;
+
++ (instancetype)dataWithData:(NSData *)data atOffset:(NSInteger)offset;
+- (instancetype)initWithData:(NSData *)data atOffset:(NSInteger)offset;
+
+@end
+
+@implementation LLOffsetData
+
++ (instancetype)dataWithData:(NSData *)data atOffset:(NSInteger)offset
+{
+    return [[self alloc] initWithData:data atOffset:offset];
+}
+
+- (instancetype)initWithData:(NSData *)data atOffset:(NSInteger)offset
+{
+    self = [super init];
+    if (self) {
+        self.data = data;
+        self.offset = offset;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ %@",
+            NSStringFromClass([self class]),
+            NSStringFromRange(NSMakeRange(self.offset, self.data.length))];
+}
+
+@end
+
+// ================================================================
 
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
@@ -23,6 +62,8 @@ static NSString *kIndexFileExtension = @".idx";
 @property (nonatomic, strong) NSString *cacheFilePath;
 @property (nonatomic, strong) NSString *indexFilePath;
 @property (nonatomic, strong) NSMutableArray<NSValue *> *ranges;
+@property (nonatomic, strong) NSMutableArray<LLOffsetData *> *data;
+@property (nonatomic, assign) NSInteger memDataSize;
 @property (nonatomic, strong) NSDictionary *allHeaderFields;
 @property (nonatomic, strong) NSFileHandle *writeFileHandle;
 @property (nonatomic, strong) NSFileHandle *readFileHandle;
@@ -35,6 +76,11 @@ static NSString *kIndexFileExtension = @".idx";
 {
     NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
     return [cache stringByAppendingPathComponent:@"LLVideoPlayer"];
+}
+
++ (NSString *)indexFileExtension
+{
+    return @".idx";
 }
 
 - (void)dealloc
@@ -53,9 +99,10 @@ static NSString *kIndexFileExtension = @".idx";
     self = [super init];
     if (self) {
         self.ranges = [NSMutableArray array];
+        self.data = [NSMutableArray array];
         self.cachePolicy = cachePolicy;
         self.cacheFilePath = filePath;
-        self.indexFilePath = [NSString stringWithFormat:@"%@%@", filePath, kIndexFileExtension];
+        self.indexFilePath = [NSString stringWithFormat:@"%@%@", filePath, [LLVideoPlayerCacheFile indexFileExtension]];
         
         NSString *dir = [filePath stringByDeletingLastPathComponent];
         if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir]) {
@@ -82,9 +129,10 @@ static NSString *kIndexFileExtension = @".idx";
         self.writeFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.cacheFilePath];
         
         [self loadIndexFileAtStartup];
+        [LLVideoPlayerCacheFile checkCacheWithFile:self.cacheFilePath policy:self.cachePolicy];
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
-        LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
-              _fileLength, self.ranges, self.allHeaderFields);
+        LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@, data: %@}",
+              _fileLength, self.ranges, self.allHeaderFields, self.data);
     }
     return self;
 }
@@ -136,8 +184,8 @@ static NSString *kIndexFileExtension = @".idx";
 {
     NSMutableArray *ranges = [NSMutableArray array];
     
-    for (NSValue *range in self.ranges) {
-        [ranges addObject:NSStringFromRange([range rangeValue])];
+    for (NSValue *rangeValue in self.ranges) {
+        [ranges addObject:NSStringFromRange([rangeValue rangeValue])];
     }
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -182,13 +230,19 @@ static NSString *kIndexFileExtension = @".idx";
     return YES;
 }
 
+- (void)makeErrorWithMessage:(NSString *)message code:(NSInteger)code forError:(NSError **)error
+{
+    if (error) {
+        *error = [NSError errorWithDomain:@"LLVideoPlayerCacheFile"
+                                     code:code
+                                 userInfo:@{NSLocalizedDescriptionKey:message}];
+    }
+    LLLog(@"{fileLength: %lu, ranges: %@, headers: %@}",
+          _fileLength, self.ranges, self.allHeaderFields);
+}
+
 - (void)addRange:(NSRange)range
 {
-    if (range.length == 0 || range.location >= _fileLength) {
-        LLLog(@"[ERR] addRange failed: %@ (file length: %lu)", NSStringFromRange(range), _fileLength);
-        return;
-    }
-    
     NSUInteger index = NSNotFound;
     for (NSUInteger i = 0; i < self.ranges.count; i++) {
         NSRange r = [self.ranges[i] rangeValue];
@@ -218,16 +272,6 @@ static NSString *kIndexFileExtension = @".idx";
     }
 }
 
-- (void)makeErrorWithMessage:(NSString *)message code:(NSInteger)code forError:(NSError **)error
-{
-    if (error) {
-        *error = [NSError errorWithDomain:@"LLVideoPlayerCacheFile"
-                                     code:code
-                                 userInfo:@{NSLocalizedDescriptionKey:message}];
-    }
-    LLLog(@"{fileLength: %lu, ranges: %@, headers: %@}",
-          _fileLength, self.ranges, self.allHeaderFields);
-}
 
 - (NSRange)cachedRangeForRange:(NSRange)requestRange
 {
@@ -236,8 +280,8 @@ static NSString *kIndexFileExtension = @".idx";
     }
     
     NSRange foundRange = LLInvalidRange;
-    for (int i = 0; i < self.ranges.count; i++) {
-        NSRange range = [self.ranges[i] rangeValue];
+    for (NSValue *rangeValue in self.ranges) {
+        NSRange range = [rangeValue rangeValue];
         if (NSLocationInRange(requestRange.location, range)) {
             foundRange = range;
             break;
@@ -253,42 +297,6 @@ static NSString *kIndexFileExtension = @".idx";
         return resultRange;
     } else {
         return LLInvalidRange;
-    }
-}
-
-- (NSData *)nofix_getDataWithRange:(NSRange)range error:(NSError **)error
-{
-    if (NO == LLValidFileRange(range)) {
-        [self makeErrorWithMessage:@"invalid file range" code:-1 forError:error];
-        return nil;
-    }
-    
-    @synchronized (self) {
-        NSRange resultRange = [self cachedRangeForRange:range];
-        if (NO == LLValidFileRange(resultRange)) {
-            [self makeErrorWithMessage:@"no cached found" code:-2 forError:error];
-            return nil;
-        }
-        
-        if (NO == NSEqualRanges(resultRange, range)) {
-            [self makeErrorWithMessage:@"range not matched" code:-3 forError:error];
-            return nil;
-        }
-        
-        NSData *data = nil;
-        @try {
-            [self.readFileHandle seekToFileOffset:range.location];
-            data = [self.readFileHandle readDataOfLength:range.length];
-        } @catch (NSException *exception) {
-            [self makeErrorWithMessage:exception.reason code:-4 forError:error];
-            return nil;
-        }
-        
-        if (nil == data) {
-            [self makeErrorWithMessage:@"read null" code:-5 forError:error];
-        }
-        
-        return data;
     }
 }
 
@@ -338,6 +346,49 @@ static NSString *kIndexFileExtension = @".idx";
     return success;
 }
 
+- (NSData *)readDataWithRange:(NSRange)range
+{
+    @try {
+        [self.readFileHandle seekToFileOffset:range.location];
+        return [self.readFileHandle readDataOfLength:range.length];
+    } @catch (NSException *exception) {
+        LLLog(@"read exception: %@", exception);
+        return nil;
+    }
+}
+
+- (void)syncMemData
+{
+    if (nil == self.writeFileHandle) {
+        return;
+    }
+    
+    LLLog(@"Synchronizing mem data... #%lu, %lu bytes", self.data.count, self.memDataSize);
+    
+    NSArray *array = [NSArray arrayWithArray:self.data];
+    for (LLOffsetData *data in array) {
+        @try {
+            [self.writeFileHandle seekToFileOffset:data.offset];
+            [self.writeFileHandle writeData:data.data];
+            
+            // Add/Remove
+            [self addRange:NSMakeRange(data.offset, data.data.length)];
+            [self.data removeObject:data];
+            self.memDataSize -= data.data.length;
+        } @catch (NSException *exception) {
+            LLLog(@"write exception: %@", exception);
+        }
+    }
+    
+    LLLog(@"Synchronized. #%lu, %lu bytes", self.data.count, self.memDataSize);
+}
+
+- (BOOL)isRangeDuplicated:(NSRange)range
+{
+    NSRange resultRange = [self cachedRangeForRange:range];
+    return NSEqualRanges(range, resultRange);
+}
+
 #pragma mark - Read/Write
 
 - (NSInteger)fileLength
@@ -356,25 +407,64 @@ static NSString *kIndexFileExtension = @".idx";
 
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error
 {
-    return [self nofix_getDataWithRange:range error:error];
-}
-
-- (BOOL)writeData:(NSData *)data atOffset:(NSInteger)offset
-{
-    if (nil == self.writeFileHandle) {
-        return NO;
+    if (NO == LLValidFileRange(range)) {
+        [self makeErrorWithMessage:@"invalid file range" code:-1 forError:error];
+        return nil;
+    }
+    
+    if (nil == self.readFileHandle) {
+        [self makeErrorWithMessage:@"read file handle nil" code:-2 forError:error];
+        return nil;
     }
     
     @synchronized (self) {
-        @try {
-            [self.writeFileHandle seekToFileOffset:offset];
-            [self.writeFileHandle writeData:data];
-            [self addRange:NSMakeRange(offset, data.length)];
-        } @catch (NSException *exception) {
-            return NO;
+        NSRange resultRange = [self cachedRangeForRange:range];
+        if (NO == LLValidFileRange(resultRange)) {
+            [self makeErrorWithMessage:@"no cached found" code:-3 forError:error];
+            return nil;
         }
         
-        return YES;
+        if (NO == NSEqualRanges(resultRange, range)) {
+            [self makeErrorWithMessage:@"range not matched" code:-4 forError:error];
+            return nil;
+        }
+        
+        NSData *data = [self readDataWithRange:range];
+        if (nil == data) {
+            [self makeErrorWithMessage:@"read null" code:-5 forError:error];
+        }
+        
+        return data;
+    }
+}
+
+- (void)writeData:(NSData *)data atOffset:(NSInteger)offset
+{
+    if (nil == self.writeFileHandle) {
+        return;
+    }
+    if (nil == data) {
+        return;
+    }
+        
+    @synchronized (self) {
+        if (offset >= _fileLength) {
+            LLLog(@"[ERR] write data overflow: %ld (file length: %ld)", offset, _fileLength);
+            return;
+        }
+        
+        NSRange range = NSMakeRange(offset, data.length);
+        if (NO == [self isRangeDuplicated:range]) {
+            LLOffsetData *offsetData = [LLOffsetData dataWithData:data atOffset:offset];
+            [self.data addObject:offsetData];
+            self.memDataSize += data.length;
+        } else {
+            LLLog(@"[DUPLICATE] discard %@", NSStringFromRange(range));
+        }
+        
+        if (self.memDataSize >= MAX_MEM_DATA_SIZE) {
+            [self syncMemData];
+        }
     }
 }
 
@@ -401,6 +491,16 @@ static NSString *kIndexFileExtension = @".idx";
                 _response = respone;
             }
         }
+    }
+}
+
+- (void)synchronize
+{
+    @synchronized (self) {
+        [self syncMemData];
+        [self saveIndexFile];
+        LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@, data: %@}",
+              _fileLength, self.ranges, self.allHeaderFields, self.data);
     }
 }
 

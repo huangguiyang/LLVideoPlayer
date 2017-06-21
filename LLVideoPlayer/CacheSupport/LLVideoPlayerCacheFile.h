@@ -17,14 +17,17 @@
 - (instancetype)initWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 + (NSString *)cacheDirectory;
++ (NSString *)indexFileExtension;
 
 #pragma mark - Read/Write
 
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error;
-- (BOOL)writeData:(NSData *)data atOffset:(NSInteger)offset;
+- (void)writeData:(NSData *)data atOffset:(NSInteger)offset;
 
 - (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest;
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
+
+- (void)synchronize;
 
 #pragma mark - Property
 - (NSArray<NSValue *> *)cachedRanges;

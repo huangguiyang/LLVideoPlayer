@@ -24,7 +24,6 @@
 
 - (void)dealloc
 {
-    LLLog(@"LLVideoPlayerCacheRemoteTask dealloc: %p", self);
     [self.connection cancel];
 }
 
@@ -56,11 +55,18 @@
     [super cancel];
 }
 
+- (void)synchronizeIfNeeded
+{
+    [self.cacheFile synchronize];
+}
+
 #pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     LLLog(@"didFailWithError: %@, %p", error, self);
+    [self synchronizeIfNeeded];
+    
     if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
         [self.delegate task:self didCompleteWithError:error];
     }
@@ -69,6 +75,8 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     LLLog(@"connectionDidFinishLoading: %@, %p", NSStringFromRange(self.range), self);
+    [self synchronizeIfNeeded];
+    
     if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
         [self.delegate task:self didCompleteWithError:nil];
     }
@@ -80,7 +88,7 @@
         return;
     }
     
-    LLLog(@"%@", response);
+    LLLog(@"didReceiveResponse: %@", response);
     [self.cacheFile receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:self.loadingRequest];
     
     if (NO == [(NSHTTPURLResponse *)response ll_supportRange]) {
