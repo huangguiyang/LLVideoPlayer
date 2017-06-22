@@ -13,46 +13,6 @@
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile+CachePolicy.h"
 
-#define MAX_MEM_DATA_SIZE (5 * 1024 * 1024)
-
-@interface LLOffsetData : NSObject
-
-@property (nonatomic, assign) NSInteger offset;
-@property (nonatomic, strong) NSData *data;
-
-+ (instancetype)dataWithData:(NSData *)data atOffset:(NSInteger)offset;
-- (instancetype)initWithData:(NSData *)data atOffset:(NSInteger)offset;
-
-@end
-
-@implementation LLOffsetData
-
-+ (instancetype)dataWithData:(NSData *)data atOffset:(NSInteger)offset
-{
-    return [[self alloc] initWithData:data atOffset:offset];
-}
-
-- (instancetype)initWithData:(NSData *)data atOffset:(NSInteger)offset
-{
-    self = [super init];
-    if (self) {
-        self.data = data;
-        self.offset = offset;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"%@ %@",
-            NSStringFromClass([self class]),
-            NSStringFromRange(NSMakeRange(self.offset, self.data.length))];
-}
-
-@end
-
-// ================================================================
-
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
     NSURLResponse *_response;
@@ -62,8 +22,6 @@
 @property (nonatomic, strong) NSString *cacheFilePath;
 @property (nonatomic, strong) NSString *indexFilePath;
 @property (nonatomic, strong) NSMutableArray<NSValue *> *ranges;
-@property (nonatomic, strong) NSMutableArray<LLOffsetData *> *data;
-@property (nonatomic, assign) NSInteger memDataSize;
 @property (nonatomic, strong) NSDictionary *allHeaderFields;
 @property (nonatomic, strong) NSFileHandle *writeFileHandle;
 @property (nonatomic, strong) NSFileHandle *readFileHandle;
@@ -99,7 +57,6 @@
     self = [super init];
     if (self) {
         self.ranges = [NSMutableArray array];
-        self.data = [NSMutableArray array];
         self.cachePolicy = cachePolicy;
         self.cacheFilePath = filePath;
         self.indexFilePath = [NSString stringWithFormat:@"%@%@", filePath, [LLVideoPlayerCacheFile indexFileExtension]];
@@ -131,18 +88,24 @@
         [self loadIndexFileAtStartup];
         [LLVideoPlayerCacheFile checkCacheWithFile:self.cacheFilePath policy:self.cachePolicy];
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
-        LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@, data: %@}",
-              _fileLength, self.ranges, self.allHeaderFields, self.data);
+        LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
+              _fileLength, self.ranges, self.allHeaderFields);
     }
     return self;
 }
 
 #pragma mark - Private
 
+- (BOOL)checkIndexOK
+{
+    //TODO
+    return YES;
+}
+
 - (void)loadIndexFileAtStartup
 {
     // load index data
-    if (NO == [self loadIndexFile]) {
+    if (NO == [self loadIndexFile] || NO == [self checkIndexOK]) {
         [self truncateFileToLength:0];
     }
 }
@@ -175,11 +138,6 @@
     return YES;
 }
 
-- (BOOL)saveIndexFile
-{
-    return [self saveIndexFileWithHeaders:self.allHeaderFields];
-}
-
 - (BOOL)saveIndexFileWithHeaders:(NSDictionary *)headers
 {
     NSMutableArray *ranges = [NSMutableArray array];
@@ -199,6 +157,11 @@
     }
     
     return [indexData writeToFile:self.indexFilePath atomically:YES];
+}
+
+- (BOOL)saveIndexFile
+{
+    return [self saveIndexFileWithHeaders:self.allHeaderFields];
 }
 
 - (BOOL)saveAllHeaderFields:(NSDictionary *)allHeaderFields
@@ -357,77 +320,6 @@
     }
 }
 
-- (void)appendMemData:(NSData *)data atOffset:(NSInteger)offset
-{
-    NSInteger index = NSNotFound;
-    for (NSInteger i = 0; i < self.data.count; i++) {
-        if (self.data[i].offset >= offset) {
-            index = i;
-            break;
-        }
-    }
-    
-    LLOffsetData *offsetData = [LLOffsetData dataWithData:data atOffset:offset];
-    
-    if (index == NSNotFound) {
-        [self.data addObject:offsetData];
-    } else {
-        [self.data insertObject:offsetData atIndex:index];
-    }
-    
-    self.memDataSize += data.length;
-    
-    // merge ranges if possible
-    for (NSUInteger i = 0; i < self.data.count; i++) {
-        if ((i + 1) < self.data.count) {
-            NSInteger currentOffset = self.data[i].offset;
-            NSInteger currentLength = self.data[i].data.length;
-            NSInteger nextOffset = self.data[i+1].offset;
-            if (currentOffset + currentLength == nextOffset) {
-                if ([self.data[i] isKindOfClass:[NSMutableData class]]) {
-                    NSMutableData *mutableData = (NSMutableData *)self.data[i].data;
-                    [mutableData appendData:self.data[i+1].data];
-                } else {
-                    NSMutableData *mutableData = [NSMutableData data];
-                    [mutableData appendData:self.data[i].data];
-                    [mutableData appendData:self.data[i+1].data];
-                    self.data[i].data = mutableData;
-                }
-                [self.data removeObjectAtIndex:(i+1)];
-                i -= 1;
-            }
-        }
-    }
-}
-
-- (void)syncMemData
-{
-    if (nil == self.writeFileHandle) {
-        return;
-    }
-    
-    LLLog(@"Synchronizing... #%lu, %lu bytes", self.data.count, self.memDataSize);
-
-    NSArray *array = [NSArray arrayWithArray:self.data];
-    for (LLOffsetData *data in array) {
-        @try {
-            [self.writeFileHandle seekToFileOffset:data.offset];
-            [self.writeFileHandle writeData:data.data];
-            
-            // Remove
-            [self.data removeObject:data];
-            self.memDataSize -= data.data.length;
-            
-            // Add Range
-            [self addRange:NSMakeRange(data.offset, data.data.length)];
-        } @catch (NSException *exception) {
-            LLLog(@"write exception: %@", exception);
-        }
-    }
-    
-    LLLog(@"Synchronized. #%lu, %lu bytes", self.data.count, self.memDataSize);
-}
-
 #pragma mark - Read/Write
 
 - (NSInteger)fileLength
@@ -479,23 +371,26 @@
 
 - (void)writeData:(NSData *)data atOffset:(NSInteger)offset
 {
-    if (nil == self.writeFileHandle) {
+    if (nil == self.writeFileHandle || offset > [self fileLength]) {
         return;
     }
-    if (nil == data) {
+    if (nil == data || data.length == 0) {
         return;
     }
         
     @synchronized (self) {
-        if (offset >= _fileLength) {
-            LLLog(@"[ERR] write data overflow: %ld (file length: %ld)", offset, _fileLength);
-            return;
-        }
-        
-        [self appendMemData:data atOffset:offset];
-        
-        if (self.memDataSize >= MAX_MEM_DATA_SIZE) {
-            [self syncMemData];
+        @try {
+            [self.writeFileHandle seekToFileOffset:offset];
+            [self.writeFileHandle writeData:data];
+            
+            // Add Range
+            [self addRange:NSMakeRange(offset, data.length)];
+            [self saveIndexFile];
+            LLLog(@"WriteData: %@", NSStringFromRange(NSMakeRange(offset, data.length)));
+            LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@}",
+                  _fileLength, self.ranges, self.allHeaderFields);
+        } @catch (NSException *exception) {
+            LLLog(@"write exception: %@", exception);
         }
     }
 }
@@ -515,7 +410,16 @@
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange
 {
     @synchronized (self) {
-        if (nil == _response && [self hasCachedHTTPURLResponse]) {
+        if (nil == _response) {
+            [self forceResponseForLoadingRequest:loadingRequest withRange:requestRange];
+        }
+    }
+}
+
+- (void)forceResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange
+{
+    @synchronized (self) {
+        if ([self hasCachedHTTPURLResponse]) {
             NSHTTPURLResponse *respone = [self constructHTTPURLResponseForURL:loadingRequest.request.URL
                                                                      andRange:requestRange];
             if (respone) {
@@ -523,16 +427,6 @@
                 _response = respone;
             }
         }
-    }
-}
-
-- (void)synchronize
-{
-    @synchronized (self) {
-        [self syncMemData];
-        [self saveIndexFile];
-        LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@, data: %@}",
-              _fileLength, self.ranges, self.allHeaderFields, self.data);
     }
 }
 

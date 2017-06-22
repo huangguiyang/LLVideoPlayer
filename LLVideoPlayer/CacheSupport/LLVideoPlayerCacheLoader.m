@@ -43,7 +43,7 @@
         NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
         self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
         self.operationQueue = [[NSOperationQueue alloc] init];
-        self.operationQueue.name = @"com.LLVideoPlayer.cache";
+        [self.operationQueue setName:@"LLVideoPlayerCacheOperationQueue"];
         self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
     }
     return self;
@@ -59,7 +59,7 @@
 
 - (void)cancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    NSArray<LLVideoPlayerCacheOperation *> *operations = self.operationQueue.operations;
+    NSArray *operations = [NSArray arrayWithArray:self.operationQueue.operations];
     for (LLVideoPlayerCacheOperation *operation in operations) {
         if (operation.loadingRequest == loadingRequest) {
             [operation cancel];

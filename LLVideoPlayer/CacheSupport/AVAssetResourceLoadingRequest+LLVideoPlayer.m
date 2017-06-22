@@ -14,9 +14,7 @@
 @implementation AVAssetResourceLoadingRequest (LLVideoPlayer)
 
 - (void)ll_fillContentInformation:(NSURLResponse *)response
-{
-    LLLog(@"ll_fillContentInformation");
-    
+{    
     if (nil == response) {
         return;
     }

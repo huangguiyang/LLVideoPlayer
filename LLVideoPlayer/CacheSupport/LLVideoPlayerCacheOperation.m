@@ -10,85 +10,25 @@
 #import "LLVideoPlayerInternal.h"
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
-#import "LLVideoPlayerCacheLocalTask.h"
-#import "LLVideoPlayerCacheRemoteTask.h"
+#import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 
-@interface LLVideoPlayerCacheOperation () <LLVideoPlayerCacheTaskDelegate>
+@interface LLVideoPlayerCacheOperation () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 {
     CFRunLoopRef _runLoop;
 }
 
-@property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, getter = isFinished, readwrite)  BOOL finished;
 @property (nonatomic, getter = isExecuting, readwrite) BOOL executing;
+@property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
-@property (nonatomic, strong) NSMutableArray *tasks;
-@property (nonatomic, strong) NSThread *operationThread;
+@property (nonatomic, strong) NSURLConnection *connection;
 
 @end
 
 @implementation LLVideoPlayerCacheOperation
 @synthesize executing = _executing;
 @synthesize finished = _finished;
-
-- (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
-                             cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-{
-    self = [super init];
-    if (self) {
-        self.loadingRequest = loadingRequest;
-        self.cacheFile = cacheFile;
-        self.tasks = [NSMutableArray array];
-    }
-    return self;
-}
-
-+ (instancetype)operationWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
-                                  cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-{
-    return [[self alloc] initWithLoadingRequest:loadingRequest cacheFile:cacheFile];
-}
-
-- (void)main
-{
-    LLLog(@"operation main: %p: %@", self, LLLoadingRequestToString(self.loadingRequest));
-    self.operationThread = [NSThread currentThread];
-    
-    @autoreleasepool {
-        if ([self isCancelled]) {
-            [self completeOperation];
-            return;
-        }
-        
-        @synchronized (self) {
-            self.executing = YES;
-            [self startOperation];
-        }
-        
-        [self startRunLoop];
-        [self completeOperation];
-    }
-}
-
-- (void)completeOperation
-{
-    self.executing = NO;
-    self.finished = YES;
-    LLLog(@"operation complete: %p", self);
-}
-
-#pragma mark - Cancel
-
-- (void)cancel
-{
-    @synchronized (self) {
-        for (LLVideoPlayerCacheTask *task in self.tasks) {
-            [task cancel];
-        }
-    }
-    [super cancel];
-    LLLog(@"operation cancelled: %p", self);
-}
 
 #pragma mark - Executing && Finished
 
@@ -128,25 +68,81 @@
     }
 }
 
-#pragma mark - RunLoop
+- (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
+                             cacheFile:(LLVideoPlayerCacheFile *)cacheFile
+{
+    self = [super init];
+    if (self) {
+        self.loadingRequest = loadingRequest;
+        self.cacheFile = cacheFile;
+    }
+    return self;
+}
+
++ (instancetype)operationWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
+                                  cacheFile:(LLVideoPlayerCacheFile *)cacheFile
+{
+    return [[self alloc] initWithLoadingRequest:loadingRequest cacheFile:cacheFile];
+}
+
+#pragma mark - Start/Cancel/Main
+
+- (void)dealloc
+{
+    [_connection cancel];
+    LLLog(@"LLVideoPlayerCacheOperation dealloc... %p", self);
+}
+
+- (void)main
+{
+    LLLog(@"operation main: %@: %@", [NSThread currentThread], LLLoadingRequestToString(self.loadingRequest));
+    
+    @autoreleasepool {
+        if ([self isCancelled]) {
+            [self complete];
+            return;
+        }
+        
+        self.executing = YES;
+        [self startOperation];
+        
+        [self startRunLoop];
+        [self complete];
+    }
+}
+
+- (void)cancel
+{
+    [self.connection cancel];
+    self.connection = nil;
+    [super cancel];
+    LLLog(@"operation cancelled: %p", self);
+}
+
+- (void)complete
+{
+    self.executing = NO;
+    self.finished = YES;
+    LLLog(@"operation complete: %p", self);
+}
 
 - (void)startRunLoop
 {
     NSRunLoop *runloop = [NSRunLoop currentRunLoop];
     [runloop addPort:[NSPort port] forMode:NSDefaultRunLoopMode];
     _runLoop = runloop.getCFRunLoop;
-    [runloop run];
+    CFRunLoopRun();
 }
 
 - (void)stopRunLoop
 {
     if (_runLoop) {
         CFRunLoopStop(_runLoop);
-        _runLoop = nil;
+        _runLoop = NULL;
     }
 }
 
-#pragma mark - Connection
+#pragma mark - Operations
 
 - (void)startOperation
 {
@@ -160,15 +156,12 @@
                             self.loadingRequest.dataRequest.requestedLength);
     }
     
-    [self mapOperationToTasksWithRange:range];
-    
-    for (LLVideoPlayerCacheTask *task in self.tasks) {
-        [task resume];
-    }
+    [self startRemoteWithRange:range];
 }
 
 - (void)finishOperationWithError:(NSError *)error
 {
+    LLLog(@"[FINISH] %@, error: %@", LLLoadingRequestToString(self.loadingRequest), error);
     if (error) {
         [self.loadingRequest finishLoadingWithError:error];
     } else {
@@ -178,114 +171,57 @@
     [self stopRunLoop];
 }
 
-// resume task on NSOperation Thread
-- (void)resumeTask:(LLVideoPlayerCacheTask *)task
-{
-    [task resume];
-}
-
 #pragma mark - LLVideoPlayerCacheTaskDelegate
 
-- (void)task:(LLVideoPlayerCacheTask *)task didCompleteWithError:(NSError *)error
+- (void)startRemoteWithRange:(NSRange)range
 {
-    __weak typeof(self) wself = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __strong typeof(wself) self = wself;
-        [self.tasks removeObject:task];
-        
-        if ([self isCancelled] || error.code == NSUserCancelledError) {
-            LLLog(@"[CANCEL] %@", task);
-            if (self.tasks.count == 0) {
-                [self stopRunLoop];
-            }
-            return;
-        }
-        
-        if (error) {
-            LLLog(@"[FAILED] %@, error: %@", task, error);
-            if ([task isKindOfClass:[LLVideoPlayerCacheLocalTask class]]) {
-                LLLog(@"LocalTask failed, try to transfer to RemoteTask...");
-                LLVideoPlayerCacheTask *remoteTask = [self addTaskWithRange:task.range fromCache:NO];
-                [self performSelector:@selector(resumeTask:)
-                             onThread:self.operationThread
-                           withObject:remoteTask
-                        waitUntilDone:NO];
-            } else {
-                [self cancel];
-                [self finishOperationWithError:error];
-            }
-            return;
-        }
-        
-        LLLog(@"[COMPLETE] %@", task);
-        if (self.tasks.count == 0) {
-            [self finishOperationWithError:error];
-        }
-    });
+    NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
+    request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
+    request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
+    
+    NSString *rangeString = LLRangeToHTTPRangeHeader(range);
+    if (rangeString) {
+        [request setValue:rangeString forHTTPHeaderField:@"Range"];
+    }
+    
+    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+    [self.connection start];
 }
 
-#pragma mark - Private
+#pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
 
-- (LLVideoPlayerCacheTask *)addTaskWithRange:(NSRange)range fromCache:(BOOL)fromCache
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    LLVideoPlayerCacheTask *task;
-    
-    if (fromCache) {
-        task = [LLVideoPlayerCacheLocalTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile];
-    } else {
-        task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range cacheFile:self.cacheFile];
-    }
-    
-    [task setDelegate:self];
-    [self.tasks addObject:task];
-    
-    LLLog(@"[ADD] %@", task);
-    
-    return task;
+    [self finishOperationWithError:error];
 }
 
-- (void)mapOperationToTasksWithRange:(NSRange)requestRange
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    [self.tasks removeAllObjects];
-    
-    [self.cacheFile tryResponseForLoadingRequest:self.loadingRequest withRange:requestRange];
-    
-    NSInteger start = requestRange.location;
-    NSInteger end = requestRange.length == NSIntegerMax ? NSIntegerMax : NSMaxRange(requestRange);
-    
-    NSArray<NSValue *> *ranges = [self.cacheFile cachedRanges];
-    for (NSValue *value in ranges) {
-        NSRange range = [value rangeValue];
-        
-        if (start >= NSMaxRange(range)) {
-            continue;
-        }
-        
-        if (start < range.location) {
-            [self addTaskWithRange:NSMakeRange(start, range.location - start) fromCache:NO];
-            start = range.location;
-        }
-        
-        // in range
-        NSAssert(NSLocationInRange(start, range), @"Oops!!!");
-        
-        if (end <= NSMaxRange(range)) {
-            [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:YES];
-            start = end;
-            break;
-        }
-        
-        [self addTaskWithRange:NSMakeRange(start, NSMaxRange(range) - start) fromCache:YES];
-        start = NSMaxRange(range);
+    [self finishOperationWithError:nil];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
+        return;
     }
     
-    if (end > start && (self.cacheFile.fileLength == 0 || start < self.cacheFile.fileLength)) {
-        if (end == NSIntegerMax) {
-            [self addTaskWithRange:NSMakeRange(start, NSIntegerMax) fromCache:NO];
-        } else {
-            [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:NO];
-        }
+    LLLog(@"didReceiveResponse: %@", response);
+    [self.loadingRequest ll_fillContentInformation:response];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    [self.loadingRequest.dataRequest respondWithData:data];
+}
+
+- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response
+{
+    if (response) {
+        self.loadingRequest.redirect = request;
     }
+    
+    return request;
 }
 
 @end
