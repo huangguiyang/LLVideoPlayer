@@ -7,6 +7,7 @@
 //
 
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "NSString+LLVideoPlayer.h"
 
 @implementation NSHTTPURLResponse (LLVideoPlayer)
 
@@ -21,16 +22,12 @@
     
     // For example: "Content-Range" = "bytes 57933824-57999359/65904318"
     NSString *contentRange = self.allHeaderFields[@"Content-Range"];
-    if (contentRange) {
-        NSArray *ranges = [contentRange componentsSeparatedByString:@"/"];
-        if (ranges.count > 0) {
-            NSString *lengthString = [[ranges lastObject] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            return [lengthString integerValue];
-        }
-    } else {
-        return [self expectedContentLength];
+    NSString *lengthString = [contentRange ll_decodeLengthFromContentRange];
+    if (lengthString) {
+        return [lengthString integerValue];
     }
-    return 0;
+    
+    return [self expectedContentLength];
 }
 
 @end

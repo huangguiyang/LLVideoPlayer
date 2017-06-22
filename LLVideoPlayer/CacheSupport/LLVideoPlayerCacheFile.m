@@ -12,6 +12,7 @@
 #import "LLVideoPlayerInternal.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile+CachePolicy.h"
+#import "NSString+LLVideoPlayer.h"
 
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
@@ -33,7 +34,7 @@
 + (NSString *)cacheDirectory
 {
     NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    return [cache stringByAppendingPathComponent:@"LLVideoPlayer"];
+    return [cache stringByAppendingPathComponent:@"com.videoplayer.ll.debug"];
 }
 
 + (NSString *)indexFileExtension
@@ -96,16 +97,10 @@
 
 #pragma mark - Private
 
-- (BOOL)checkIndexOK
-{
-    //TODO
-    return YES;
-}
-
 - (void)loadIndexFileAtStartup
 {
     // load index data
-    if (NO == [self loadIndexFile] || NO == [self checkIndexOK]) {
+    if (NO == [self loadIndexFile]) {
         [self truncateFileToLength:0];
     }
 }
@@ -124,8 +119,6 @@
         return NO;
     }
     
-    _fileLength = [dict[@"size"] integerValue];
-    
     NSMutableArray *ranges = dict[@"ranges"];
     [self.ranges removeAllObjects];
     for (NSString *rangeString in ranges) {
@@ -133,7 +126,8 @@
         [self.ranges addObject:[NSValue valueWithRange:range]];
     }
     
-    self.allHeaderFields = dict[@"allHeaderFields"];
+    _allHeaderFields = dict[@"allHeaderFields"];
+    _fileLength = [[_allHeaderFields[@"Content-Range"] ll_decodeLengthFromContentRange] integerValue];
     
     return YES;
 }
@@ -147,7 +141,6 @@
     }
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    dict[@"size"] = @(_fileLength);
     dict[@"ranges"] = ranges;
     dict[@"allHeaderFields"] = headers;
     
@@ -410,16 +403,7 @@
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange
 {
     @synchronized (self) {
-        if (nil == _response) {
-            [self forceResponseForLoadingRequest:loadingRequest withRange:requestRange];
-        }
-    }
-}
-
-- (void)forceResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange
-{
-    @synchronized (self) {
-        if ([self hasCachedHTTPURLResponse]) {
+        if (nil == _response && [self hasCachedHTTPURLResponse]) {
             NSHTTPURLResponse *respone = [self constructHTTPURLResponseForURL:loadingRequest.request.URL
                                                                      andRange:requestRange];
             if (respone) {

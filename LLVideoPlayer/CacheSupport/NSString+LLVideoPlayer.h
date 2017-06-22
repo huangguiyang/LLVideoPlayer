@@ -12,4 +12,6 @@
 
 - (NSString *)ll_md5;
 
+- (NSString *)ll_decodeLengthFromContentRange;
+
 @end

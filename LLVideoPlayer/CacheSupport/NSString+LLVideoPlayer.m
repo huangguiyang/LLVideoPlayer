@@ -25,4 +25,20 @@
             ];
 }
 
+- (NSString *)ll_decodeLengthFromContentRange
+{
+    // For example: "Content-Range" = "bytes 57933824-57999359/65904318"
+    
+    NSArray *ranges = [self componentsSeparatedByString:@"/"];
+    if (ranges.count > 0) {
+        NSString *result = [[ranges lastObject] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (result.length == 0) {
+            return nil;
+        }
+        
+        return result;
+    }
+    return nil;
+}
+
 @end
