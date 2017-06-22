@@ -23,6 +23,7 @@
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, strong) NSURLConnection *connection;
+@property (nonatomic, strong) NSURLResponse *response;
 
 @end
 
@@ -156,6 +157,14 @@
                             self.loadingRequest.dataRequest.requestedLength);
     }
     
+    NSURLResponse *response = [self.cacheFile constructHTTPURLResponseForURL:self.loadingRequest.request.URL
+                                                                    andRange:range];
+    if (response) {
+        [self.loadingRequest ll_fillContentInformation:response];
+        self.response = response;
+        LLLog(@"construct response: %@", response);
+    }
+    
     [self startRemoteWithRange:range];
 }
 
@@ -205,9 +214,14 @@
     if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
         return;
     }
+    if (self.response) {
+        return;
+    }
     
     LLLog(@"didReceiveResponse: %@", response);
     [self.loadingRequest ll_fillContentInformation:response];
+    [self.cacheFile writeResponse:(NSHTTPURLResponse *)response];
+    self.response = response;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data

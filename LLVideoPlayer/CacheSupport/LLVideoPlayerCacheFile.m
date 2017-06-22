@@ -256,50 +256,9 @@
     }
 }
 
-- (NSHTTPURLResponse *)constructHTTPURLResponseForURL:(NSURL *)url andRange:(NSRange)range
-{
-    if (NO == [self hasCachedHTTPURLResponse]) {
-        return nil;
-    }
-    
-    if (range.length == NSIntegerMax) {
-        range.length = _fileLength - range.location;
-    }
-    
-    NSMutableDictionary *responseHeaders = [self.allHeaderFields mutableCopy];
-    NSString *contentRangeKey = @"Content-Range";
-    BOOL supportRange = responseHeaders[contentRangeKey] != nil;
-    
-    if (supportRange && LLValidByteRange(range)) {
-        responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, _fileLength);
-    } else {
-        [responseHeaders removeObjectForKey:contentRangeKey];
-    }
-    
-    responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu", range.length];
-    NSInteger statusCode = supportRange ? 206 : 200;
-    
-    return [[NSHTTPURLResponse alloc] initWithURL:url
-                                       statusCode:statusCode
-                                      HTTPVersion:@"HTTP/1.1"
-                                     headerFields:responseHeaders];
-}
-
 - (BOOL)hasCachedHTTPURLResponse
 {
     return _fileLength > 0 && self.allHeaderFields.count > 0;
-}
-
-
-- (BOOL)writeResponse:(NSHTTPURLResponse *)response
-{
-    BOOL success = YES;
-    if (_fileLength == 0) {
-        success = [self truncateFileToLength:[response ll_totalLength]];
-    }
-    success = success && [self saveAllHeaderFields:[response allHeaderFields]];
-    
-    return success;
 }
 
 - (NSData *)readDataWithRange:(NSRange)range
@@ -386,6 +345,46 @@
             LLLog(@"write exception: %@", exception);
         }
     }
+}
+
+- (BOOL)writeResponse:(NSHTTPURLResponse *)response
+{
+    BOOL success = YES;
+    if (_fileLength == 0) {
+        success = [self truncateFileToLength:[response ll_totalLength]];
+    }
+    success = success && [self saveAllHeaderFields:[response allHeaderFields]];
+    
+    return success;
+}
+
+- (NSHTTPURLResponse *)constructHTTPURLResponseForURL:(NSURL *)url andRange:(NSRange)range
+{
+    if (NO == [self hasCachedHTTPURLResponse]) {
+        return nil;
+    }
+    
+    if (range.length == NSIntegerMax) {
+        range.length = _fileLength - range.location;
+    }
+    
+    NSMutableDictionary *responseHeaders = [self.allHeaderFields mutableCopy];
+    NSString *contentRangeKey = @"Content-Range";
+    BOOL supportRange = responseHeaders[contentRangeKey] != nil;
+    
+    if (supportRange && LLValidByteRange(range)) {
+        responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, _fileLength);
+    } else {
+        [responseHeaders removeObjectForKey:contentRangeKey];
+    }
+    
+    responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu", range.length];
+    NSInteger statusCode = supportRange ? 206 : 200;
+    
+    return [[NSHTTPURLResponse alloc] initWithURL:url
+                                       statusCode:statusCode
+                                      HTTPVersion:@"HTTP/1.1"
+                                     headerFields:responseHeaders];
 }
 
 - (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest

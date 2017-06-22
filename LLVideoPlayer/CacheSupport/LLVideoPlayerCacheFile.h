@@ -24,6 +24,9 @@
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error;
 - (void)writeData:(NSData *)data atOffset:(NSInteger)offset;
 
+- (BOOL)writeResponse:(NSHTTPURLResponse *)response;
+- (NSHTTPURLResponse *)constructHTTPURLResponseForURL:(NSURL *)url andRange:(NSRange)range;
+
 - (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest;
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
 
