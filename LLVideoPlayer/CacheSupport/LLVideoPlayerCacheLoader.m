@@ -63,7 +63,6 @@
     for (LLVideoPlayerCacheOperation *operation in operations) {
         if (operation.loadingRequest == loadingRequest) {
             [operation cancel];
-            break;
         }
     }
 }
