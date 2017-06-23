@@ -193,8 +193,7 @@
                                      code:code
                                  userInfo:@{NSLocalizedDescriptionKey:message}];
     }
-    LLLog(@"{fileLength: %lu, ranges: %@, headers: %@}",
-          _fileLength, self.ranges, self.allHeaderFields);
+    LLLog(@"[ERROR] can't read range: %@", message);
 }
 
 - (void)addRange:(NSRange)range
@@ -323,10 +322,12 @@
 
 - (void)writeData:(NSData *)data atOffset:(NSInteger)offset
 {
-    if (nil == self.writeFileHandle || offset > [self fileLength]) {
+    if (nil == data || data.length == 0 || nil == self.writeFileHandle) {
+        LLLog(@"[ERROR] write data nil");
         return;
     }
-    if (nil == data || data.length == 0) {
+    if (offset > [self fileLength]) {
+        LLLog(@"[ERROR] write data overflow: %ld > %ld", offset, [self fileLength]);
         return;
     }
         
