@@ -34,7 +34,7 @@
 + (NSString *)cacheDirectory
 {
     NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    return [cache stringByAppendingPathComponent:@"com.videoplayer.ll.debug"];
+    return [cache stringByAppendingPathComponent:@"LLVideoPlayer"];
 }
 
 + (NSString *)indexFileExtension
