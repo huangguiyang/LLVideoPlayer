@@ -63,34 +63,34 @@
         self.indexFilePath = [NSString stringWithFormat:@"%@%@", filePath, [LLVideoPlayerCacheFile indexFileExtension]];
         
         NSString *dir = [filePath stringByDeletingLastPathComponent];
-        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir]) {
-            if (NO == [[NSFileManager defaultManager] createDirectoryAtPath:dir
-                                                withIntermediateDirectories:YES attributes:nil error:nil]) {
-                LLLog(@"cannot create directory: %@", dir);
-                return nil;
-            }
+        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir] &&
+            NO == [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
+            LLLog(@"[ERROR] Cannot create cache directory: %@", dir);
+            return nil;
         }
         
-        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:self.cacheFilePath]) {
-            if (NO == [[NSFileManager defaultManager] createFileAtPath:self.cacheFilePath contents:nil attributes:nil]) {
-                return nil;
-            }
+        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:self.cacheFilePath] &&
+            NO == [[NSFileManager defaultManager] createFileAtPath:self.cacheFilePath contents:nil attributes:nil]) {
+            LLLog(@"[ERROR] Cannot create cache file: %@", self.cacheFilePath);
+            return nil;
         }
         
-        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:self.indexFilePath]) {
-            if (NO == [[NSFileManager defaultManager] createFileAtPath:self.indexFilePath contents:nil attributes:nil]) {
-                return nil;
-            }
+        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:self.indexFilePath] &&
+            NO == [[NSFileManager defaultManager] createFileAtPath:self.indexFilePath contents:nil attributes:nil]) {
+            LLLog(@"[ERROR] Cannot create index file: %@", self.cacheFilePath);
+            return nil;
         }
         
         self.readFileHandle = [NSFileHandle fileHandleForReadingAtPath:self.cacheFilePath];
         self.writeFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.cacheFilePath];
         
         [self loadIndexFileAtStartup];
-        [LLVideoPlayerCacheFile checkCacheWithFile:self.cacheFilePath policy:self.cachePolicy];
+        
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
         LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
               _fileLength, self.ranges, self.allHeaderFields);
+        
+        [self checkCacheDirectory];
     }
     return self;
 }
@@ -339,9 +339,7 @@
             LLLog(@"write exception: %@", exception);
             return;
         }
-        
-        LLLog(@"WriteData: %@", NSStringFromRange(NSMakeRange(offset, data.length)));
-        
+                
         // Add Range
         [self addRange:NSMakeRange(offset, data.length)];
     }

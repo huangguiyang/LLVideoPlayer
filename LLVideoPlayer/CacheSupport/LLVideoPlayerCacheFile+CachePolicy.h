@@ -10,6 +10,6 @@
 
 @interface LLVideoPlayerCacheFile (CachePolicy)
 
-+ (void)checkCacheWithFile:(NSString *)cacheFilePath policy:(LLVideoPlayerCachePolicy *)policy;
+- (void)checkCacheDirectory;
 
 @end

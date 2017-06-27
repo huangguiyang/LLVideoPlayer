@@ -36,4 +36,7 @@
 - (NSArray<NSValue *> *)cachedRanges;
 @property (nonatomic, assign, readonly) NSInteger fileLength;
 
+@property (nonatomic, strong, readonly) NSString *cacheFilePath;
+@property (nonatomic, strong, readonly) LLVideoPlayerCachePolicy *cachePolicy;
+
 @end

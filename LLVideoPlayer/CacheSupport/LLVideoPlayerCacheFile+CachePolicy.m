@@ -47,9 +47,9 @@
     LLLog(@"cache deleted: %@", path);
 }
 
-+ (void)checkCacheWithFile:(NSString *)cacheFilePath policy:(LLVideoPlayerCachePolicy *)cachePolicy
+- (void)checkCacheDirectory
 {
-    NSString *directory = [self cacheDirectory];
+    NSString *directory = [[self class] cacheDirectory];
     NSError *error;
     NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:&error];
     if (error) {
@@ -57,6 +57,8 @@
         return;
     }
     
+    NSString *cacheFilePath = self.cacheFilePath;
+    LLVideoPlayerCachePolicy *cachePolicy = self.cachePolicy;
     if (nil == cachePolicy) {
         cachePolicy = [LLVideoPlayerCachePolicy defaultPolicy];
     }
@@ -66,7 +68,7 @@
     NSMutableArray *paths = [NSMutableArray array];
     
     for (NSString *name in contents) {
-        if ([name hasSuffix:[self indexFileExtension]]) {
+        if ([name hasSuffix:[[self class] indexFileExtension]]) {
             continue;
         }
         
@@ -87,7 +89,7 @@
         NSDate *date = [attr fileCreationDate];
         NSInteger hours = [now timeIntervalSinceDate:date] / 3600;
         if (hours >= cachePolicy.outdatedHours) {
-            [self removeCacheAtPath:path];
+            [[self class] removeCacheAtPath:path];
             continue;
         }
         
@@ -98,8 +100,8 @@
     CGFloat currentDiskAvailableRate = cachePolicy.diskAvailableRate;
     
     if (totalSize < cachePolicy.diskCapacity) {
-        int64_t diskSpaceSize = [self diskSpace];
-        int64_t diskSpaceFreeSize = [self diskSpaceFree];
+        int64_t diskSpaceSize = [[self class] diskSpace];
+        int64_t diskSpaceFreeSize = [[self class] diskSpaceFree];
         if (-1 != diskSpaceSize && -1 != diskSpaceFreeSize) {
             currentDiskAvailableRate = (CGFloat)diskSpaceFreeSize / (CGFloat)diskSpaceSize;
         }
@@ -120,7 +122,7 @@
     while (paths.count > 0 && (totalSize  >= cachePolicy.diskCapacity || currentDiskAvailableRate < cachePolicy.diskAvailableRate)) {
         NSString *path = [paths firstObject];
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-        [self removeCacheAtPath:path];
+        [[self class] removeCacheAtPath:path];
         totalSize -= [attr fileSize];
         [paths removeObject:path];
     }
