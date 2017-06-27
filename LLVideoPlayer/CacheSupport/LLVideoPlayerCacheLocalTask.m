@@ -11,9 +11,15 @@
 
 @implementation LLVideoPlayerCacheLocalTask
 
-- (void)resume
+- (void)main
 {
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    @autoreleasepool {
+        if ([self isCancelled]) {
+            return;
+        }
+        
+        [self setExecuting:YES];
+        
         NSInteger offset = self.range.location;
         NSInteger lengthPerRead = 8192;
         NSError *error = nil;
@@ -38,10 +44,10 @@
             offset = NSMaxRange(range);
         }
         
-        if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
-            [self.delegate task:self didCompleteWithError:error];
-        }
-    });
+        self.error = error;
+        [self setExecuting:NO];
+        [self setFinished:YES];
+    }
 }
 
 @end

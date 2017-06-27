@@ -15,60 +15,24 @@
 #import "LLVideoPlayerCacheRemoteTask.h"
 #import "LLVideoPlayerCacheLocalTask.h"
 
-@interface LLVideoPlayerCacheOperation () <LLVideoPlayerCacheTaskDelegate>
+@interface LLVideoPlayerCacheOperation ()
 {
     CFRunLoopRef _runLoop;
-    NSThread *_operationThread;
 }
 
-@property (nonatomic, getter = isFinished, readwrite)  BOOL finished;
-@property (nonatomic, getter = isExecuting, readwrite) BOOL executing;
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
-@property (nonatomic, strong) NSMutableArray<LLVideoPlayerCacheTask *> *tasks;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, assign) NSInteger cancels;
 
 @end
 
 @implementation LLVideoPlayerCacheOperation
-@synthesize executing = _executing;
-@synthesize finished = _finished;
 
-#pragma mark - Executing && Finished
-
-- (BOOL)isExecuting
+- (void)dealloc
 {
-    @synchronized (self) {
-        return _executing;
-    }
-}
-
-- (BOOL)isFinished
-{
-    @synchronized (self) {
-        return _finished;
-    }
-}
-
-- (void)setExecuting:(BOOL)executing
-{
-    if (executing != _executing) {
-        [self willChangeValueForKey:@"isExecuting"];
-        @synchronized (self) {
-            _executing = executing;
-        }
-        [self didChangeValueForKey:@"isExecuting"];
-    }
-}
-
-- (void)setFinished:(BOOL)finished
-{
-    if (finished != _finished) {
-        [self willChangeValueForKey:@"isFinished"];
-        @synchronized (self) {
-            _finished = finished;
-        }
-        [self didChangeValueForKey:@"isFinished"];
-    }
+    [self.operationQueue removeObserver:self forKeyPath:@"operationCount"];
+    [self.operationQueue cancelAllOperations];
 }
 
 - (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
@@ -78,7 +42,11 @@
     if (self) {
         self.loadingRequest = loadingRequest;
         self.cacheFile = cacheFile;
-        self.tasks = [NSMutableArray array];
+        self.operationQueue = [[NSOperationQueue alloc] init];
+        [self.operationQueue setName:@"LLVideoPlayerCacheOperation-Tasks"];
+        self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.operationQueue.maxConcurrentOperationCount = 1;    // very important
+        [self.operationQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
 }
@@ -94,30 +62,30 @@
 - (void)main
 {
     LLLog(@"operation main: %@: %@", [NSThread currentThread], LLLoadingRequestToString(self.loadingRequest));
-    _operationThread = [NSThread currentThread];
     
     @autoreleasepool {
-        if ([self isCancelled]) {
-            return;
+        @synchronized (self) {
+            if ([self isCancelled]) {
+                return;
+            }
+            
+            [self setExecuting:YES];
+            [self startOperation];
         }
         
-        self.executing = YES;
-        [self startOperation];
-        
         [self startRunLoop];
-        self.executing = NO;
-        self.finished = YES;
+        
+        [self setExecuting:NO];
+        [self setFinished:YES];
         LLLog(@"operation complete: %p", self);
     }
 }
 
 - (void)cancel
 {
-    [super cancel];
-    
-    NSArray *tasks = [NSArray arrayWithArray:self.tasks];
-    for (LLVideoPlayerCacheTask *task in tasks) {
-        [task cancel];
+    @synchronized (self) {
+        [super cancel];
+        [self.operationQueue cancelAllOperations];
     }
     LLLog(@"operation cancelled: %p", self);
 }
@@ -135,23 +103,68 @@
     if (_runLoop) {
         CFRunLoopStop(_runLoop);
         _runLoop = NULL;
-        _operationThread = nil;
+    }
+}
+
+- (void)finishOperationWithError:(NSError *)error
+{
+    if (error) {
+        [self.loadingRequest finishLoadingWithError:error];
+    } else {
+        [self.loadingRequest finishLoading];
+    }
+    [self stopRunLoop];
+}
+
+#pragma mark - KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"cancelled"]) {
+        
+        BOOL cancelled = [change[NSKeyValueChangeNewKey] boolValue];
+        if (cancelled) {
+            LLVideoPlayerCacheTask *task = (LLVideoPlayerCacheTask *)object;
+            [task removeObserver:self forKeyPath:@"cancelled"];
+            [task removeObserver:self forKeyPath:@"finished"];
+            self.cancels++;
+            LLLog(@"[CANCEL] %@", task);
+        }
+        
+    } else if ([keyPath isEqualToString:@"finished"]) {
+        
+        BOOL finished = [change[NSKeyValueChangeNewKey] boolValue];
+        if (finished) {
+            LLVideoPlayerCacheTask *task = (LLVideoPlayerCacheTask *)object;
+            [task removeObserver:self forKeyPath:@"cancelled"];
+            [task removeObserver:self forKeyPath:@"finished"];
+            
+            if (task.error) {
+                LLLog(@"[FAILED] %@", task);
+                [self cancel];
+                [self finishOperationWithError:task.error];
+            } else {
+                // OK
+                LLLog(@"[COMPLETE] %@", task);
+            }
+        }
+        
+    } else if ([keyPath isEqualToString:@"operationCount"]) {
+        
+        NSInteger operationCount = [change[NSKeyValueChangeNewKey] integerValue];
+        if (operationCount == 0) {
+            if (self.cancels == 0) {
+                LLLog(@"[FINISH] %@", self);
+                [self finishOperationWithError:nil];
+            }
+        }
+        
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 
 #pragma mark - Operations
-
-- (void)startNextTask
-{
-    if (self.tasks.count > 0) {
-        [[self.tasks firstObject] resume];
-    } else {
-        // finish operation
-        LLLog(@"[FINISH] %@", LLLoadingRequestToString(self.loadingRequest));
-        [self.loadingRequest finishLoading];
-        [self stopRunLoop];
-    }
-}
 
 - (void)startOperation
 {
@@ -165,11 +178,12 @@
                             self.loadingRequest.dataRequest.requestedLength);
     }
     
-    [self.tasks removeAllObjects];
-    [self mapOperationToTasksWithRange:range];
+    self.operationQueue.suspended = YES;
     
+    [self mapOperationToTasksWithRange:range];
     [self.cacheFile tryResponseForLoadingRequest:self.loadingRequest withRange:range];
-    [self startNextTask];
+    
+    self.operationQueue.suspended = NO;
 }
 
 - (LLVideoPlayerCacheTask *)addTaskWithRange:(NSRange)range fromCache:(BOOL)fromCache
@@ -183,9 +197,10 @@
         task = [LLVideoPlayerCacheRemoteTask taskWithRequest:self.loadingRequest range:range
                                                    cacheFile:self.cacheFile];
     }
-    
-    [task setDelegate:self];
-    [self.tasks addObject:task];
+
+    [task addObserver:self forKeyPath:@"finished" options:NSKeyValueObservingOptionNew context:nil];
+    [task addObserver:self forKeyPath:@"cancelled" options:NSKeyValueObservingOptionNew context:nil];
+    [self.operationQueue addOperation:task];
     
     LLLog(@"[ADD] %@", task);
     
@@ -234,51 +249,6 @@
             [self addTaskWithRange:NSMakeRange(start, end - start) fromCache:NO];
         }
     }
-}
-
-- (void)handleTaskDidComplete:(NSDictionary *)params
-{
-    LLVideoPlayerCacheTask *task = params[@"task"];
-    NSError *error = params[@"error"];
-    
-    [self.tasks removeObject:task];
-    
-    if ([self isCancelled] || error.code == NSURLErrorCancelled) {
-        LLLog(@"[CANCEL] %@", task);
-        if (self.tasks.count == 0) {
-            [self stopRunLoop];
-        }
-        return;
-    }
-    
-    if (error) {
-        LLLog(@"[FAILED] %@", task);
-        [self.loadingRequest finishLoadingWithError:error];
-        [self.tasks removeAllObjects];
-        [self stopRunLoop];
-        return;
-    }
-    
-    LLLog(@"[COMPLETE] %@", task);
-    [self startNextTask];
-}
-
-#pragma mark - LLVideoPlayerCacheTaskDelegate
-
-- (void)task:(LLVideoPlayerCacheTask *)task didCompleteWithError:(NSError *)error
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (_operationThread) {
-            NSMutableDictionary *params = [NSMutableDictionary dictionary];
-            params[@"task"] = task;
-            if (error) {
-                params[@"error"] = error;
-            }
-            
-            [self performSelector:@selector(handleTaskDidComplete:)
-                         onThread:_operationThread withObject:params waitUntilDone:NO];
-        }
-    });
 }
 
 @end

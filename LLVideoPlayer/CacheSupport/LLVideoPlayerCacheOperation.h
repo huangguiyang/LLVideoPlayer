@@ -9,8 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LLVideoPlayerCacheFile.h"
+#import "LLVideoPlayerBasicOperation.h"
 
-@interface LLVideoPlayerCacheOperation : NSOperation
+@interface LLVideoPlayerCacheOperation : LLVideoPlayerBasicOperation
 
 - (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                              cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
