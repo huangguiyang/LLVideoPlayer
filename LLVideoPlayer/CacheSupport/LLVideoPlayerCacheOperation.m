@@ -94,17 +94,15 @@
 - (void)main
 {
     LLLog(@"operation main: %@: %@", [NSThread currentThread], LLLoadingRequestToString(self.loadingRequest));
+    _operationThread = [NSThread currentThread];
     
     @autoreleasepool {
         if ([self isCancelled]) {
             return;
         }
         
-        @synchronized (self) {
-            _operationThread = [NSThread currentThread];
-            self.executing = YES;
-            [self startOperation];
-        }
+        self.executing = YES;
+        [self startOperation];
         
         [self startRunLoop];
         self.executing = NO;
@@ -117,11 +115,9 @@
 {
     [super cancel];
     
-    @synchronized (self) {
-        NSArray *tasks = [NSArray arrayWithArray:self.tasks];
-        for (LLVideoPlayerCacheTask *task in tasks) {
-            [task cancel];
-        }
+    NSArray *tasks = [NSArray arrayWithArray:self.tasks];
+    for (LLVideoPlayerCacheTask *task in tasks) {
+        [task cancel];
     }
     LLLog(@"operation cancelled: %p", self);
 }
@@ -139,6 +135,7 @@
     if (_runLoop) {
         CFRunLoopStop(_runLoop);
         _runLoop = NULL;
+        _operationThread = nil;
     }
 }
 
@@ -150,7 +147,9 @@
         [[self.tasks firstObject] resume];
     } else {
         // finish operation
-        [self finishOperationWithError:nil];
+        LLLog(@"[FINISH] %@", LLLoadingRequestToString(self.loadingRequest));
+        [self.loadingRequest finishLoading];
+        [self stopRunLoop];
     }
 }
 
@@ -171,18 +170,6 @@
     
     [self.cacheFile tryResponseForLoadingRequest:self.loadingRequest withRange:range];
     [self startNextTask];
-}
-
-- (void)finishOperationWithError:(NSError *)error
-{
-    LLLog(@"[FINISH] %@, error: %@", LLLoadingRequestToString(self.loadingRequest), error);
-    if (error) {
-        [self.loadingRequest finishLoadingWithError:error];
-    } else {
-        [self.loadingRequest finishLoading];
-    }
-    
-    [self stopRunLoop];
 }
 
 - (LLVideoPlayerCacheTask *)addTaskWithRange:(NSRange)range fromCache:(BOOL)fromCache
@@ -266,8 +253,9 @@
     
     if (error) {
         LLLog(@"[FAILED] %@", task);
-        [self cancel];
-        [self finishOperationWithError:error];
+        [self.loadingRequest finishLoadingWithError:error];
+        [self.tasks removeAllObjects];
+        [self stopRunLoop];
         return;
     }
     
@@ -280,14 +268,16 @@
 - (void)task:(LLVideoPlayerCacheTask *)task didCompleteWithError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSMutableDictionary *params = [NSMutableDictionary dictionary];
-        params[@"task"] = task;
-        if (error) {
-            params[@"error"] = error;
+        if (_operationThread) {
+            NSMutableDictionary *params = [NSMutableDictionary dictionary];
+            params[@"task"] = task;
+            if (error) {
+                params[@"error"] = error;
+            }
+            
+            [self performSelector:@selector(handleTaskDidComplete:)
+                         onThread:_operationThread withObject:params waitUntilDone:NO];
         }
-        
-        [self performSelector:@selector(handleTaskDidComplete:)
-                     onThread:_operationThread withObject:params waitUntilDone:NO];
     });
 }
 

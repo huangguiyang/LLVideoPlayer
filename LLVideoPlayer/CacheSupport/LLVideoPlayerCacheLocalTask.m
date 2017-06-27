@@ -15,7 +15,7 @@
 {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSInteger offset = self.range.location;
-        NSInteger lengthPerRead = 4096;
+        NSInteger lengthPerRead = 8192;
         NSError *error = nil;
         
         while (offset < NSMaxRange(self.range)) {

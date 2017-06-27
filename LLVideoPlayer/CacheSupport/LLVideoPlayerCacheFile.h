@@ -30,6 +30,8 @@
 - (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest;
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
 
+- (void)synchronize;
+
 #pragma mark - Property
 - (NSArray<NSValue *> *)cachedRanges;
 @property (nonatomic, assign, readonly) NSInteger fileLength;

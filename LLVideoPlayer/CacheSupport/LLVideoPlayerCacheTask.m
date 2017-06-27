@@ -41,11 +41,13 @@
 - (void)cancel
 {
     @synchronized (self) {
-        _cancel = YES;
-        if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
-            [self.delegate task:self didCompleteWithError:[NSError errorWithDomain:@"LLVideoPlayerCacheTask"
-                                                                              code:NSURLErrorCancelled
-                                                                          userInfo:nil]];
+        if (!_cancel) {
+            _cancel = YES;
+            if ([self.delegate respondsToSelector:@selector(task:didCompleteWithError:)]) {
+                [self.delegate task:self didCompleteWithError:[NSError errorWithDomain:@"LLVideoPlayerCacheTask"
+                                                                                  code:NSURLErrorCancelled
+                                                                              userInfo:nil]];
+            }
         }
     }
 }

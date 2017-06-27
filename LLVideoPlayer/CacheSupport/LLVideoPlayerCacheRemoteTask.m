@@ -12,7 +12,7 @@
 #import "LLVideoPlayerInternal.h"
 #import "NSHTTPURLResponse+LLVideoPlayer.h"
 
-#define MAX_MEM_SIZE (2 * 1024 * 1024)
+#define MAX_MEM_SIZE (1024 * 1024)
 
 @interface LLVideoPlayerCacheRemoteTask () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 {
@@ -36,6 +36,7 @@
     request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
     request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
     _offset = 0;
+    _mutableData = [NSMutableData data];
     
     NSString *rangeString = LLRangeToHTTPRangeHeader(self.range);
     if (rangeString) {
@@ -52,11 +53,19 @@
     [super cancel];
     [_connection cancel];
     _connection = nil;
+    [self synchronizeIfNeeded];
 }
 
 - (void)synchronizeIfNeeded
 {
-    [self.cacheFile writeData:_mutableData atOffset:_offset];
+    @synchronized (self) {
+        if ([_mutableData length] > 0) {
+            [self.cacheFile writeData:_mutableData atOffset:_offset];
+            _mutableData = nil;
+        }
+    }
+    
+    [self.cacheFile synchronize];
 }
 
 #pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
@@ -82,6 +91,7 @@
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
     if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
+        LLLog(@"[ERROR] invalid response: %@", response);
         return;
     }
     
@@ -89,9 +99,9 @@
     [self.cacheFile receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:self.loadingRequest];
     
     if (NO == [(NSHTTPURLResponse *)response ll_supportRange]) {
+        LLLog(@"[ERROR] not support range");
         _offset = 0;
     }
-    _mutableData = [NSMutableData data];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -99,12 +109,13 @@
     [self.loadingRequest.dataRequest respondWithData:data];
     
     // save local
-    if (_mutableData.length < MAX_MEM_SIZE) {
+    @synchronized (self) {
         [_mutableData appendData:data];
-    } else {
-        [self.cacheFile writeData:_mutableData atOffset:_offset];
-        _offset += [_mutableData length];
-        _mutableData = [NSMutableData data];
+        if (_mutableData.length >= MAX_MEM_SIZE) {
+            [self.cacheFile writeData:_mutableData atOffset:_offset];
+            _offset += [_mutableData length];
+            _mutableData = [NSMutableData data];
+        }
     }
 }
 

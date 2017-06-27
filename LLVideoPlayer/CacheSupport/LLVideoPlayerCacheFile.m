@@ -335,16 +335,15 @@
         @try {
             [self.writeFileHandle seekToFileOffset:offset];
             [self.writeFileHandle writeData:data];
-            
-            // Add Range
-            [self addRange:NSMakeRange(offset, data.length)];
-            [self saveIndexFile];
-            LLLog(@"WriteData: %@", NSStringFromRange(NSMakeRange(offset, data.length)));
-            LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@}",
-                  _fileLength, self.ranges, self.allHeaderFields);
         } @catch (NSException *exception) {
             LLLog(@"write exception: %@", exception);
+            return;
         }
+        
+        LLLog(@"WriteData: %@", NSStringFromRange(NSMakeRange(offset, data.length)));
+        
+        // Add Range
+        [self addRange:NSMakeRange(offset, data.length)];
     }
 }
 
@@ -411,6 +410,15 @@
                 _response = respone;
             }
         }
+    }
+}
+
+- (void)synchronize
+{
+    @synchronized (self) {
+        [self saveIndexFile];
+        LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@}",
+              _fileLength, self.ranges, self.allHeaderFields);
     }
 }
 
