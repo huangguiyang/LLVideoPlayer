@@ -7,9 +7,10 @@
 //
 
 #import "LLVideoPlayerCacheFile.h"
+#import "LLVideoPlayerCachePolicy.h"
 
 @interface LLVideoPlayerCacheFile (CachePolicy)
 
-- (void)checkCacheDirectory;
++ (void)checkCacheDirectoryWithCachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 @end

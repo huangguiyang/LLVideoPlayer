@@ -143,6 +143,10 @@
                 LLLog(@"[FAILED] %@", task);
                 [self cancel];
                 [self finishOperationWithError:task.error];
+                if ([task isKindOfClass:[LLVideoPlayerCacheLocalTask class]]) {
+                    LLLog(@"[FATAL] Local Task Failed !!!");
+                    [self.cacheFile clear];
+                }
             } else {
                 // OK
                 LLLog(@"[COMPLETE] %@", task);

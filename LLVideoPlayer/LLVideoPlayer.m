@@ -334,6 +334,7 @@ typedef void (^VoidBlock) (void);
                 self.loadingAsset = nil;
             } else {
                 LLLog(@"The asset's tracks were not loaded: %@", error);
+                [[self class] clearAllCachedData];
                 [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track];
             }
         });
@@ -682,7 +683,7 @@ typedef void (^VoidBlock) (void);
 
 + (void)clearAllCachedData
 {
-    [[NSFileManager defaultManager] removeItemAtPath:[LLVideoPlayerCacheFile cacheDirectory] error:nil];
+    [LLVideoPlayerCacheHelper clearAllCache];
 }
 
 @end

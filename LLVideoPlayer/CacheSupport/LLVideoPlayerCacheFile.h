@@ -31,6 +31,7 @@
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
 
 - (void)synchronize;
+- (void)clear;
 
 #pragma mark - Property
 - (NSArray<NSValue *> *)cachedRanges;

@@ -57,6 +57,9 @@
 {
     self = [super init];
     if (self) {
+        // Check first
+        [LLVideoPlayerCacheFile checkCacheDirectoryWithCachePolicy:cachePolicy];
+        
         self.ranges = [NSMutableArray array];
         self.cachePolicy = cachePolicy;
         self.cacheFilePath = filePath;
@@ -89,8 +92,6 @@
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
         LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
               _fileLength, self.ranges, self.allHeaderFields);
-        
-        [self checkCacheDirectory];
     }
     return self;
 }
@@ -417,6 +418,18 @@
         [self saveIndexFile];
         LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@}",
               _fileLength, self.ranges, self.allHeaderFields);
+    }
+}
+
+- (void)clear
+{
+    @synchronized (self) {
+        _fileLength = 0;
+        _response = nil;
+        self.allHeaderFields = nil;
+        [self.ranges removeAllObjects];
+        [[NSFileManager defaultManager] removeItemAtPath:self.indexFilePath error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:self.cacheFilePath error:nil];
     }
 }
 

@@ -42,12 +42,12 @@
 + (void)removeCacheAtPath:(NSString *)path
 {
     [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    NSString *index = [path stringByAppendingPathComponent:[self indexFileExtension]];
+    NSString *index = [path stringByAppendingString:[self indexFileExtension]];
     [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
-    LLLog(@"cache deleted: %@", path);
+    LLLog(@"cache deleted: %@, %@", path, index);
 }
 
-- (void)checkCacheDirectory
++ (void)checkCacheDirectoryWithCachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
     NSString *directory = [[self class] cacheDirectory];
     NSError *error;
@@ -56,9 +56,7 @@
         LLLog(@"[ERR] can't get contents of directory: %@, error: %@", directory, error);
         return;
     }
-    
-    NSString *cacheFilePath = self.cacheFilePath;
-    LLVideoPlayerCachePolicy *cachePolicy = self.cachePolicy;
+
     if (nil == cachePolicy) {
         cachePolicy = [LLVideoPlayerCachePolicy defaultPolicy];
     }
@@ -82,9 +80,6 @@
         if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {
             continue;
         }
-        if ([path isEqualToString:cacheFilePath]) {
-            continue;
-        }
         
         NSDate *date = [attr fileCreationDate];
         NSInteger hours = [now timeIntervalSinceDate:date] / 3600;
@@ -102,6 +97,7 @@
     if (totalSize < cachePolicy.diskCapacity) {
         int64_t diskSpaceSize = [[self class] diskSpace];
         int64_t diskSpaceFreeSize = [[self class] diskSpaceFree];
+        LLLog(@"%llu MiB/ %llu MiB", diskSpaceFreeSize >> 20, diskSpaceSize >> 20);
         if (-1 != diskSpaceSize && -1 != diskSpaceFreeSize) {
             currentDiskAvailableRate = (CGFloat)diskSpaceFreeSize / (CGFloat)diskSpaceSize;
         }
