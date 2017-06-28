@@ -305,6 +305,7 @@ typedef void (^VoidBlock) (void);
 - (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerLayerView *)playerLayerView track:(LLVideoTrack *)track
 {
     static NSString *kPlayableKey = @"playable";
+    static NSString *kTracks = @"tracks";
     AVURLAsset *asset;
     
     if (self.cacheSupportEnabled) {
@@ -315,7 +316,7 @@ typedef void (^VoidBlock) (void);
         asset = [[AVURLAsset alloc] initWithURL:streamURL options:nil];
     }
     
-    [asset loadValuesAsynchronouslyForKeys:@[kPlayableKey] completionHandler:^{
+    [asset loadValuesAsynchronouslyForKeys:@[kPlayableKey, kTracks] completionHandler:^{
         ll_run_on_ui_thread(^{
             if (NO == [streamURL isEqual:self.track.streamURL]) {
                 LLLog(@"URL dismatch: %@ loaded, but cuurent is %@",streamURL, self.track.streamURL);
