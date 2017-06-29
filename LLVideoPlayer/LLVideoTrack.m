@@ -18,10 +18,11 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p> streamURL: %@, totalDuration: %@, lastWatchedDuration: %@, isPlayedToEnd: %@",
+    return [NSString stringWithFormat:@"<%@: %p> streamURL: %@, totalDuration: %@, lastWatchedDuration: %@, isPlayedToEnd: %@, isCacheComplete: %@",
             NSStringFromClass([self class]), self,
             self.streamURL, self.totalDuration, self.lastWatchedDuration,
-            self.isPlayedToEnd ? @"YES" : @"NO"];
+            self.isPlayedToEnd ? @"YES" : @"NO",
+            self.isCacheComplete ? @"YES" : @"NO"];
 }
 
 - (instancetype)init

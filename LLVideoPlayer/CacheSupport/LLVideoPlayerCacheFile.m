@@ -17,6 +17,7 @@
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
     NSURLResponse *_response;
+    BOOL _complete;
 }
 
 @property (nonatomic, strong) LLVideoPlayerCachePolicy *cachePolicy;
@@ -88,6 +89,7 @@
         self.writeFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.cacheFilePath];
         
         [self loadIndexFileAtStartup];
+        [self checkComplete];
         
         LLLog(@"[CacheSupport] cache file path: %@", filePath);
         LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
@@ -97,6 +99,21 @@
 }
 
 #pragma mark - Private
+
+- (void)checkComplete
+{
+    if (self.ranges.count == 1) {
+        NSRange range = [self.ranges[0] rangeValue];
+        _complete = range.location == 0 && range.length == _fileLength;
+    } else {
+        _complete = NO;
+    }
+#ifdef DEBUG
+    if (_complete) {
+        LLLog(@"Cache Complete!!!");
+    }
+#endif
+}
 
 - (void)loadIndexFileAtStartup
 {
@@ -226,6 +243,8 @@
             }
         }
     }
+    
+    [self checkComplete];
 }
 
 
@@ -430,6 +449,13 @@
         [self.ranges removeAllObjects];
         [[NSFileManager defaultManager] removeItemAtPath:self.indexFilePath error:nil];
         [[NSFileManager defaultManager] removeItemAtPath:self.cacheFilePath error:nil];
+    }
+}
+
+- (BOOL)isComplete
+{
+    @synchronized (self) {
+        return _complete;
     }
 }
 

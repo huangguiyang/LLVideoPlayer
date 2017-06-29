@@ -33,6 +33,8 @@
 - (void)synchronize;
 - (void)clear;
 
+- (BOOL)isComplete;
+
 #pragma mark - Property
 - (NSArray<NSValue *> *)cachedRanges;
 @property (nonatomic, assign, readonly) NSInteger fileLength;

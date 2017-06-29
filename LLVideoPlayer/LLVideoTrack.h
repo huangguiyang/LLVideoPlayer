@@ -16,5 +16,6 @@
 @property (nonatomic, strong) NSNumber *totalDuration;
 @property (nonatomic, strong) NSNumber *lastWatchedDuration;
 @property (nonatomic, strong, readonly) NSURL *streamURL;
+@property (nonatomic, assign) BOOL isCacheComplete;
 
 @end

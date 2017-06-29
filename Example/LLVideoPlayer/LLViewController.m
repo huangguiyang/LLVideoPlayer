@@ -209,6 +209,13 @@
     self.slider.value = time / [track.totalDuration doubleValue];
 }
 
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track
+{
+    if (track.isCacheComplete) {
+        NSLog(@"::Cache Complete!!!");
+    }
+}
+
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayToEnd:(LLVideoTrack *)track
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));

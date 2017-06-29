@@ -16,4 +16,6 @@
 
 - (instancetype)initWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
+- (BOOL)isCacheComplete;
+
 @end

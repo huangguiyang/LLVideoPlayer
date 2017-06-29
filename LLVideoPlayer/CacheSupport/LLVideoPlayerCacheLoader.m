@@ -49,6 +49,11 @@
     return self;
 }
 
+- (BOOL)isCacheComplete
+{
+    return [self.cacheFile isComplete];
+}
+
 #pragma mark - Private
 
 - (void)startLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
