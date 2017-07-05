@@ -34,26 +34,29 @@
 - (void)main
 {
     @autoreleasepool {
-        if ([self isCancelled]) {
-            return;
+        @synchronized (self) {
+            if ([self isCancelled]) {
+                return;
+            }
+            
+            [self setExecuting:YES];
+            
+            NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
+            request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
+            request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
+            _offset = 0;
+            _mutableData = [NSMutableData data];
+            
+            NSString *rangeString = LLRangeToHTTPRangeHeader(self.range);
+            if (rangeString) {
+                [request setValue:rangeString forHTTPHeaderField:@"Range"];
+                _offset = self.range.location;
+            }
+            
+            _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+            [_connection start];
         }
         
-        [self setExecuting:YES];
-        
-        NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
-        request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
-        request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
-        _offset = 0;
-        _mutableData = [NSMutableData data];
-        
-        NSString *rangeString = LLRangeToHTTPRangeHeader(self.range);
-        if (rangeString) {
-            [request setValue:rangeString forHTTPHeaderField:@"Range"];
-            _offset = self.range.location;
-        }
-        
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-        [_connection start];
         [self startRunLoop];
         
         [self setExecuting:NO];
@@ -63,9 +66,12 @@
 
 - (void)cancel
 {
-    [super cancel];
-    [_connection cancel];
-    _connection = nil;
+    @synchronized (self) {
+        [super cancel];
+        [_connection cancel];
+        _connection = nil;
+    }
+    
     [self synchronizeIfNeeded];
 }
 
