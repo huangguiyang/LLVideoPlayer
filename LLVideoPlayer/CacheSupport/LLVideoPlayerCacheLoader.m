@@ -44,7 +44,9 @@
         self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
         self.operationQueue = [[NSOperationQueue alloc] init];
         [self.operationQueue setName:@"LLVideoPlayerCacheOperationQueue"];
-        self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        if ([self.operationQueue respondsToSelector:@selector(setQualityOfService:)]) {
+            self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        }
     }
     return self;
 }
