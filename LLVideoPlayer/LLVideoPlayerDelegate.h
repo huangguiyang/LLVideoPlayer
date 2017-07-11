@@ -38,5 +38,6 @@
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(LLVideoTrack *)track;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty track:(LLVideoTrack *)track;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp track:(LLVideoTrack *)track;
+- (float)videoPlayer:(LLVideoPlayer *)videoPlayer adjustLastWatchedDuration:(float)lastWatchedDuration;
 
 @end
