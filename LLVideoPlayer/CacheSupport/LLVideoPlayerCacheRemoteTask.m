@@ -138,11 +138,17 @@
     
     // save local
     @synchronized (self) {
-        [_mutableData appendData:data];
-        if (_mutableData.length >= MAX_MEM_SIZE) {
-            [self.cacheFile writeData:_mutableData atOffset:_offset];
-            _offset += [_mutableData length];
-            _mutableData = [NSMutableData data];
+        if (_offset == 0 && data.length == 2) {
+            // special case: write directly
+            [self.cacheFile writeData:data atOffset:_offset];
+            _offset += [data length];
+        } else {
+            [_mutableData appendData:data];
+            if (_mutableData.length >= MAX_MEM_SIZE) {
+                [self.cacheFile writeData:_mutableData atOffset:_offset];
+                _offset += [_mutableData length];
+                _mutableData = [NSMutableData data];
+            }
         }
     }
 }
