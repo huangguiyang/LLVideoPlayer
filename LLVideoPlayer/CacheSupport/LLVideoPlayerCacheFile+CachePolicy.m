@@ -9,9 +9,9 @@
 #import "LLVideoPlayerCacheFile+CachePolicy.h"
 #import "LLVideoPlayerInternal.h"
 
-@implementation LLVideoPlayerCacheFile (CachePolicy)
+#define kMinFreeSpaceLimit (1ULL << 30)
 
-+ (int64_t)diskSpaceFree
+static uint64_t diskFreeCapacity(void)
 {
     NSError *error = nil;
     NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
@@ -25,7 +25,7 @@
     return space;
 }
 
-+ (int64_t)diskSpace
+static uint64_t diskCapacity(void)
 {
     NSError *error = nil;
     NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
@@ -38,6 +38,8 @@
     }
     return space;
 }
+
+@implementation LLVideoPlayerCacheFile (CachePolicy)
 
 + (void)removeCacheAtPath:(NSString *)path
 {
@@ -92,17 +94,11 @@
         totalSize += [attr fileSize];
     }
     
-    CGFloat currentDiskAvailableRate = cachePolicy.diskAvailableRate;
+    const uint64_t minFreeSpaceLimit = kMinFreeSpaceLimit;
+    int64_t diskSpaceFreeSize = diskFreeCapacity();
     
     if (totalSize < cachePolicy.diskCapacity) {
-        int64_t diskSpaceSize = [[self class] diskSpace];
-        int64_t diskSpaceFreeSize = [[self class] diskSpaceFree];
-        LLLog(@"%llu MiB/ %llu MiB", diskSpaceFreeSize >> 20, diskSpaceSize >> 20);
-        if (-1 != diskSpaceSize && -1 != diskSpaceFreeSize) {
-            currentDiskAvailableRate = (CGFloat)diskSpaceFreeSize / (CGFloat)diskSpaceSize;
-        }
-        
-        if (currentDiskAvailableRate >= cachePolicy.diskAvailableRate) {
+        if (diskSpaceFreeSize >= minFreeSpaceLimit) {
             return;
         }
     }
@@ -115,11 +111,12 @@
         return [date1 compare:date2];
     }];
     
-    while (paths.count > 0 && (totalSize  >= cachePolicy.diskCapacity || currentDiskAvailableRate < cachePolicy.diskAvailableRate)) {
+    while (paths.count > 0 && (totalSize >= cachePolicy.diskCapacity || diskSpaceFreeSize < minFreeSpaceLimit)) {
         NSString *path = [paths firstObject];
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         [[self class] removeCacheAtPath:path];
         totalSize -= [attr fileSize];
+        diskSpaceFreeSize += [attr fileSize];
         [paths removeObject:path];
     }
 }

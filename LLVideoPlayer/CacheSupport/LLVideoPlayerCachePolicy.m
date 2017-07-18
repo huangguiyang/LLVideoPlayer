@@ -20,9 +20,8 @@
     self = [super init];
     if (self) {
         // default
-        self.diskCapacity = 200ULL << 20;
+        self.diskCapacity = 500ULL << 20;
         self.outdatedHours = 7 * 24;
-        self.diskAvailableRate = 0.1;
     }
     return self;
 }
