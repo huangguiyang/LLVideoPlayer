@@ -109,7 +109,7 @@ pod "LLVideoPlayer"
 
 ## Author
 
-mario, mohu3g@163.com
+mario, guiyang.huang@gmail.com
 
 ## License
 
