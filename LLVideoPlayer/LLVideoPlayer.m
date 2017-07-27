@@ -307,13 +307,18 @@ typedef void (^VoidBlock) (void);
     return self.view;
 }
 
+- (BOOL)sessionCacheEnabled
+{
+    return self.cacheSupportEnabled && NO == [self.track.streamURL isFileURL];
+}
+
 - (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerLayerView *)playerLayerView track:(LLVideoTrack *)track
 {
     static NSString *kPlayableKey = @"playable";
     static NSString *kTracks = @"tracks";
     AVURLAsset *asset;
     
-    if (self.cacheSupportEnabled) {
+    if ([self sessionCacheEnabled]) {
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL] options:nil];
         self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:streamURL cachePolicy:self.cachePolicy];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
@@ -349,14 +354,14 @@ typedef void (^VoidBlock) (void);
     self.loadingAsset = asset;
 }
 
-- (AVPlayer*)playerWithPlayerItem:(AVPlayerItem*)playerItem
+- (AVPlayer*)playerWithPlayerItem:(AVPlayerItem *)playerItem
 {
     AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
     if ([player respondsToSelector:@selector(setAllowsExternalPlayback:)]) {
         player.allowsExternalPlayback = NO;
     }
     if ([player respondsToSelector:@selector(setAutomaticallyWaitsToMinimizeStalling:)]) {
-        if (self.cacheSupportEnabled) {
+        if ([self sessionCacheEnabled]) {
             [player setAutomaticallyWaitsToMinimizeStalling:NO];
         } else {
             [player setAutomaticallyWaitsToMinimizeStalling:YES];
