@@ -51,7 +51,4 @@
 - (NSTimeInterval)currentTime;
 - (BOOL)stalling;
 
-#pragma mark - Cache
-+ (void)clearAllCachedData;
-
 @end

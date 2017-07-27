@@ -12,4 +12,10 @@
 
 + (void)clearAllCache;
 
++ (void)preloadWithURL:(NSURL *)url;
+
++ (void)cancelWithURL:(NSURL *)url;
+
++ (void)cancelAllPreloads;
+
 @end

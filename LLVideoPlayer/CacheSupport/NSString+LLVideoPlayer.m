@@ -41,4 +41,25 @@
     return nil;
 }
 
+- (NSRange)ll_decodeRangeFromContentRange
+{
+    NSArray *ranges = [self componentsSeparatedByString:@"/"];
+    if (ranges.count == 0) {
+        return NSMakeRange(NSNotFound, 0);
+    }
+    ranges = [ranges[0] componentsSeparatedByString:@" "];
+    if (ranges.count < 2) {
+        return NSMakeRange(NSNotFound, 0);
+    }
+    NSString *rangeString = [ranges[1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    ranges = [rangeString componentsSeparatedByString:@"-"];
+    if (ranges.count != 2) {
+        return NSMakeRange(NSNotFound, 0);
+    }
+    NSInteger start = [ranges[0] integerValue];
+    NSInteger end = [ranges[1] integerValue];
+    
+    return NSMakeRange(start, end - start + 1);
+}
+
 @end
