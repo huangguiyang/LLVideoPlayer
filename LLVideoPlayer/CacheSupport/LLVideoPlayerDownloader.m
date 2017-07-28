@@ -60,6 +60,9 @@
     if (nil == url || url.absoluteString.length == 0) {
         return nil;
     }
+    if ([url isFileURL]) {
+        return nil;
+    }
     
     NSString *name = [url.absoluteString ll_md5];
     NSString *path = [[self cacheDirectory] stringByAppendingPathComponent:name];
@@ -73,6 +76,14 @@
         LLLog(@"[ERROR] can't create cache file");
         return;
     }
+    
+    NSArray *operations = self.operationQueue.operations;
+    for (LLVideoPlayerDownloadOperation *operation in operations) {
+        if ([operation.url isEqual:url]) {
+            return;
+        }
+    }
+    
     LLVideoPlayerDownloadOperation *operation = [[LLVideoPlayerDownloadOperation alloc] initWithURL:url downloadFile:file];
     [self.operationQueue addOperation:operation];
 }

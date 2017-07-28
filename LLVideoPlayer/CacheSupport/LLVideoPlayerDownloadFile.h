@@ -16,10 +16,6 @@
 
 @property (nonatomic, strong, readonly) NSString *filePath;
 
-- (void)lock;
-- (void)unlock;
-- (BOOL)isLocked;
-
 - (void)removeCache;
 - (BOOL)validateCache;
 

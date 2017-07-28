@@ -19,7 +19,6 @@
 
 @property (nonatomic, strong) NSString *filePath;
 @property (nonatomic, strong) NSString *indexPath;
-@property (nonatomic, strong) NSString *lockPath;
 
 @end
 
@@ -43,29 +42,9 @@
         
         self.filePath = filePath;
         self.indexPath = [filePath stringByAppendingString:@".idx"];
-        self.lockPath = [filePath stringByAppendingString:@".lock"];
         LLLog(@"DownloadFile: %@", self.filePath);
     }
     return self;
-}
-
-- (void)lock
-{
-    if (NO == [[NSFileManager defaultManager] createFileAtPath:self.lockPath contents:nil attributes:nil]) {
-        LLLog(@"[ERROR] can't create lock file");
-    }
-}
-
-- (void)unlock
-{
-    if (NO == [[NSFileManager defaultManager] removeItemAtPath:self.lockPath error:nil]) {
-        LLLog(@"[ERROR] can't remove lock file");
-    }
-}
-
-- (BOOL)isLocked
-{
-    return [[NSFileManager defaultManager] fileExistsAtPath:self.lockPath];
 }
 
 - (void)removeCache
