@@ -126,6 +126,7 @@
 
 - (void)loadAction:(id)sender
 {
+    NSLog(@"[PRESS] loadAction");
     self.player.cacheSupportEnabled = self.cacheSwitch.on;
     [self.player loadVideoWithStreamURL:kTestVideoURL];
     //    LLVideoTrack *track = [[LLVideoTrack alloc] initWithStreamURL:url];

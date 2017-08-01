@@ -28,6 +28,11 @@
     [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url];
 }
 
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
+{
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:bytes];
+}
+
 + (void)cancelWithURL:(NSURL *)url
 {
     [[LLVideoPlayerDownloader defaultDownloader] cancelWithURL:url];

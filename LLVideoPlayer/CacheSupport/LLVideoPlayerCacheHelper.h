@@ -14,6 +14,8 @@
 
 + (void)preloadWithURL:(NSURL *)url;
 
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes;
+
 + (void)cancelWithURL:(NSURL *)url;
 
 + (void)cancelAllPreloads;
