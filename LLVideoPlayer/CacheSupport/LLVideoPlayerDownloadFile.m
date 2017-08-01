@@ -24,6 +24,11 @@
 
 @implementation LLVideoPlayerDownloadFile
 
++ (NSString *)indexFileExtension
+{
+    return @".idx";
+}
+
 + (instancetype)fileWithFilePath:(NSString *)filePath
 {
     return [[self alloc] initWithFilePath:filePath];
@@ -34,6 +39,10 @@
     self = [super init];
     if (self) {
         NSString *dir = [filePath stringByDeletingLastPathComponent];
+        
+        // check directory
+        [LLVideoPlayerDownloadFile checkCacheDirectory:dir];
+        
         if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir] &&
             NO == [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
             LLLog(@"[ERROR] Cannot create cache directory: %@", dir);
@@ -41,15 +50,9 @@
         }
         
         self.filePath = filePath;
-        self.indexPath = [filePath stringByAppendingString:@".idx"];
+        self.indexPath = [filePath stringByAppendingString:[[self class] indexFileExtension]];
     }
     return self;
-}
-
-- (void)removeCache
-{
-    [[NSFileManager defaultManager] removeItemAtPath:self.indexPath error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:self.filePath error:nil];
 }
 
 - (NSDictionary *)doReadCache
@@ -105,6 +108,49 @@
 {
     @synchronized (self) {
         [data writeToFile:self.filePath atomically:YES];
+    }
+}
+
+#pragma mark - Private
+
++ (void)checkCacheDirectory:(NSString *)directory
+{
+    if (NO == [[NSFileManager defaultManager] fileExistsAtPath:directory]) {
+        return;
+    }
+    
+    NSError *error;
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:&error];
+    if (error) {
+        LLLog(@"[ERR] can't get contents of directory: %@, error: %@", directory, error);
+        return;
+    }
+    
+    NSDate *now = [NSDate date];
+    
+    for (NSString *name in contents) {
+        if ([name hasSuffix:[[self class] indexFileExtension]]) {
+            continue;
+        }
+        
+        NSString *path = [directory stringByAppendingPathComponent:name];
+        error = nil;
+        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+        if (error) {
+            LLLog(@"[ERR] can't get attributes of file: %@, error: %@", path, error);
+            continue;
+        }
+        if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {
+            continue;
+        }
+        
+        NSDate *date = [attr fileCreationDate];
+        NSInteger days = [now timeIntervalSinceDate:date] / (3600 * 24);
+        if (days >= 7) {
+            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+            NSString *index = [path stringByAppendingString:[self indexFileExtension]];
+            [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+        }
     }
 }
 

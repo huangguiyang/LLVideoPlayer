@@ -16,7 +16,6 @@
 
 @property (nonatomic, strong, readonly) NSString *filePath;
 
-- (void)removeCache;
 - (BOOL)validateCache;
 - (NSDictionary *)readCache;
 
