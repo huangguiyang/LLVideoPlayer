@@ -10,6 +10,8 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
+#define kTestVideoURL [NSURL URLWithString:@"http://baobab.wdjcdn.com/1456665467509qingshu.mp4"]
+
 @interface LLViewController () <LLVideoPlayerDelegate>
 
 @property (nonatomic, strong) LLVideoPlayer *player;
@@ -44,10 +46,10 @@
     
     {
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [button setTitle:@"force play" forState:UIControlStateNormal];
+        [button setTitle:@"preload" forState:UIControlStateNormal];
         [self.view addSubview:button];
         button.frame = CGRectMake(100, 30, 80, 40);
-        [button addTarget:self action:@selector(forcePlayAction:) forControlEvents:UIControlEventTouchUpInside];
+        [button addTarget:self action:@selector(preloadAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
     {
@@ -124,9 +126,8 @@
 
 - (void)loadAction:(id)sender
 {
-    NSURL *url = [NSURL URLWithString:@"http://baobab.wdjcdn.com/1456665467509qingshu.mp4"];
     self.player.cacheSupportEnabled = self.cacheSwitch.on;
-    [self.player loadVideoWithStreamURL:url];
+    [self.player loadVideoWithStreamURL:kTestVideoURL];
     //    LLVideoTrack *track = [[LLVideoTrack alloc] initWithStreamURL:url];
     //    track.lastWatchedDuration = @(40);
     //    [self.player loadVideoWithTrack:track];
@@ -158,9 +159,9 @@
     }];
 }
 
-- (void)forcePlayAction:(id)sender
+- (void)preloadAction:(id)sender
 {
-    self.player.state = LLVideoPlayerStateContentPlaying;
+    [LLVideoPlayerCacheHelper preloadWithURL:kTestVideoURL];
 }
 
 #pragma mark - LLVideoPlayerDelegate

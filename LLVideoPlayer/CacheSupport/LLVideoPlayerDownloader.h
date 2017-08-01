@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LLVideoPlayerDownloadFile.h"
 
 @interface LLVideoPlayerDownloader : NSObject
 
@@ -18,8 +19,12 @@
 
 - (void)preloadWithURL:(NSURL *)url;
 
+- (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes;
+
 - (void)cancelWithURL:(NSURL *)url;
 
 - (void)cancelAllPreloads;
+
++ (LLVideoPlayerDownloadFile *)getExternalDownloadFileWithName:(NSString *)name;
 
 @end

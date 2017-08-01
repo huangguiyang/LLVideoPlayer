@@ -11,6 +11,7 @@
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerDownloadOperation.h"
+#import "LLVideoPlayerCacheUtils.h"
 
 @interface LLVideoPlayerDownloader ()
 
@@ -71,9 +72,23 @@
 
 - (void)preloadWithURL:(NSURL *)url
 {
+    [self preloadWithURL:url range:NSMakeRange(0, 1024)];
+}
+
+- (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
+{
+    [self preloadWithURL:url range:NSMakeRange(0, bytes)];
+}
+
+- (void)preloadWithURL:(NSURL *)url range:(NSRange)range
+{
     LLVideoPlayerDownloadFile *file = [LLVideoPlayerDownloader downloadFileWithURL:url];
     if (nil == file) {
         LLLog(@"[ERROR] can't create cache file");
+        return;
+    }
+    if (NO == LLValidByteRange(range)) {
+        LLLog(@"[ERROR] invalid range");
         return;
     }
     
@@ -84,7 +99,7 @@
         }
     }
     
-    LLVideoPlayerDownloadOperation *operation = [[LLVideoPlayerDownloadOperation alloc] initWithURL:url downloadFile:file];
+    LLVideoPlayerDownloadOperation *operation = [[LLVideoPlayerDownloadOperation alloc] initWithURL:url range:range downloadFile:file];
     [self.operationQueue addOperation:operation];
 }
 
@@ -101,6 +116,12 @@
 - (void)cancelAllPreloads
 {
     [self.operationQueue cancelAllOperations];
+}
+
++ (LLVideoPlayerDownloadFile *)getExternalDownloadFileWithName:(NSString *)name
+{
+    NSString *path = [[self cacheDirectory] stringByAppendingPathComponent:name];
+    return [LLVideoPlayerDownloadFile fileWithFilePath:path];
 }
 
 @end

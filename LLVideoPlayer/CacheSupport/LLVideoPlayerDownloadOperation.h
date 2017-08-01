@@ -12,11 +12,14 @@
 
 @interface LLVideoPlayerDownloadOperation : LLVideoPlayerBasicOperation
 
-- (instancetype)initWithURL:(NSURL *)url downloadFile:(LLVideoPlayerDownloadFile *)downloadFile;
+- (instancetype)initWithURL:(NSURL *)url
+                      range:(NSRange)range
+               downloadFile:(LLVideoPlayerDownloadFile *)downloadFile;
 
-+ (instancetype)operationWithURL:(NSURL *)url downloadFile:(LLVideoPlayerDownloadFile *)downloadFile;
++ (instancetype)operationWithURL:(NSURL *)url
+                           range:(NSRange)range
+                    downloadFile:(LLVideoPlayerDownloadFile *)downloadFile;
 
 @property (nonatomic, strong, readonly) NSURL *url;
-@property (nonatomic, strong) NSError *error;
 
 @end

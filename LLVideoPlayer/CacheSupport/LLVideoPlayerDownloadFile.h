@@ -18,6 +18,7 @@
 
 - (void)removeCache;
 - (BOOL)validateCache;
+- (NSDictionary *)readCache;
 
 - (void)didReceivedResponse:(NSHTTPURLResponse *)response;
 - (void)writeData:(NSData *)data atOffset:(NSUInteger)offset;

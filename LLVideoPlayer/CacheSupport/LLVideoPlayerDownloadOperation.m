@@ -19,6 +19,7 @@
 }
 
 @property (nonatomic, strong) NSURL *url;
+@property (nonatomic, assign) NSRange range;
 @property (nonatomic, strong) LLVideoPlayerDownloadFile *downloadFile;
 
 @end
@@ -30,16 +31,21 @@
     [_connection cancel];
 }
 
-+ (instancetype)operationWithURL:(NSURL *)url downloadFile:(LLVideoPlayerDownloadFile *)downloadFile
++ (instancetype)operationWithURL:(NSURL *)url
+                           range:(NSRange)range
+                    downloadFile:(LLVideoPlayerDownloadFile *)downloadFile
 {
-    return [[self alloc] initWithURL:url downloadFile:downloadFile];
+    return [[self alloc] initWithURL:url range:range downloadFile:downloadFile];
 }
 
-- (instancetype)initWithURL:(NSURL *)url downloadFile:(LLVideoPlayerDownloadFile *)downloadFile
+- (instancetype)initWithURL:(NSURL *)url
+                      range:(NSRange)range
+               downloadFile:(LLVideoPlayerDownloadFile *)downloadFile
 {
     self = [super init];
     if (self) {
         self.url = url;
+        self.range = range;
         self.downloadFile = downloadFile;
     }
     return self;
@@ -48,17 +54,25 @@
 - (void)main
 {
     @autoreleasepool {
-        if ([self isCancelled]) {
-            return;
-        }
-        
-        [self setExecuting:YES];
-        
-        if (NO == [self.downloadFile validateCache]) {
+        @synchronized (self) {
+            if ([self isCancelled]) {
+                return;
+            }
+            
+            [self setExecuting:YES];
+            
+            if ([self.downloadFile validateCache]) {
+                LLLog(@"[SUCCESS] %@: already cached.", self.url);
+                [self setExecuting:NO];
+                [self setFinished:YES];
+                return;
+            }
+            
             // start
             [self startRequest];
-            [self startRunLoop];
         }
+        
+        [self startRunLoop];
         
         [self setExecuting:NO];
         [self setFinished:YES];
@@ -67,7 +81,11 @@
 
 - (void)cancel
 {
-    [super cancel];
+    @synchronized (self) {
+        [super cancel];
+        [_connection cancel];
+        _connection = nil;
+    }
 }
 
 - (void)startRunLoop
@@ -88,8 +106,10 @@
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.url
                                                            cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    NSRange range = NSMakeRange(0, 1444);
-    NSString *rangeString = LLRangeToHTTPRangeHeader(range);
+    // NOT allowed cellular access
+    request.allowsCellularAccess = NO;
+    
+    NSString *rangeString = LLRangeToHTTPRangeHeader(self.range);
     [request setValue:rangeString forHTTPHeaderField:@"Range"];
     
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
@@ -98,8 +118,13 @@
 
 - (void)failWithError:(NSError *)error
 {
-    LLLog(@"[FAILED] %@", error);
-    self.error = error;
+    LLLog(@"[FAILED] %@, %@", self.url, error);
+    [self stopRunLoop];
+}
+
+- (void)success
+{
+    LLLog(@"[SUCCESS] %@: %lu bytes", self.url, _mutableData.length);
     [self stopRunLoop];
 }
 
@@ -111,16 +136,16 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
-    LLLog(@"[RESPONSE] %@", response);
-    
+{    
     if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
         return;
     }
     
     if (NO == [(NSHTTPURLResponse *)response ll_supportRange]) {
         [connection cancel];
-        [self failWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:@{NSLocalizedDescriptionKey: @"Range not supported."}]];
+        [self failWithError:[NSError errorWithDomain:NSURLErrorDomain
+                                                code:NSURLErrorCancelled
+                                            userInfo:@{NSLocalizedDescriptionKey: @"Range not supported."}]];
         return;
     }
     
@@ -135,9 +160,8 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    LLLog(@"[SUCCESS] %lu bytes", _mutableData.length);
     [self.downloadFile writeData:_mutableData atOffset:0];
-    [self stopRunLoop];
+    [self success];
 }
 
 @end
