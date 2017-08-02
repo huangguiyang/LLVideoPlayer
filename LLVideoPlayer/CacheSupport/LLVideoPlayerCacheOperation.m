@@ -44,7 +44,9 @@
         self.cacheFile = cacheFile;
         self.operationQueue = [[NSOperationQueue alloc] init];
         [self.operationQueue setName:@"LLVideoPlayerCacheOperation-Tasks"];
-        self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        if ([self.operationQueue respondsToSelector:@selector(setQualityOfService:)]) {
+            self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        }
         self.operationQueue.maxConcurrentOperationCount = 1;    // very important
         [self.operationQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
     }
