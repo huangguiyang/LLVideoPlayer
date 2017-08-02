@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"http://vod.seeyouyima.com/vedio/sd/5318d53a17115829fb811069fde7440f.mp4"]
+#define kTestVideoURL [NSURL URLWithString:@"http://mycdn.seeyouyima.com/news/vod/1b389b8678066924d8f493866d4e84f5.mp4"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 
@@ -20,8 +20,8 @@
 @property (nonatomic, strong) UILabel *totalTimeLabel;
 @property (nonatomic, strong) UISlider *slider;
 @property (nonatomic, strong) UISwitch *cacheSwitch;
-@property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
-@property (nonatomic, strong) AVURLAsset *asset;
+//@property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
+//@property (nonatomic, strong) AVURLAsset *asset;
 
 @end
 
@@ -194,15 +194,15 @@
 {
 //    [LLVideoPlayerCacheHelper preloadWithURL:kTestVideoURL bytes:1024*20];
     
-    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[kTestVideoURL ll_customSchemeURL] options:nil];
-    self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:kTestVideoURL cachePolicy:nil];
-    [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
-    
-    [asset loadValuesAsynchronouslyForKeys:@[@"playable", @"tracks"] completionHandler:^{
-        NSLog(@"AVURLAsset loaded. [OK]");
-    }];
-    
-    self.asset = asset;
+//    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[kTestVideoURL ll_customSchemeURL] options:nil];
+//    self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:kTestVideoURL cachePolicy:nil];
+//    [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
+//    
+//    [asset loadValuesAsynchronouslyForKeys:@[@"playable", @"tracks"] completionHandler:^{
+//        NSLog(@"AVURLAsset loaded. [OK]");
+//    }];
+//    
+//    self.asset = asset;
 }
 
 #pragma mark - LLVideoPlayerDelegate

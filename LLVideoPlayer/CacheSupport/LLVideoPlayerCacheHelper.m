@@ -25,7 +25,7 @@
 
 + (void)preloadWithURL:(NSURL *)url
 {
-    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url];
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:2];
 }
 
 + (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes

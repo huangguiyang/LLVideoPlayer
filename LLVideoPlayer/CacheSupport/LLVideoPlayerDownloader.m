@@ -70,24 +70,14 @@
     return [[LLVideoPlayerDownloadFile alloc] initWithFilePath:path];
 }
 
-- (void)preloadWithURL:(NSURL *)url
-{
-    [self preloadWithURL:url range:NSMakeRange(0, 1024)];
-}
-
 - (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
-{
-    [self preloadWithURL:url range:NSMakeRange(0, bytes)];
-}
-
-- (void)preloadWithURL:(NSURL *)url range:(NSRange)range
 {
     LLVideoPlayerDownloadFile *file = [LLVideoPlayerDownloader downloadFileWithURL:url];
     if (nil == file) {
         LLLog(@"[ERROR] can't create cache file");
         return;
     }
-    if (NO == LLValidByteRange(range)) {
+    if (0 == bytes) {
         LLLog(@"[ERROR] invalid range");
         return;
     }
@@ -99,7 +89,7 @@
         }
     }
     
-    LLVideoPlayerDownloadOperation *operation = [[LLVideoPlayerDownloadOperation alloc] initWithURL:url range:range downloadFile:file];
+    LLVideoPlayerDownloadOperation *operation = [[LLVideoPlayerDownloadOperation alloc] initWithURL:url range:NSMakeRange(0, bytes) downloadFile:file];
     [self.operationQueue addOperation:operation];
 }
 
