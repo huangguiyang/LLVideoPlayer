@@ -10,6 +10,7 @@ A Low Level Video Player inspired by [VKVideoPlayer](https://github.com/viki-org
 
 - [x] simple and flexible
 - [x] customize cache support
+- [x] preload support
 - [ ] AirPlay support
 
 
@@ -93,6 +94,12 @@ player.cachePolicy = your_policy;
 ```
 
 See `LLVideoPlayerCachePolicy` for more details.
+
+## Preload Support
+
+```
+[LLVideoPlayerCacheHelper preloadWithURL:url];
+```
 
 ## Requirements
 
