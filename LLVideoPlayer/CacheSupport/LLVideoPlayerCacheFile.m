@@ -13,6 +13,7 @@
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile+CachePolicy.h"
 #import "NSString+LLVideoPlayer.h"
+#import "LLVideoPlayerDownloader.h"
 
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
@@ -89,9 +90,9 @@
         self.writeFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.cacheFilePath];
         
         [self loadIndexFileAtStartup];
+        [self loadExternalCache];
         [self checkComplete];
         
-        LLLog(@"[CacheSupport] cache file path: %@", filePath);
         LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
               _fileLength, self.ranges, self.allHeaderFields);
     }
@@ -99,6 +100,44 @@
 }
 
 #pragma mark - Private
+
+- (void)loadExternalCache
+{
+    if (NO == self.cachePolicy.enablePreload) {
+        return;
+    }
+    
+    LLVideoPlayerDownloadFile *downloadFile = [LLVideoPlayerDownloader getExternalDownloadFileWithName:[self.cacheFilePath lastPathComponent]];
+    if (nil == downloadFile) {
+        return;
+    }
+    NSDictionary *dict = [downloadFile readCache];
+    if (nil == dict) {
+        return;
+    }
+    
+    LLLog(@"Read Download Cache OK.");
+    BOOL needToSave = NO;
+    
+    if (nil == _allHeaderFields) {
+        _allHeaderFields = dict[@"headers"];
+        _fileLength = [[_allHeaderFields[@"Content-Range"] ll_decodeLengthFromContentRange] integerValue];
+        needToSave = YES;
+    }
+
+    NSRange range = NSRangeFromString(dict[@"range"]);
+    NSRange cache = [self cachedRangeForRange:range];
+    if (NO == LLValidFileRange(cache)) {
+        [self writeData:dict[@"data"] atOffset:range.location];
+        needToSave = YES;
+    } else {
+        LLLog(@"Range: %@ already cached.", NSStringFromRange(range));
+    }
+    
+    if (needToSave) {
+        [self synchronize];
+    }
+}
 
 - (void)checkComplete
 {
@@ -268,7 +307,7 @@
     }
     
     NSRange resultRange = NSIntersectionRange(foundRange, requestRange);
-    if (resultRange.length > 0) {
+    if (NSEqualRanges(resultRange, requestRange)) {
         return resultRange;
     } else {
         return LLInvalidRange;
@@ -322,18 +361,13 @@
     @synchronized (self) {
         NSRange resultRange = [self cachedRangeForRange:range];
         if (NO == LLValidFileRange(resultRange)) {
-            [self makeErrorWithMessage:@"no cached found" code:-3 forError:error];
-            return nil;
-        }
-        
-        if (NO == NSEqualRanges(resultRange, range)) {
-            [self makeErrorWithMessage:@"range not matched" code:-4 forError:error];
+            [self makeErrorWithMessage:@"no cached found or not match" code:-3 forError:error];
             return nil;
         }
         
         NSData *data = [self readDataWithRange:range];
         if (nil == data) {
-            [self makeErrorWithMessage:@"read null" code:-5 forError:error];
+            [self makeErrorWithMessage:@"read null" code:-4 forError:error];
         }
         
         return data;

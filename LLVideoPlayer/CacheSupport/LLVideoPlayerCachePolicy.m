@@ -22,6 +22,7 @@
         // default
         self.diskCapacity = 500ULL << 20;
         self.outdatedHours = 7 * 24;
+        self.enablePreload = NO;
     }
     return self;
 }

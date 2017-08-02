@@ -10,6 +10,8 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
+#define kTestVideoURL [NSURL URLWithString:@"http://mycdn.seeyouyima.com/news/vod/1b389b8678066924d8f493866d4e84f5.mp4"]
+
 @interface LLViewController () <LLVideoPlayerDelegate>
 
 @property (nonatomic, strong) LLVideoPlayer *player;
@@ -18,6 +20,8 @@
 @property (nonatomic, strong) UILabel *totalTimeLabel;
 @property (nonatomic, strong) UISlider *slider;
 @property (nonatomic, strong) UISwitch *cacheSwitch;
+//@property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
+//@property (nonatomic, strong) AVURLAsset *asset;
 
 @end
 
@@ -27,27 +31,29 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    BOOL cacheSupport = YES;
     
-    self.player = [[LLVideoPlayer alloc] init];
-    [self.view addSubview:self.player.view];
-    self.player.view.frame = CGRectMake(10, 80, 300, 200);
-    self.player.delegate = self;
-    self.player.cacheSupportEnabled = cacheSupport;
-    
+    [self createPlayer];
     {
         self.cacheSwitch = [UISwitch new];
         [self.view addSubview:self.cacheSwitch];
         self.cacheSwitch.frame = CGRectMake(10, 30, self.cacheSwitch.frame.size.width, self.cacheSwitch.frame.size.height);
-        self.cacheSwitch.on = cacheSupport;
+        self.cacheSwitch.on = YES;
     }
     
     {
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [button setTitle:@"force play" forState:UIControlStateNormal];
+        [button setTitle:@"preload" forState:UIControlStateNormal];
         [self.view addSubview:button];
         button.frame = CGRectMake(100, 30, 80, 40);
-        [button addTarget:self action:@selector(forcePlayAction:) forControlEvents:UIControlEventTouchUpInside];
+        [button addTarget:self action:@selector(preloadAction:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [button setTitle:@"clear" forState:UIControlStateNormal];
+        [self.view addSubview:button];
+        button.frame = CGRectMake(200, 30, 80, 40);
+        [button addTarget:self action:@selector(clearAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
     {
@@ -122,11 +128,29 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)createPlayer
+{
+    if (self.player) {
+        self.player.delegate = nil;
+        [self.player.view removeFromSuperview];
+        self.player = nil;
+    }
+    
+    self.player = [[LLVideoPlayer alloc] init];
+    [self.view addSubview:self.player.view];
+    self.player.view.frame = CGRectMake(10, 80, 300, 200);
+    self.player.delegate = self;
+    self.player.cacheSupportEnabled = YES;
+    LLVideoPlayerCachePolicy *policy = [LLVideoPlayerCachePolicy defaultPolicy];
+    policy.enablePreload = YES;
+    self.player.cachePolicy = policy;
+}
+
 - (void)loadAction:(id)sender
 {
-    NSURL *url = [NSURL URLWithString:@"http://baobab.wdjcdn.com/1456665467509qingshu.mp4"];
+    NSLog(@"[PRESS] loadAction");
     self.player.cacheSupportEnabled = self.cacheSwitch.on;
-    [self.player loadVideoWithStreamURL:url];
+    [self.player loadVideoWithStreamURL:kTestVideoURL];
     //    LLVideoTrack *track = [[LLVideoTrack alloc] initWithStreamURL:url];
     //    track.lastWatchedDuration = @(40);
     //    [self.player loadVideoWithTrack:track];
@@ -145,6 +169,8 @@
 - (void)dismissAction:(id)sender
 {
     [self.player dismissContent];
+    
+    [self createPlayer];
 }
 
 - (void)sliderTouchUpInside:(UISlider *)sender
@@ -158,9 +184,25 @@
     }];
 }
 
-- (void)forcePlayAction:(id)sender
+- (void)clearAction:(id)sender
 {
-    self.player.state = LLVideoPlayerStateContentPlaying;
+    [LLVideoPlayerCacheHelper clearAllCache];
+    NSLog(@"Claear Cache.");
+}
+
+- (void)preloadAction:(id)sender
+{
+//    [LLVideoPlayerCacheHelper preloadWithURL:kTestVideoURL bytes:1024*20];
+    
+//    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[kTestVideoURL ll_customSchemeURL] options:nil];
+//    self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:kTestVideoURL cachePolicy:nil];
+//    [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
+//    
+//    [asset loadValuesAsynchronouslyForKeys:@[@"playable", @"tracks"] completionHandler:^{
+//        NSLog(@"AVURLAsset loaded. [OK]");
+//    }];
+//    
+//    self.asset = asset;
 }
 
 #pragma mark - LLVideoPlayerDelegate

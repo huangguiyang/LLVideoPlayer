@@ -8,13 +8,39 @@
 
 #import "LLVideoPlayerCacheHelper.h"
 #import "LLVideoPlayerCacheFile.h"
+#import "LLVideoPlayerDownloader.h"
 
 @implementation LLVideoPlayerCacheHelper
 
 + (void)clearAllCache
 {
-    NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
+    NSString *dir;
+    
+    dir = [LLVideoPlayerCacheFile cacheDirectory];
     [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
+    
+    dir = [LLVideoPlayerDownloader cacheDirectory];
+    [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
+}
+
++ (void)preloadWithURL:(NSURL *)url
+{
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:2];
+}
+
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
+{
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:bytes];
+}
+
++ (void)cancelWithURL:(NSURL *)url
+{
+    [[LLVideoPlayerDownloader defaultDownloader] cancelWithURL:url];
+}
+
++ (void)cancelAllPreloads
+{
+    [[LLVideoPlayerDownloader defaultDownloader] cancelAllPreloads];
 }
 
 @end

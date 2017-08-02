@@ -14,4 +14,6 @@
 
 - (NSString *)ll_decodeLengthFromContentRange;
 
+- (NSRange)ll_decodeRangeFromContentRange;
+
 @end

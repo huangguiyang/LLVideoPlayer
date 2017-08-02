@@ -14,6 +14,6 @@
 
 @property (nonatomic, assign) NSUInteger diskCapacity;   // in bytes
 @property (nonatomic, assign) NSUInteger outdatedHours;  // in hours
-
+@property (nonatomic, assign) BOOL enablePreload;
 
 @end
