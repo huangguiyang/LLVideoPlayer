@@ -21,3 +21,11 @@
 + (void)cancelAllPreloads;
 
 @end
+
+@interface LLVideoPlayerCacheHelper (CacheDirectory)
+
++ (NSString *)cacheDirectory;
+
++ (NSString *)preloadCacheDirectory;
+
+@end

@@ -44,3 +44,17 @@
 }
 
 @end
+
+@implementation LLVideoPlayerCacheHelper (CacheDirectory)
+
++ (NSString *)cacheDirectory
+{
+    return [LLVideoPlayerCacheFile cacheDirectory];
+}
+
++ (NSString *)preloadCacheDirectory
+{
+    return [LLVideoPlayerDownloader cacheDirectory];
+}
+
+@end
