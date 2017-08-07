@@ -103,10 +103,6 @@
 
 - (void)loadExternalCache
 {
-    if (NO == self.cachePolicy.enablePreload) {
-        return;
-    }
-    
     LLVideoPlayerDownloadFile *downloadFile = [LLVideoPlayerDownloader getExternalDownloadFileWithName:[self.cacheFilePath lastPathComponent]];
     if (nil == downloadFile) {
         return;

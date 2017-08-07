@@ -142,7 +142,6 @@
     self.player.delegate = self;
     self.player.cacheSupportEnabled = YES;
     LLVideoPlayerCachePolicy *policy = [LLVideoPlayerCachePolicy defaultPolicy];
-    policy.enablePreload = YES;
     self.player.cachePolicy = policy;
 }
 
