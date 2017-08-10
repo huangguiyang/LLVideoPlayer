@@ -20,6 +20,8 @@
 
 + (void)cancelAllPreloads;
 
++ (BOOL)isCacheComplete:(NSURL *)url;
+
 @end
 
 @interface LLVideoPlayerCacheHelper (CacheDirectory)

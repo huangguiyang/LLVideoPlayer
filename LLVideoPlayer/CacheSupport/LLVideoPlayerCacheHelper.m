@@ -9,6 +9,7 @@
 #import "LLVideoPlayerCacheHelper.h"
 #import "LLVideoPlayerCacheFile.h"
 #import "LLVideoPlayerDownloader.h"
+#import "NSString+LLVideoPlayer.h"
 
 @implementation LLVideoPlayerCacheHelper
 
@@ -41,6 +42,20 @@
 + (void)cancelAllPreloads
 {
     [[LLVideoPlayerDownloader defaultDownloader] cancelAllPreloads];
+}
+
++ (BOOL)isCacheComplete:(NSURL *)url
+{
+    if (nil == url) {
+        return NO;
+    }
+    if ([url isFileURL]) {
+        return YES;
+    }
+    NSString *name = [url.absoluteString ll_md5];
+    NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+    LLVideoPlayerCacheFile *cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:nil];
+    return [cacheFile isComplete];
 }
 
 @end
