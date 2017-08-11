@@ -25,23 +25,25 @@
         NSError *error = nil;
         
         while (offset < NSMaxRange(self.range)) {
-            if ([self isCancelled]) {
-                return;
+            @autoreleasepool {
+                if ([self isCancelled]) {
+                    return;
+                }
+                
+                error = nil;
+                NSRange range = NSMakeRange(offset, MIN(NSMaxRange(self.range) - offset, lengthPerRead));
+                NSData *data = [self.cacheFile dataWithRange:range error:&error];
+                if (error) {
+                    break;
+                }
+                if (nil == data) {
+                    error = [NSError errorWithDomain:@"LLVideoPlayerCacheLocalTask" code:NSURLErrorUnknown userInfo:nil];
+                    break;
+                }
+                
+                [self.loadingRequest.dataRequest respondWithData:data];
+                offset = NSMaxRange(range);
             }
-            
-            error = nil;
-            NSRange range = NSMakeRange(offset, MIN(NSMaxRange(self.range) - offset, lengthPerRead));
-            NSData *data = [self.cacheFile dataWithRange:range error:&error];
-            if (error) {
-                break;
-            }
-            if (nil == data) {
-                error = [NSError errorWithDomain:@"LLVideoPlayerCacheLocalTask" code:NSURLErrorUnknown userInfo:nil];
-                break;
-            }
-            
-            [self.loadingRequest.dataRequest respondWithData:data];
-            offset = NSMaxRange(range);
         }
         
         self.error = error;
