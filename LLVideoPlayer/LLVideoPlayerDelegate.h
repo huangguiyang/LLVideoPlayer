@@ -30,6 +30,7 @@
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(LLVideoTrack *)track time:(NSTimeInterval)time;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayToEnd:(LLVideoTrack *)track;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer willContinuePlaying:(LLVideoTrack *)track;
 
 #pragma mark - Error
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error;
@@ -38,6 +39,5 @@
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(LLVideoTrack *)track;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty track:(LLVideoTrack *)track;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp track:(LLVideoTrack *)track;
-- (float)videoPlayer:(LLVideoPlayer *)videoPlayer adjustLastWatchedDuration:(float)lastWatchedDuration;
 
 @end

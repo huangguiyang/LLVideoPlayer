@@ -260,11 +260,9 @@ typedef void (^VoidBlock) (void);
 {
     ll_run_on_ui_thread(^{
         float lastWatchedTime = [self.track.lastWatchedDuration floatValue];
-        if ([self.delegate respondsToSelector:@selector(videoPlayer:adjustLastWatchedDuration:)]) {
-            lastWatchedTime = [self.delegate videoPlayer:self adjustLastWatchedDuration:lastWatchedTime];
-        } else {
-            if (lastWatchedTime > 5) {
-                lastWatchedTime -= 1;
+        if (lastWatchedTime > 0) {
+            if ([self.delegate respondsToSelector:@selector(videoPlayer:willContinuePlaying:)]) {
+                [self.delegate videoPlayer:self willContinuePlaying:self.track];
             }
         }
         
