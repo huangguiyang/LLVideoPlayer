@@ -281,6 +281,7 @@ typedef void (^VoidBlock) (void);
     self.avPlayerItem = nil;
     self.loadingAsset = nil;
     self.resourceLoader = nil;
+    [[self activePlayerView].playerLayerView setPlayer:nil];
 }
 
 - (void)playVideoTrack:(LLVideoTrack *)track
@@ -578,6 +579,7 @@ typedef void (^VoidBlock) (void);
     if (finishedItem == self.avPlayerItem) {
         // is current player's item
         ll_run_on_ui_thread(^{
+            [self clearPlayer];
             self.track.isPlayedToEnd = YES;
             self.state = LLVideoPlayerStateUnknown;
             if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
