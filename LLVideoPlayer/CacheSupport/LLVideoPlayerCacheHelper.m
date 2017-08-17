@@ -24,6 +24,29 @@
     [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
 }
 
++ (void)removeCacheForURL:(NSURL *)url
+{
+    {
+        NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
+        NSString *md5 = [url.absoluteString ll_md5];
+        NSString *data = [dir stringByAppendingPathComponent:md5];
+        NSString *index = [NSString stringWithFormat:@"%@%@", data, [LLVideoPlayerCacheFile indexFileExtension]];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:data error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+    }
+    
+    {
+        NSString *dir = [LLVideoPlayerDownloader cacheDirectory];
+        NSString *md5 = [url.absoluteString ll_md5];
+        NSString *data = [dir stringByAppendingPathComponent:md5];
+        NSString *index = [NSString stringWithFormat:@"%@%@", data, [LLVideoPlayerDownloadFile indexFileExtension]];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:data error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+    }
+}
+
 + (void)preloadWithURL:(NSURL *)url
 {
     [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:2];

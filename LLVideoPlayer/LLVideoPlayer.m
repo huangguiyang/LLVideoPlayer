@@ -345,7 +345,7 @@ typedef void (^VoidBlock) (void);
                 self.loadingAsset = nil;
             } else {
                 LLLog(@"The asset's tracks were not loaded: %@", error);
-                [LLVideoPlayerCacheHelper clearAllCache];
+                [LLVideoPlayerCacheHelper removeCacheForURL:streamURL];
                 [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track];
             }
         });

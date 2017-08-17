@@ -10,6 +10,8 @@
 
 @interface LLVideoPlayerDownloadFile : NSObject
 
++ (NSString *)indexFileExtension;
+
 + (instancetype)fileWithFilePath:(NSString *)filePath;
 
 - (instancetype)initWithFilePath:(NSString *)filePath;

@@ -12,6 +12,8 @@
 
 + (void)clearAllCache;
 
++ (void)removeCacheForURL:(NSURL *)url;
+
 + (void)preloadWithURL:(NSURL *)url;
 
 + (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes;
