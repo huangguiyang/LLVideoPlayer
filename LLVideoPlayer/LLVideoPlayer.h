@@ -13,8 +13,6 @@
 #import "LLVideoPlayerHelper.h"
 #import "LLVideoPlayerDelegate.h"
 #import "LLVideoPlayerCachePolicy.h"
-#import "LLVideoPlayerCacheHelper.h"
-
 
 /// LLVideoPlayer: Low Level Video Player
 
@@ -50,5 +48,23 @@
 - (double)currentBitRateInKbps;
 - (NSTimeInterval)currentTime;
 - (BOOL)stalling;
+
+@end
+
+
+@interface LLVideoPlayer (CacheSupport)
+
++ (void)clearAllCache;
++ (void)removeCacheForURL:(NSURL *)url;
+
++ (void)preloadWithURL:(NSURL *)url;
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes;
++ (void)cancelPreloadWithURL:(NSURL *)url;
++ (void)cancelAllPreloads;
+
++ (BOOL)isCacheComplete:(NSURL *)url;
+
++ (NSString *)cacheDirectory;
++ (NSString *)preloadCacheDirectory;
 
 @end

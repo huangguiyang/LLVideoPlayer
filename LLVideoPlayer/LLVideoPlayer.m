@@ -14,6 +14,8 @@
 #import "LLVideoPlayerCacheLoader.h"
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile.h"
+#import "LLVideoPlayerDownloader.h"
+#import "NSString+LLVideoPlayer.h"
 
 typedef void (^VoidBlock) (void);
 
@@ -345,7 +347,7 @@ typedef void (^VoidBlock) (void);
                 self.loadingAsset = nil;
             } else {
                 LLLog(@"The asset's tracks were not loaded: %@", error);
-                [LLVideoPlayerCacheHelper removeCacheForURL:streamURL];
+                [LLVideoPlayer removeCacheForURL:streamURL];
                 [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track];
             }
         });
@@ -689,6 +691,88 @@ typedef void (^VoidBlock) (void);
 - (BOOL)isPlayingVideo
 {
     return self.avPlayer && self.avPlayer.rate != 0.0;
+}
+
+@end
+
+@implementation LLVideoPlayer (CacheSupport)
+
++ (void)clearAllCache
+{
+    NSString *dir;
+    
+    dir = [LLVideoPlayerCacheFile cacheDirectory];
+    [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
+    
+    dir = [LLVideoPlayerDownloader cacheDirectory];
+    [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
+}
+
++ (void)removeCacheForURL:(NSURL *)url
+{
+    {
+        NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
+        NSString *md5 = [url.absoluteString ll_md5];
+        NSString *data = [dir stringByAppendingPathComponent:md5];
+        NSString *index = [NSString stringWithFormat:@"%@%@", data, [LLVideoPlayerCacheFile indexFileExtension]];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:data error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+    }
+    
+    {
+        NSString *dir = [LLVideoPlayerDownloader cacheDirectory];
+        NSString *md5 = [url.absoluteString ll_md5];
+        NSString *data = [dir stringByAppendingPathComponent:md5];
+        NSString *index = [NSString stringWithFormat:@"%@%@", data, [LLVideoPlayerDownloadFile indexFileExtension]];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:data error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+    }
+}
+
++ (void)preloadWithURL:(NSURL *)url
+{
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:2];
+}
+
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
+{
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:bytes];
+}
+
++ (void)cancelPreloadWithURL:(NSURL *)url
+{
+    [[LLVideoPlayerDownloader defaultDownloader] cancelWithURL:url];
+}
+
++ (void)cancelAllPreloads
+{
+    [[LLVideoPlayerDownloader defaultDownloader] cancelAllPreloads];
+}
+
++ (BOOL)isCacheComplete:(NSURL *)url
+{
+    if (nil == url) {
+        return NO;
+    }
+    if ([url isFileURL]) {
+        return YES;
+    }
+    NSString *name = [url.absoluteString ll_md5];
+    NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+    LLVideoPlayerCacheFile *cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:nil];
+    return [cacheFile isComplete];
+}
+
++ (NSString *)cacheDirectory
+{
+    return [LLVideoPlayerCacheFile cacheDirectory];
+}
+
++ (NSString *)preloadCacheDirectory
+{
+    return [LLVideoPlayerDownloader cacheDirectory];
 }
 
 @end

@@ -185,7 +185,7 @@
 
 - (void)clearAction:(id)sender
 {
-    [LLVideoPlayerCacheHelper clearAllCache];
+    [LLVideoPlayer clearAllCache];
     NSLog(@"Claear Cache.");
 }
 
