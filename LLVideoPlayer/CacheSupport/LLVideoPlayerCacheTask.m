@@ -40,7 +40,6 @@
 
 - (void)dealloc
 {
-    LLLog(@"dealloc %@", self);
 }
 
 - (void)resume

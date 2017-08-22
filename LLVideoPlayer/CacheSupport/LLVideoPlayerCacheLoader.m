@@ -55,11 +55,28 @@
     return [self.cacheFile isComplete];
 }
 
+#pragma mark - LLVideoPlayerCacheOperationDelegate
+
+- (void)operationDidFinish:(LLVideoPlayerCacheOperation *)operation
+{
+    LLLog(@"[COMPLETE] %@", operation);
+    [operation.loadingRequest finishLoading];
+    [self.operationQueue removeObject:operation];
+}
+
+- (void)operation:(LLVideoPlayerCacheOperation *)operation didFailWithError:(NSError *)error
+{
+    LLLog(@"[FAIL] %@, %@", operation, error);
+    [operation.loadingRequest finishLoadingWithError:error];
+    [self.operationQueue removeObject:operation];
+}
+
 #pragma mark - Private
 
 - (void)startLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     LLVideoPlayerCacheOperation *operation = [LLVideoPlayerCacheOperation operationWithLoadingRequest:loadingRequest cacheFile:self.cacheFile];
+    operation.delegate = self;
     [self.operationQueue addObject:operation];
     [operation resume];
 }

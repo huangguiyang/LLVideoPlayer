@@ -10,7 +10,7 @@
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "LLVideoPlayerInternal.h"
-#import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "NSURLResponse+LLVideoPlayer.h"
 
 #define MAX_MEM_SIZE (1024 * 1024)
 
@@ -32,7 +32,7 @@
 
 - (void)resume
 {
-    LLLog(@"resume %@", self);
+    [super resume];
     dispatch_async(dispatch_get_main_queue(), ^{
         @synchronized (self) {
             if ([self isCancelled]) {
@@ -62,29 +62,32 @@
     @synchronized (self) {
         [_connection cancel];
         _connection = nil;
+        [self synchronize];
         [super cancel];
     }
-    [self synchronizeIfNeeded];
-    LLLog(@"cancel %@", self);
 }
 
-- (void)synchronizeIfNeeded
+- (void)synchronize
+{
+    if ([_mutableData length] > 0) {
+        [self.cacheFile writeData:_mutableData atOffset:_offset];
+        _mutableData = nil;
+        [self.cacheFile synchronize];
+    }
+}
+
+- (void)synchronizeSafe
 {
     @synchronized (self) {
-        if ([_mutableData length] > 0) {
-            [self.cacheFile writeData:_mutableData atOffset:_offset];
-            _mutableData = nil;
-        }
+        [self synchronize];
     }
-    
-    [self.cacheFile synchronize];
 }
 
 #pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    [self synchronizeIfNeeded];
+    [self synchronizeSafe];
     if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
         [self.delegate task:self didFailWithError:error];
     }
@@ -92,7 +95,7 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    [self synchronizeIfNeeded];
+    [self synchronizeSafe];
     if ([self.delegate respondsToSelector:@selector(taskDidFinish:)]) {
         [self.delegate taskDidFinish:self];
     }
@@ -100,15 +103,9 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-    if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
-        return;
-    }
+    [self.cacheFile receivedResponse:response forLoadingRequest:self.loadingRequest];
     
-    LLLog(@"didReceiveResponse: %@ <%@>", response, [NSThread currentThread]);
-    
-    [self.cacheFile receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:self.loadingRequest];
-    
-    if (NO == [(NSHTTPURLResponse *)response ll_supportRange]) {
+    if (NO == [response ll_supportRange]) {
         LLLog(@"[ERROR] not support range");
         _offset = 0;
     }
@@ -120,17 +117,11 @@
     
     // save local
     @synchronized (self) {
-        if (_offset == 0 && data.length == 2) {
-            // special case: write directly
-            [self.cacheFile writeData:data atOffset:_offset];
-            _offset += [data length];
-        } else {
-            [_mutableData appendData:data];
-            if (_mutableData.length >= MAX_MEM_SIZE) {
-                [self.cacheFile writeData:_mutableData atOffset:_offset];
-                _offset += [_mutableData length];
-                _mutableData = [NSMutableData data];
-            }
+        [_mutableData appendData:data];
+        if (_mutableData.length >= MAX_MEM_SIZE) {
+            [self.cacheFile writeData:_mutableData atOffset:_offset];
+            _offset += [_mutableData length];
+            _mutableData = [NSMutableData data];
         }
     }
 }

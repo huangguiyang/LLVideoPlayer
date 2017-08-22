@@ -1,14 +1,14 @@
 //
-//  NSHTTPURLResponse+LLVideoPlayer.h
+//  NSURLResponse+LLVideoPlayer.h
 //  Pods
 //
-//  Created by mario on 2017/2/23.
+//  Created by mario on 2017/8/22.
 //
 //
 
 #import <Foundation/Foundation.h>
 
-@interface NSHTTPURLResponse (LLVideoPlayer)
+@interface NSURLResponse (LLVideoPlayer)
 
 - (BOOL)ll_supportRange;
 

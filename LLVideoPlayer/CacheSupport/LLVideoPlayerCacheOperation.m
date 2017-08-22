@@ -74,8 +74,11 @@
         [self.taskQueue removeObject:task];
         if (self.taskQueue.count == 0) {
             if (_cancels == 0) {
-                LLLog(@"[COMPLETE] %@", self);
-                [self.loadingRequest finishLoading];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if ([self.delegate respondsToSelector:@selector(operationDidFinish:)]) {
+                        [self.delegate operationDidFinish:self];
+                    }
+                });
             }
         } else {
             [self resumeNextTask];
@@ -85,15 +88,18 @@
 
 - (void)task:(LLVideoPlayerCacheTask *)task didFailWithError:(NSError *)error
 {
-    LLLog(@"[TASK FAIL] %@", task);
+    LLLog(@"[TASK FAIL] %@, %@", task, error);
     @synchronized (self) {
         [self.taskQueue removeObject:task];
         if ([task isCancelled] || error.code == NSURLErrorCancelled) {
             _cancels++;
         } else {
-            LLLog(@"[FAIL] %@", self);
             [self cancel];
-            [self.loadingRequest finishLoadingWithError:error];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
+                    [self.delegate operation:self didFailWithError:error];
+                }
+            });
         }
     }
 }
