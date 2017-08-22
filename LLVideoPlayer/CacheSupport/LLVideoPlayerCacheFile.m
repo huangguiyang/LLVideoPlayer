@@ -8,11 +8,12 @@
 
 #import "LLVideoPlayerCacheFile.h"
 #import "LLVideoPlayerCacheUtils.h"
-#import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "NSURLResponse+LLVideoPlayer.h"
 #import "LLVideoPlayerInternal.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerDownloader.h"
+#import "LLVideoPlayerHelper.h"
 
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
@@ -159,15 +160,10 @@
 
 - (BOOL)loadIndexFile
 {
-    NSError *error = nil;
     NSData *indexData = [NSData dataWithContentsOfFile:self.indexFilePath];
-    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:indexData options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers error:&error];
-    if (error) {
-        LLLog(@"load index file failed: %@", error);
-        return NO;
-    }
+    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:indexData options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers error:nil];
     if (nil == dict || NO == [dict isKindOfClass:[NSDictionary class]]) {
-        LLLog(@"empty/invalid data: %@", dict);
+        LLLog(@"[WRN] empty or invalid index file: %@", dict);
         return NO;
     }
     
@@ -379,19 +375,21 @@
         LLLog(@"[ERROR] write data overflow: %ld > %ld", offset, [self fileLength]);
         return;
     }
-        
-    @synchronized (self) {
-        @try {
-            [self.writeFileHandle seekToFileOffset:offset];
-            [self.writeFileHandle writeData:data];
-        } @catch (NSException *exception) {
-            LLLog(@"write exception: %@", exception);
-            return;
+    
+    ll_run_on_non_ui_thread(^{
+        @synchronized (self) {
+            @try {
+                [self.writeFileHandle seekToFileOffset:offset];
+                [self.writeFileHandle writeData:data];
+            } @catch (NSException *exception) {
+                LLLog(@"write exception: %@", exception);
+                return;
+            }
+            
+            // Add Range
+            [self addRange:NSMakeRange(offset, data.length)];
         }
-                
-        // Add Range
-        [self addRange:NSMakeRange(offset, data.length)];
-    }
+    });
 }
 
 - (BOOL)writeResponse:(NSHTTPURLResponse *)response
@@ -434,10 +432,14 @@
                                      headerFields:responseHeaders];
 }
 
-- (void)receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
+- (void)receivedResponse:(NSURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
+    if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
+        return;
+    }
     @synchronized (self) {
         if (nil == _response) {
+            LLLog(@"didReceiveResponse: %@ <%@>", response, [NSThread currentThread]);
             [loadingRequest ll_fillContentInformation:response];
             // save local
             [self writeResponse:(NSHTTPURLResponse *)response];
@@ -462,11 +464,12 @@
 
 - (void)synchronize
 {
-    @synchronized (self) {
-        [self saveIndexFile];
-        LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@}",
-              _fileLength, self.ranges, self.allHeaderFields);
-    }
+    ll_run_on_non_ui_thread(^{
+        @synchronized (self) {
+            [self saveIndexFile];
+            LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@}", _fileLength, self.ranges);
+        }
+    });
 }
 
 - (void)clear
@@ -520,7 +523,6 @@ static uint64_t diskFreeCapacity(void)
     NSError *error;
     NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:&error];
     if (error) {
-        LLLog(@"[ERR] can't get contents of directory: %@, error: %@", directory, error);
         return;
     }
     

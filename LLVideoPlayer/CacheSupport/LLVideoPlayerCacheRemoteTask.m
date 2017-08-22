@@ -2,7 +2,7 @@
 //  LLVideoPlayerCacheRemoteTask.m
 //  Pods
 //
-//  Created by mario on 2017/6/23.
+//  Created by mario on 2017/8/21.
 //
 //
 
@@ -10,7 +10,7 @@
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "LLVideoPlayerInternal.h"
-#import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "NSURLResponse+LLVideoPlayer.h"
 
 #define MAX_MEM_SIZE (1024 * 1024)
 
@@ -19,7 +19,6 @@
     NSURLConnection *_connection;
     NSInteger _offset;
     NSMutableData *_mutableData;
-    CFRunLoopRef _runLoop;
 }
 
 @end
@@ -31,15 +30,14 @@
     [_connection cancel];
 }
 
-- (void)main
+- (void)resume
 {
-    @autoreleasepool {
+    [super resume];
+    dispatch_async(dispatch_get_main_queue(), ^{
         @synchronized (self) {
             if ([self isCancelled]) {
                 return;
             }
-            
-            [self setExecuting:YES];
             
             NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
             request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
@@ -56,77 +54,58 @@
             _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
             [_connection start];
         }
-        
-        [self startRunLoop];
-        
-        [self setExecuting:NO];
-        [self setFinished:YES];
-    }
+    });
 }
 
 - (void)cancel
 {
     @synchronized (self) {
-        [super cancel];
         [_connection cancel];
         _connection = nil;
-    }
-    
-    [self synchronizeIfNeeded];
-}
-
-- (void)startRunLoop
-{
-    _runLoop = CFRunLoopGetCurrent();
-    CFRunLoopRun();
-}
-
-- (void)stopRunLoop
-{
-    if (_runLoop) {
-        CFRunLoopStop(_runLoop);
-        _runLoop = NULL;
+        [self synchronize];
+        [super cancel];
     }
 }
 
-- (void)synchronizeIfNeeded
+- (void)synchronize
+{
+    if ([_mutableData length] > 0) {
+        [self.cacheFile writeData:_mutableData atOffset:_offset];
+        _mutableData = nil;
+        [self.cacheFile synchronize];
+    }
+}
+
+- (void)synchronizeSafe
 {
     @synchronized (self) {
-        if ([_mutableData length] > 0) {
-            [self.cacheFile writeData:_mutableData atOffset:_offset];
-            _mutableData = nil;
-        }
+        [self synchronize];
     }
-    
-    [self.cacheFile synchronize];
 }
 
 #pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    self.error = error;
-    [self synchronizeIfNeeded];
-    [self stopRunLoop];
+    [self synchronizeSafe];
+    if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
+        [self.delegate task:self didFailWithError:error];
+    }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    [self synchronizeIfNeeded];
-    [self stopRunLoop];
+    [self synchronizeSafe];
+    if ([self.delegate respondsToSelector:@selector(taskDidFinish:)]) {
+        [self.delegate taskDidFinish:self];
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-    if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
-        return;
-    }
+    [self.cacheFile receivedResponse:response forLoadingRequest:self.loadingRequest];
     
-    LLLog(@"didReceiveResponse: %@ <%@>", response, [NSThread currentThread]);
-    
-    [self.cacheFile receivedResponse:(NSHTTPURLResponse *)response forLoadingRequest:self.loadingRequest];
-    
-    if (NO == [(NSHTTPURLResponse *)response ll_supportRange]) {
+    if (NO == [response ll_supportRange]) {
         LLLog(@"[ERROR] not support range");
         _offset = 0;
     }
@@ -138,17 +117,11 @@
     
     // save local
     @synchronized (self) {
-        if (_offset == 0 && data.length == 2) {
-            // special case: write directly
-            [self.cacheFile writeData:data atOffset:_offset];
-            _offset += [data length];
-        } else {
-            [_mutableData appendData:data];
-            if (_mutableData.length >= MAX_MEM_SIZE) {
-                [self.cacheFile writeData:_mutableData atOffset:_offset];
-                _offset += [_mutableData length];
-                _mutableData = [NSMutableData data];
-            }
+        [_mutableData appendData:data];
+        if (_mutableData.length >= MAX_MEM_SIZE) {
+            [self.cacheFile writeData:_mutableData atOffset:_offset];
+            _offset += [_mutableData length];
+            _mutableData = [NSMutableData data];
         }
     }
 }

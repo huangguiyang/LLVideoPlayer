@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"http://mycdn.seeyouyima.com/news/vod/1b389b8678066924d8f493866d4e84f5.mp4"]
+#define kTestVideoURL [NSURL URLWithString:@"http://sc.seeyouyima.com/baby_android_1071507658_1502679433873_540_303.mp4"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 
@@ -79,7 +79,7 @@
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [button setTitle:@"play" forState:UIControlStateNormal];
         [self.view addSubview:button];
-        button.frame = CGRectMake(70, 340, 50, 40);
+        button.frame = CGRectMake(60, 340, 50, 40);
         [button addTarget:self action:@selector(playAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
@@ -87,7 +87,7 @@
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [button setTitle:@"pause" forState:UIControlStateNormal];
         [self.view addSubview:button];
-        button.frame = CGRectMake(130, 340, 50, 40);
+        button.frame = CGRectMake(110, 340, 50, 40);
         [button addTarget:self action:@selector(pauseAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
@@ -95,8 +95,16 @@
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [button setTitle:@"dismiss" forState:UIControlStateNormal];
         [self.view addSubview:button];
-        button.frame = CGRectMake(190, 340, 60, 40);
+        button.frame = CGRectMake(160, 340, 60, 40);
         [button addTarget:self action:@selector(dismissAction:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [button setTitle:@"loadErr" forState:UIControlStateNormal];
+        [self.view addSubview:button];
+        button.frame = CGRectMake(220, 340, 60, 40);
+        [button addTarget:self action:@selector(loadErrAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
     {
@@ -150,9 +158,6 @@
     NSLog(@"[PRESS] loadAction");
     self.player.cacheSupportEnabled = self.cacheSwitch.on;
     [self.player loadVideoWithStreamURL:kTestVideoURL];
-    //    LLVideoTrack *track = [[LLVideoTrack alloc] initWithStreamURL:url];
-    //    track.lastWatchedDuration = @(40);
-    //    [self.player loadVideoWithTrack:track];
 }
 
 - (void)playAction:(id)sender
@@ -168,8 +173,16 @@
 - (void)dismissAction:(id)sender
 {
     [self.player dismissContent];
+}
+
+- (void)loadErrAction:(id)sender
+{
+    NSLog(@"[PRESS] loadErrAction");
+    self.player.cacheSupportEnabled = self.cacheSwitch.on;
+    [self.player loadVideoWithStreamURL:kTestVideoURL];
     
-    [self createPlayer];
+    // Testing dismiss right after loading
+    [self.player dismissContent];
 }
 
 - (void)sliderTouchUpInside:(UISlider *)sender
@@ -186,7 +199,7 @@
 - (void)clearAction:(id)sender
 {
     [LLVideoPlayer clearAllCache];
-    NSLog(@"Claear Cache.");
+    NSLog(@"Clear Cache.");
 }
 
 - (void)preloadAction:(id)sender
@@ -209,42 +222,35 @@
 #pragma mark - State Changed
 - (BOOL)shouldVideoPlayer:(LLVideoPlayer *)videoPlayer changeStateTo:(LLVideoPlayerState)state
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
     return YES;
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer willChangeStateTo:(LLVideoPlayerState)state
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didChangeStateFrom:(LLVideoPlayerState)state
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
     self.stateLabel.text = [LLVideoPlayerHelper playerStateToString:self.player.state];
 }
 
 #pragma mark - Play Control
 - (BOOL)shouldVideoPlayer:(LLVideoPlayer *)videoPlayer startVideo:(LLVideoTrack *)track
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
     return YES;
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer willStartVideo:(LLVideoTrack *)track
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didStartVideo:(LLVideoTrack *)track
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
     self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[track.totalDuration floatValue]];
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(LLVideoTrack *)track time:(NSTimeInterval)time
 {
-//    NSLog(@"%@", NSStringFromSelector(_cmd));
     self.currentTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:time];
     self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[track.totalDuration floatValue]];
     self.slider.value = time / [track.totalDuration doubleValue];
@@ -252,20 +258,15 @@
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track
 {
-    if (track.isCacheComplete) {
-        NSLog(@"::Cache Complete!!!");
-    }
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayToEnd:(LLVideoTrack *)track
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 #pragma mark - Error
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error track:(LLVideoTrack *)track
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 @end

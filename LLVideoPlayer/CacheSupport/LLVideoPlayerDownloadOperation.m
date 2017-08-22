@@ -7,7 +7,7 @@
 //
 
 #import "LLVideoPlayerDownloadOperation.h"
-#import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "NSURLResponse+LLVideoPlayer.h"
 #import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerCacheUtils.h"
 

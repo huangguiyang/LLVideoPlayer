@@ -9,7 +9,7 @@
 #import "LLVideoPlayerDownloadFile.h"
 #import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerCacheUtils.h"
-#import "NSHTTPURLResponse+LLVideoPlayer.h"
+#import "NSURLResponse+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
 
 #define kAllHeaderFieldsKey @"allHeaderFields"
