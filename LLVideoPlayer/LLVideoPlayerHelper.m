@@ -73,12 +73,3 @@ void ll_run_on_ui_thread(dispatch_block_t block)
         dispatch_sync(dispatch_get_main_queue(), block);
     }
 }
-
-void ll_run_on_non_ui_thread(dispatch_block_t block)
-{
-    if ([NSThread isMainThread]) {
-        dispatch_async(dispatch_get_global_queue(0, 0), block);
-    } else {
-        block();
-    }
-}

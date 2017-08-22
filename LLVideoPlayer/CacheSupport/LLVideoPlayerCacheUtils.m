@@ -58,3 +58,12 @@ NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest
                                               loadingRequest.dataRequest.requestedLength))];
     }
 }
+
+void ll_run_on_non_ui_thread(dispatch_block_t block)
+{
+    if ([NSThread isMainThread]) {
+        dispatch_async(dispatch_get_global_queue(0, 0), block);
+    } else {
+        block();
+    }
+}

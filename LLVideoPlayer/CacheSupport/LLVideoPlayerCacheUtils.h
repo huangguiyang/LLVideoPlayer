@@ -30,3 +30,5 @@ FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeHeader(NSRange range);
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length);
 
 FOUNDATION_EXTERN NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest);
+
+void ll_run_on_non_ui_thread(dispatch_block_t);

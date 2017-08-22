@@ -13,7 +13,6 @@
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerDownloader.h"
-#import "LLVideoPlayerHelper.h"
 
 @interface LLVideoPlayerCacheFile () {
     NSInteger _fileLength;
