@@ -41,14 +41,8 @@
     return [[self alloc] initWithLoadingRequest:loadingRequest cacheFile:cacheFile];
 }
 
-- (void)dealloc
-{
-    LLLog(@"dealloc %@", self);
-}
-
 - (void)resume
 {
-    LLLog(@"resume %@", self);
     @synchronized (self) {
         [self startOperation];
     }
@@ -62,14 +56,12 @@
             [task cancel];
         }
     }
-    LLLog(@"cancel %@", self);
 }
 
 #pragma mark - LLVideoPlayerCacheTaskDelegate
 
 - (void)taskDidFinish:(LLVideoPlayerCacheTask *)task
 {
-    LLLog(@"[TASK FINISH] %@", task);
     @synchronized (self) {
         [self.taskQueue removeObject:task];
         if (self.taskQueue.count == 0) {
@@ -88,7 +80,6 @@
 
 - (void)task:(LLVideoPlayerCacheTask *)task didFailWithError:(NSError *)error
 {
-    LLLog(@"[TASK FAIL] %@, %@", task, error);
     @synchronized (self) {
         [self.taskQueue removeObject:task];
         if ([task isCancelled] || error.code == NSURLErrorCancelled) {

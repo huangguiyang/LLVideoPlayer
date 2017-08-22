@@ -9,7 +9,7 @@
 #ifndef LLVideoPlayerInternal_h
 #define LLVideoPlayerInternal_h
 
-#ifdef DEBUG
+#if defined DEBUG
 #define LLLog(...)  NSLog(__VA_ARGS__)
 #else
 #define LLLog(...)

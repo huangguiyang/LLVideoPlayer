@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"http://sc.seeyouyima.com/baby_android_1071507658_1502679433873_540_303.mp4"]
+#define kTestVideoURL [NSURL URLWithString:@"http://baobab.wdjcdn.com/1456665467509qingshu.mp4"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 
@@ -44,7 +44,7 @@
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [button setTitle:@"preload" forState:UIControlStateNormal];
         [self.view addSubview:button];
-        button.frame = CGRectMake(100, 30, 80, 40);
+        button.frame = CGRectMake(100, 30, 60, 40);
         [button addTarget:self action:@selector(preloadAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
@@ -52,8 +52,16 @@
         UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [button setTitle:@"clear" forState:UIControlStateNormal];
         [self.view addSubview:button];
-        button.frame = CGRectMake(200, 30, 80, 40);
+        button.frame = CGRectMake(160, 30, 60, 40);
         [button addTarget:self action:@selector(clearAction:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [button setTitle:@"destroy" forState:UIControlStateNormal];
+        [self.view addSubview:button];
+        button.frame = CGRectMake(220, 30, 60, 40);
+        [button addTarget:self action:@selector(destroyAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
     {
@@ -183,6 +191,14 @@
     
     // Testing dismiss right after loading
     [self.player dismissContent];
+}
+
+- (void)destroyAction:(id)sender
+{
+    NSLog(@"[PRESS] destroyAction");
+    self.player.delegate = nil;
+    [self.player.view removeFromSuperview];
+    self.player = nil;
 }
 
 - (void)sliderTouchUpInside:(UISlider *)sender

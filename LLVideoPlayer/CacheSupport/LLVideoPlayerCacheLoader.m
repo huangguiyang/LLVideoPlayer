@@ -27,7 +27,6 @@
 
 - (void)dealloc
 {
-    LLLog(@"dealloc %@", self);
     for (LLVideoPlayerCacheOperation *operation in self.operationQueue) {
         [operation cancel];
     }
