@@ -2,16 +2,23 @@
 //  LLVideoPlayerCacheOperation.h
 //  Pods
 //
-//  Created by mario on 2017/6/8.
+//  Created by mario on 2017/8/21.
 //
 //
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LLVideoPlayerCacheFile.h"
-#import "LLVideoPlayerBasicOperation.h"
 
-@interface LLVideoPlayerCacheOperation : LLVideoPlayerBasicOperation
+@class LLVideoPlayerCacheOperation;
+@protocol LLVideoPlayerCacheOperationDelegate <NSObject>
+
+- (void)operationDidFinish:(LLVideoPlayerCacheOperation *)operation;
+- (void)operation:(LLVideoPlayerCacheOperation *)operation didFailWithError:(NSError *)error;
+
+@end
+
+@interface LLVideoPlayerCacheOperation : NSObject
 
 - (instancetype)initWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
                              cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
@@ -20,5 +27,9 @@
                                   cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
 
 @property (nonatomic, strong, readonly) AVAssetResourceLoadingRequest *loadingRequest;
+@property (nonatomic, weak) id<LLVideoPlayerCacheOperationDelegate> delegate;
+
+- (void)resume;
+- (void)cancel;
 
 @end

@@ -2,7 +2,7 @@
 //  LLVideoPlayerCacheRemoteTask.m
 //  Pods
 //
-//  Created by mario on 2017/6/23.
+//  Created by mario on 2017/8/21.
 //
 //
 
@@ -19,7 +19,6 @@
     NSURLConnection *_connection;
     NSInteger _offset;
     NSMutableData *_mutableData;
-    CFRunLoopRef _runLoop;
 }
 
 @end
@@ -31,15 +30,14 @@
     [_connection cancel];
 }
 
-- (void)main
+- (void)resume
 {
-    @autoreleasepool {
+    LLLog(@"resume %@", self);
+    dispatch_async(dispatch_get_main_queue(), ^{
         @synchronized (self) {
             if ([self isCancelled]) {
                 return;
             }
-            
-            [self setExecuting:YES];
             
             NSMutableURLRequest *request = [self.loadingRequest.request mutableCopy];
             request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
@@ -56,37 +54,18 @@
             _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
             [_connection start];
         }
-        
-        [self startRunLoop];
-        
-        [self setExecuting:NO];
-        [self setFinished:YES];
-    }
+    });
 }
 
 - (void)cancel
 {
     @synchronized (self) {
-        [super cancel];
         [_connection cancel];
         _connection = nil;
+        [super cancel];
     }
-    
     [self synchronizeIfNeeded];
-}
-
-- (void)startRunLoop
-{
-    _runLoop = CFRunLoopGetCurrent();
-    CFRunLoopRun();
-}
-
-- (void)stopRunLoop
-{
-    if (_runLoop) {
-        CFRunLoopStop(_runLoop);
-        _runLoop = NULL;
-    }
+    LLLog(@"cancel %@", self);
 }
 
 - (void)synchronizeIfNeeded
@@ -105,15 +84,18 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    self.error = error;
     [self synchronizeIfNeeded];
-    [self stopRunLoop];
+    if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
+        [self.delegate task:self didFailWithError:error];
+    }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     [self synchronizeIfNeeded];
-    [self stopRunLoop];
+    if ([self.delegate respondsToSelector:@selector(taskDidFinish:)]) {
+        [self.delegate taskDidFinish:self];
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response

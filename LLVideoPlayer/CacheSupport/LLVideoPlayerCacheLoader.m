@@ -14,10 +14,10 @@
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheOperation.h"
 
-@interface LLVideoPlayerCacheLoader ()
+@interface LLVideoPlayerCacheLoader () <LLVideoPlayerCacheOperationDelegate>
 
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
-@property (nonatomic, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, strong) NSMutableArray *operationQueue;
 
 @end
 
@@ -27,7 +27,10 @@
 
 - (void)dealloc
 {
-    [self.operationQueue cancelAllOperations];
+    LLLog(@"dealloc %@", self);
+    for (LLVideoPlayerCacheOperation *operation in self.operationQueue) {
+        [operation cancel];
+    }
 }
 
 + (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
@@ -42,11 +45,7 @@
         NSString *name = [url.absoluteString ll_md5];
         NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
         self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
-        self.operationQueue = [[NSOperationQueue alloc] init];
-        [self.operationQueue setName:@"LLVideoPlayerCacheOperationQueue"];
-        if ([self.operationQueue respondsToSelector:@selector(setQualityOfService:)]) {
-            self.operationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        }
+        self.operationQueue = [[NSMutableArray alloc] initWithCapacity:4];
     }
     return self;
 }
@@ -61,15 +60,18 @@
 - (void)startLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     LLVideoPlayerCacheOperation *operation = [LLVideoPlayerCacheOperation operationWithLoadingRequest:loadingRequest cacheFile:self.cacheFile];
-    [self.operationQueue addOperation:operation];
+    [self.operationQueue addObject:operation];
+    [operation resume];
 }
 
 - (void)cancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    NSArray *operations = [NSArray arrayWithArray:self.operationQueue.operations];
-    for (LLVideoPlayerCacheOperation *operation in operations) {
+    for (NSInteger i = 0; i < self.operationQueue.count; i++) {
+        LLVideoPlayerCacheOperation *operation = self.operationQueue[i];
         if (operation.loadingRequest == loadingRequest) {
             [operation cancel];
+            [self.operationQueue removeObjectAtIndex:i];
+            i--;
         }
     }
 }

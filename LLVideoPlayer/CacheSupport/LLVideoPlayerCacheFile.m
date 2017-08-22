@@ -464,8 +464,7 @@
 {
     @synchronized (self) {
         [self saveIndexFile];
-        LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@, headers: %@}",
-              _fileLength, self.ranges, self.allHeaderFields);
+        LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@}", _fileLength, self.ranges);
     }
 }
 

@@ -2,12 +2,19 @@
 //  LLVideoPlayerCacheTask.m
 //  Pods
 //
-//  Created by mario on 2017/6/23.
+//  Created by mario on 2017/8/21.
 //
 //
 
 #import "LLVideoPlayerCacheTask.h"
 #import "LLVideoPlayerInternal.h"
+
+@interface LLVideoPlayerCacheTask ()
+{
+    BOOL _cancel;
+}
+
+@end
 
 @implementation LLVideoPlayerCacheTask
 
@@ -31,10 +38,33 @@
     return [[self alloc] initWithRequest:loadingRequest range:range cacheFile:cacheFile];
 }
 
-- (NSString *)description
+- (void)dealloc
 {
-    return [NSString stringWithFormat:@"%@<%p>: %@",
-            NSStringFromClass([self class]), self, NSStringFromRange(self.range)];
+    LLLog(@"dealloc %@", self);
+}
+
+- (void)resume
+{
+}
+
+- (void)cancel
+{
+    @synchronized (self) {
+        if (NO == _cancel) {
+            _cancel = YES;
+            if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
+                [self.delegate task:self didFailWithError:
+                 [NSError errorWithDomain:@"LLVideoPlayerCacheTask" code:NSURLErrorCancelled userInfo:nil]];
+            }
+        }
+    }
+}
+
+- (BOOL)isCancelled
+{
+    @synchronized (self) {
+        return _cancel;
+    }
 }
 
 @end
