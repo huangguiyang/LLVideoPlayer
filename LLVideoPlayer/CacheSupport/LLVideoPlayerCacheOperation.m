@@ -135,9 +135,6 @@
     
     task.delegate = self;
     [self.taskQueue addObject:task];
-    
-    LLLog(@"[ADD] %@", task);
-    
     return task;
 }
 

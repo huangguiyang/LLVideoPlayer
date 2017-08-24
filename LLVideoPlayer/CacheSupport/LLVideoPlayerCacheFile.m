@@ -438,7 +438,6 @@
     }
     @synchronized (self) {
         if (nil == _response) {
-            LLLog(@"didReceiveResponse: %@ <%@>", response, [NSThread currentThread]);
             [loadingRequest ll_fillContentInformation:response];
             // save local
             [self writeResponse:(NSHTTPURLResponse *)response];
@@ -466,7 +465,6 @@
     ll_run_on_non_ui_thread(^{
         @synchronized (self) {
             [self saveIndexFile];
-            LLLog(@"[Synchronize] {fileLength: %lu, ranges: %@}", _fileLength, self.ranges);
         }
     });
 }

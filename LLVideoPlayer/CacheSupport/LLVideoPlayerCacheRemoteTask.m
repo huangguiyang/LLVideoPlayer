@@ -128,8 +128,6 @@
 
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response
 {
-    LLLog(@"[WRN] redirect... %@", response);
-    
     if (response) {
         self.loadingRequest.redirect = request;
     }

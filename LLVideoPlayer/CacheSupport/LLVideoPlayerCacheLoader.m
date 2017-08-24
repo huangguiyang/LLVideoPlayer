@@ -58,14 +58,12 @@
 
 - (void)operationDidFinish:(LLVideoPlayerCacheOperation *)operation
 {
-    LLLog(@"[COMPLETE] %@", operation);
     [operation.loadingRequest finishLoading];
     [self.operationQueue removeObject:operation];
 }
 
 - (void)operation:(LLVideoPlayerCacheOperation *)operation didFailWithError:(NSError *)error
 {
-    LLLog(@"[FAIL] %@, %@", operation, error);
     [operation.loadingRequest finishLoadingWithError:error];
     [self.operationQueue removeObject:operation];
 }
@@ -96,14 +94,12 @@
 
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLLog(@"[Comming] %@", LLLoadingRequestToString(loadingRequest));
     [self startLoadingRequest:loadingRequest];
     return YES;
 }
 
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLLog(@"[Cancel] %@", LLLoadingRequestToString(loadingRequest));
     [self cancelLoadingRequest:loadingRequest];
 }
 
