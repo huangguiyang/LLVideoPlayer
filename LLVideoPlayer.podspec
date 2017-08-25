@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'LLVideoPlayer'
   s.version          = '0.8.1'
-  s.summary          = 'A Low Level Video Player.'
+  s.summary          = 'A low level, flexible video player based on AVPlayer for iOS.'
 
   s.description      = <<-DESC
 LLVideoPlayer is a low level video player which is simple and easy to extend.
