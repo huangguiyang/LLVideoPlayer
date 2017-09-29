@@ -304,7 +304,17 @@ typedef void (^VoidBlock) (void);
 
 - (BOOL)sessionCacheEnabled
 {
-    return self.cacheSupportEnabled && NO == [self.track.streamURL isFileURL];
+    if (NO == self.cacheSupportEnabled) {
+        return NO;
+    }
+    if ([self.track.streamURL isFileURL]) {
+        return NO;
+    }
+    NSString *ext = [[self.track.streamURL pathExtension] lowercaseString];
+    if ([ext isEqualToString:@"m3u8"]) {
+        return NO;
+    }
+    return YES;
 }
 
 - (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerLayerView *)playerLayerView track:(LLVideoTrack *)track
