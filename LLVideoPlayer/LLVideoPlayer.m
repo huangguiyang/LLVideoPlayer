@@ -23,6 +23,7 @@ typedef void (^VoidBlock) (void);
 
 @property (nonatomic, strong) id avTimeObserver;
 @property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
+@property (nonatomic, strong) NSMutableSet *failingURLs;
 
 @end
 
@@ -312,6 +313,9 @@ typedef void (^VoidBlock) (void);
     }
     NSString *ext = [[self.track.streamURL pathExtension] lowercaseString];
     if ([ext isEqualToString:@"m3u8"]) {
+        return NO;
+    }
+    if ([self.failingURLs containsObject:self.track.streamURL]) {
         return NO;
     }
     return YES;
@@ -668,12 +672,26 @@ typedef void (^VoidBlock) (void);
 - (void)handleErrorCode:(LLVideoPlayerError)errorCode track:(LLVideoTrack *)track
 {
     LLLog(@"[ERROR] %@: %@", [LLVideoPlayerHelper errorCodeToString:errorCode], track);
+    [self addFailingURL:track.streamURL];
     if (errorCode == LLVideoPlayerErrorAssetLoadError) {
         [LLVideoPlayer removeCacheForURL:track.streamURL];
     }
     if ([self.delegate respondsToSelector:@selector(videoPlayer:didFailWithError:)]) {
         [self.delegate videoPlayer:self didFailWithError:[NSError errorWithDomain:@"LLVideoPlayer" code:errorCode userInfo:@{@"track":track}]];
     }
+}
+
+- (void)addFailingURL:(NSURL *)url {
+    if (nil == url) {
+        return;
+    }
+    if (nil == self.failingURLs) {
+        self.failingURLs = [NSMutableSet set];
+    }
+    if (self.failingURLs.count > 64) {
+        [self.failingURLs removeAllObjects];
+    }
+    [self.failingURLs addObject:url];
 }
 
 #pragma mark - Misc
