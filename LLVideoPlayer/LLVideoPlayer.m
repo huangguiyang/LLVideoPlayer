@@ -404,6 +404,9 @@ typedef void (^VoidBlock) (void);
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:AVPlayerItemDidPlayToEndTimeNotification
                                                       object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:AVPlayerItemPlaybackStalledNotification
+                                                      object:nil];
         _avPlayerItem = avPlayerItem;
         if (avPlayerItem) {
             [avPlayerItem addObserver:self forKeyPath:@"status" options:0 context:nil];
@@ -413,6 +416,10 @@ typedef void (^VoidBlock) (void);
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(playerDidPlayToEnd:)
                                                          name:AVPlayerItemDidPlayToEndTimeNotification
+                                                       object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(playItemPlaybackStall:)
+                                                         name:AVPlayerItemPlaybackStalledNotification
                                                        object:nil];
         }
     }
@@ -582,21 +589,38 @@ typedef void (^VoidBlock) (void);
 
 - (void)playerDidPlayToEnd:(NSNotification *)note
 {
-    LLLog(@"playerDidPlayToEnd: %@", note);
-    AVPlayerItem *finishedItem = (AVPlayerItem *)note.object;
-    if (finishedItem == self.avPlayerItem) {
-        // is current player's item
-        ll_run_on_ui_thread(^{
-            [self clearPlayer];
-            self.track.isPlayedToEnd = YES;
-            self.state = LLVideoPlayerStateUnknown;
-            if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
-                [self.delegate videoPlayer:self didPlayToEnd:self.track];
-            }
-        });
-    } else {
+    LLLog(@"playerDidPlayToEnd: %@", note.object);
+    AVPlayerItem *finishedItem = note.object;
+    if (NO == [finishedItem isEqual:self.avPlayerItem]) {
         LLLog(@"[WRN] finished playerItem of another AVPlayer");
+        return;
     }
+    
+    // is current player's item
+    ll_run_on_ui_thread(^{
+        [self clearPlayer];
+        self.track.isPlayedToEnd = YES;
+        self.state = LLVideoPlayerStateUnknown;
+        if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
+            [self.delegate videoPlayer:self didPlayToEnd:self.track];
+        }
+    });
+}
+
+- (void)playItemPlaybackStall:(NSNotification *)note
+{
+    LLLog(@"playItemPlaybackStall: %@", note.object);
+    AVPlayerItem *stallItem = note.object;
+    if (NO == [stallItem isEqual:self.avPlayerItem]) {
+        LLLog(@"[WRN] stall playerItem of another AVPlayer");
+        return;
+    }
+    
+    ll_run_on_ui_thread(^{
+        if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackStall:)]) {
+            [self.delegate videoPlayer:self playbackStall:self.track];
+        }
+    });
 }
 
 #pragma mark - State Changed
