@@ -62,6 +62,7 @@
 + (void)cancelPreloadWithURL:(NSURL *)url;
 + (void)cancelAllPreloads;
 
++ (NSString *)cachePathForURL:(NSURL *)url;
 + (BOOL)isCacheComplete:(NSURL *)url;
 
 + (NSString *)cacheDirectory;

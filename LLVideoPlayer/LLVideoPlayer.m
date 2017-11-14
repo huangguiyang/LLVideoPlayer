@@ -798,6 +798,20 @@ typedef void (^VoidBlock) (void);
     [[LLVideoPlayerDownloader defaultDownloader] cancelAllPreloads];
 }
 
++ (NSString *)cachePathForURL:(NSURL *)url
+{
+    if (nil == url) {
+        return nil;
+    }
+    if ([url isFileURL]) {
+        return [url absoluteString];
+    }
+    NSString *name = [url.absoluteString ll_md5];
+    NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+    LLVideoPlayerCacheFile *cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:nil];
+    return [cacheFile isComplete] ? path : nil;
+}
+
 + (BOOL)isCacheComplete:(NSURL *)url
 {
     if (nil == url) {
