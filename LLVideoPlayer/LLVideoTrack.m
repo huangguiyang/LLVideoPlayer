@@ -35,6 +35,9 @@
     self = [super init];
     if (self) {
         self.streamURL = streamURL;
+        if ([streamURL isFileURL]) {
+            self.isCacheComplete = YES;
+        }
     }
     return self;
 }
