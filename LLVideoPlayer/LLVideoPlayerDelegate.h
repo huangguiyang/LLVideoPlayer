@@ -10,7 +10,6 @@
 #import "LLVideoPlayerDefines.h"
 
 @class LLVideoPlayer;
-@class LLVideoTrack;
 
 /// LLVideoPlayerDelegate
 
@@ -24,21 +23,21 @@
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didChangeStateFrom:(LLVideoPlayerState)state;
 
 #pragma mark - Play Control
-- (BOOL)shouldVideoPlayer:(LLVideoPlayer *)videoPlayer startVideo:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer willStartVideo:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didStartVideo:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(LLVideoTrack *)track time:(NSTimeInterval)time;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayToEnd:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer willContinuePlaying:(LLVideoTrack *)track;
+- (BOOL)shouldVideoPlayerStartVideo:(LLVideoPlayer *)videoPlayer;
+- (void)videoPlayerWillStartVideo:(LLVideoPlayer *)videoPlayer;
+- (void)videoPlayerDidStartVideo:(LLVideoPlayer *)videoPlayer;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(NSTimeInterval)time;
+- (void)videoPlayerDidPlayToEnd:(LLVideoPlayer *)videoPlayer;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges;
+- (void)videoPlayerWillContinuePlaying:(LLVideoPlayer *)videoPlayer;
 
 #pragma mark - Error
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error;
 
 #pragma mark - 
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty track:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp track:(LLVideoTrack *)track;
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackStall:(LLVideoTrack *)track;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(NSNumber *)duration;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp;
+- (void)videoPlayerPlaybackStalled:(LLVideoPlayer *)videoPlayer;
 
 @end

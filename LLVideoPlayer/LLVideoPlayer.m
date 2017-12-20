@@ -258,8 +258,8 @@ typedef void (^VoidBlock) (void);
     ll_run_on_ui_thread(^{
         float lastWatchedTime = [self.track.lastWatchedDuration floatValue];
         if (lastWatchedTime > 0) {
-            if ([self.delegate respondsToSelector:@selector(videoPlayer:willContinuePlaying:)]) {
-                [self.delegate videoPlayer:self willContinuePlaying:self.track];
+            if ([self.delegate respondsToSelector:@selector(videoPlayerWillContinuePlaying:)]) {
+                [self.delegate videoPlayerWillContinuePlaying:self];
             }
         }
         
@@ -283,8 +283,8 @@ typedef void (^VoidBlock) (void);
 
 - (void)playVideoTrack:(LLVideoTrack *)track
 {
-    if ([self.delegate respondsToSelector:@selector(shouldVideoPlayer:startVideo:)]) {
-        if (NO == [self.delegate shouldVideoPlayer:self startVideo:track]) {
+    if ([self.delegate respondsToSelector:@selector(shouldVideoPlayerStartVideo:)]) {
+        if (NO == [self.delegate shouldVideoPlayerStartVideo:self]) {
             return;
         }
     }
@@ -497,8 +497,8 @@ typedef void (^VoidBlock) (void);
             if (self.state == LLVideoPlayerStateContentPlaying &&
                 [self currentTime] > 0 &&
                 [self currentTime] < [self.avPlayer ll_currentItemDuration] - 1) {
-                if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:track:)]) {
-                    [self.delegate videoPlayer:self playbackBufferEmpty:self.avPlayerItem.playbackBufferEmpty track:self.track];
+                if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackBufferEmpty:)]) {
+                    [self.delegate videoPlayer:self playbackBufferEmpty:self.avPlayerItem.playbackBufferEmpty];
                 }
             }
         }
@@ -508,8 +508,8 @@ typedef void (^VoidBlock) (void);
         if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
             LLLog(@"playbackLikelyToKeepUp: %@", self.avPlayerItem.playbackLikelyToKeepUp ? @"YES" : @"NO");
             if (self.state == LLVideoPlayerStateContentPlaying) {
-                if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:track:)]) {
-                    [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.avPlayerItem.playbackLikelyToKeepUp track:self.track];
+                if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:)]) {
+                    [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.avPlayerItem.playbackLikelyToKeepUp];
                 }
                 if (self.avPlayerItem.playbackLikelyToKeepUp && NO == [self isPlayingVideo]) {
                     [self.avPlayer play];
@@ -519,8 +519,8 @@ typedef void (^VoidBlock) (void);
         
         /// loadedTimeRanges
         if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
-            if ([self.delegate respondsToSelector:@selector(videoPlayer:loadedTimeRanges:track:)]) {
-                [self.delegate videoPlayer:self loadedTimeRanges:self.avPlayerItem.loadedTimeRanges track:self.track];
+            if ([self.delegate respondsToSelector:@selector(videoPlayer:loadedTimeRanges:)]) {
+                [self.delegate videoPlayer:self loadedTimeRanges:self.avPlayerItem.loadedTimeRanges];
             }
         }
     }
@@ -534,16 +534,16 @@ typedef void (^VoidBlock) (void);
         switch (self.state) {
             case LLVideoPlayerStateContentLoading:
             case LLVideoPlayerStateError: {
-                if ([self.delegate respondsToSelector:@selector(videoPlayer:willStartVideo:)]) {
-                    [self.delegate videoPlayer:self willStartVideo:self.track];
+                if ([self.delegate respondsToSelector:@selector(videoPlayerWillStartVideo:)]) {
+                    [self.delegate videoPlayerWillStartVideo:self];
                 }
                 
                 [self seekToLastWatchedDuration:^(BOOL finished) {
                     if (finished) {
                         [self startContent];
                         
-                        if ([self.delegate respondsToSelector:@selector(videoPlayer:didStartVideo:)]) {
-                            [self.delegate videoPlayer:self didStartVideo:self.track];
+                        if ([self.delegate respondsToSelector:@selector(videoPlayerDidStartVideo:)]) {
+                            [self.delegate videoPlayerDidStartVideo:self];
                         }
                     }
                 }];
@@ -576,13 +576,13 @@ typedef void (^VoidBlock) (void);
         if (nil == self.track.totalDuration) {
             self.track.totalDuration = [NSNumber numberWithFloat:[self.avPlayer ll_currentItemDuration]];
             if ([self.delegate respondsToSelector:@selector(videoPlayer:durationDidLoad:)]) {
-                [self.delegate videoPlayer:self durationDidLoad:self.track];
+                [self.delegate videoPlayer:self durationDidLoad:self.track.totalDuration];
             }
         }
     }
     
-    if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayFrame:time:)]) {
-        [self.delegate videoPlayer:self didPlayFrame:self.track time:timeInSeconds];
+    if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayFrame:)]) {
+        [self.delegate videoPlayer:self didPlayFrame:timeInSeconds];
     }
 }
 
@@ -600,8 +600,8 @@ typedef void (^VoidBlock) (void);
         [self clearPlayer];
         self.track.isPlayedToEnd = YES;
         self.state = LLVideoPlayerStateUnknown;
-        if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayToEnd:)]) {
-            [self.delegate videoPlayer:self didPlayToEnd:self.track];
+        if ([self.delegate respondsToSelector:@selector(videoPlayerDidPlayToEnd:)]) {
+            [self.delegate videoPlayerDidPlayToEnd:self];
         }
     });
 }
@@ -616,8 +616,8 @@ typedef void (^VoidBlock) (void);
     }
     
     ll_run_on_ui_thread(^{
-        if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackStall:)]) {
-            [self.delegate videoPlayer:self playbackStall:self.track];
+        if ([self.delegate respondsToSelector:@selector(videoPlayerPlaybackStalled:)]) {
+            [self.delegate videoPlayerPlaybackStalled:self];
         }
     });
 }
