@@ -331,7 +331,6 @@ typedef void (^VoidBlock) (void);
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL] options:nil];
         self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:streamURL cachePolicy:self.cachePolicy];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
-        track.isCacheComplete = [self.resourceLoader isCacheComplete];
     } else {
         asset = [[AVURLAsset alloc] initWithURL:streamURL options:nil];
     }

@@ -18,11 +18,10 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p> streamURL: %@, totalDuration: %@, lastWatchedDuration: %@, isPlayedToEnd: %@, isCacheComplete: %@",
+    return [NSString stringWithFormat:@"<%@: %p> streamURL: %@, totalDuration: %@, lastWatchedDuration: %@, isPlayedToEnd: %@",
             NSStringFromClass([self class]), self,
             self.streamURL, self.totalDuration, self.lastWatchedDuration,
-            self.isPlayedToEnd ? @"YES" : @"NO",
-            self.isCacheComplete ? @"YES" : @"NO"];
+            self.isPlayedToEnd ? @"YES" : @"NO"];
 }
 
 - (instancetype)init
@@ -35,9 +34,6 @@
     self = [super init];
     if (self) {
         self.streamURL = streamURL;
-        if ([streamURL isFileURL]) {
-            self.isCacheComplete = YES;
-        }
     }
     return self;
 }
