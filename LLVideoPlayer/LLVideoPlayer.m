@@ -311,8 +311,7 @@ typedef void (^VoidBlock) (void);
     if ([self.track.streamURL isFileURL]) {
         return NO;
     }
-    NSString *ext = [[self.track.streamURL pathExtension] lowercaseString];
-    if ([ext isEqualToString:@"m3u8"]) {
+    if ([self.track.streamURL ll_m3u8]) {
         return NO;
     }
     if ([self.failingURLs containsObject:self.track.streamURL]) {
@@ -802,6 +801,9 @@ typedef void (^VoidBlock) (void);
     if (nil == url) {
         return nil;
     }
+    if ([url ll_m3u8]) {
+        return nil;
+    }
     if ([url isFileURL]) {
         return [url absoluteString];
     }
@@ -814,6 +816,9 @@ typedef void (^VoidBlock) (void);
 + (BOOL)isCacheComplete:(NSURL *)url
 {
     if (nil == url) {
+        return NO;
+    }
+    if ([url ll_m3u8]) {
         return NO;
     }
     if ([url isFileURL]) {

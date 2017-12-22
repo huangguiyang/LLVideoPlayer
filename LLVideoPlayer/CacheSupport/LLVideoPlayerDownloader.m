@@ -12,6 +12,7 @@
 #import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerDownloadOperation.h"
 #import "LLVideoPlayerCacheUtils.h"
+#import "NSURL+LLVideoPlayer.h"
 
 @interface LLVideoPlayerDownloader ()
 
@@ -72,7 +73,7 @@
 
 - (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
 {
-    if ([[[url pathExtension] lowercaseString] isEqualToString:@"m3u8"]) {
+    if ([url ll_m3u8]) {
         LLLog(@"[ERROR] m3u8 file ignore");
         return;
     }

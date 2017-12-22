@@ -32,4 +32,9 @@ static NSString *const kCustomSchemePrefix = @"ll-";
     return [components URL];
 }
 
+- (BOOL)ll_m3u8
+{
+    return [[[self pathExtension] lowercaseString] isEqualToString:@"m3u8"];
+}
+
 @end

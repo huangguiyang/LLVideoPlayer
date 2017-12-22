@@ -14,4 +14,6 @@
 
 - (NSURL *)ll_originalSchemeURL;
 
+- (BOOL)ll_m3u8;
+
 @end
