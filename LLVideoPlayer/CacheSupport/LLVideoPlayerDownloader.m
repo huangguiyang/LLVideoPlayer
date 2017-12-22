@@ -72,6 +72,11 @@
 
 - (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
 {
+    if ([[[url pathExtension] lowercaseString] isEqualToString:@"m3u8"]) {
+        LLLog(@"[ERROR] m3u8 file ignore");
+        return;
+    }
+    
     LLVideoPlayerDownloadFile *file = [LLVideoPlayerDownloader downloadFileWithURL:url];
     if (nil == file) {
         LLLog(@"[ERROR] can't create cache file");
