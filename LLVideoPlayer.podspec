@@ -17,12 +17,7 @@ LLVideoPlayer is a low level video player which is simple and easy to extend.
   s.public_header_files = 'LLVideoPlayer/*.h'
   s.source_files = 'LLVideoPlayer/*.{m,h}'
 
-  s.subspec 'Private' do |ss|
-	ss.source_files = 'LLVideoPlayer/Private'
-  end
-
   s.subspec 'CacheSupport' do |ss|
-    ss.dependency 'LLVideoPlayer/Private'
 	ss.source_files = 'LLVideoPlayer/CacheSupport'
   end
 
