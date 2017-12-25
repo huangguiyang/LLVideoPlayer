@@ -7,7 +7,6 @@
 //
 
 #import "LLVideoPlayerDownloadFile.h"
-#import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSURLResponse+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
@@ -45,7 +44,6 @@
         
         if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir] &&
             NO == [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
-            LLLog(@"[ERROR] Cannot create cache directory: %@", dir);
             return nil;
         }
         
@@ -66,19 +64,16 @@
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:self.indexPath];
         NSDictionary *allHeaderFields = dict[kAllHeaderFieldsKey];
         if (nil == dict || nil == allHeaderFields) {
-            LLLog(@"[ERROR] dict empty: %@", dict);
             return nil;
         }
         
         NSRange range = [allHeaderFields[@"Content-Range"] ll_decodeRangeFromContentRange];
         if (NO == LLValidByteRange(range)) {
-            LLLog(@"[ERROR] decode error");
             return nil;
         }
         
         NSData *data = [NSData dataWithContentsOfFile:self.filePath];
         if (nil == data || data.length != range.length) {
-            LLLog(@"size not equal");
             return nil;
         }
         
@@ -122,7 +117,6 @@
     NSError *error;
     NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:&error];
     if (error) {
-        LLLog(@"[ERR] can't get contents of directory: %@, error: %@", directory, error);
         return;
     }
     
@@ -137,7 +131,6 @@
         error = nil;
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
         if (error) {
-            LLLog(@"[ERR] can't get attributes of file: %@, error: %@", path, error);
             continue;
         }
         if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {

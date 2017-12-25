@@ -8,7 +8,6 @@
 
 #import "LLVideoPlayerDownloadOperation.h"
 #import "NSURLResponse+LLVideoPlayer.h"
-#import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerCacheUtils.h"
 
 @interface LLVideoPlayerDownloadOperation () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
@@ -62,7 +61,6 @@
             [self setExecuting:YES];
             
             if ([self.downloadFile validateCache]) {
-                LLLog(@"[SUCCESS] %@: already cached.", self.url);
                 [self setExecuting:NO];
                 [self setFinished:YES];
                 return;
@@ -118,13 +116,11 @@
 
 - (void)failWithError:(NSError *)error
 {
-    LLLog(@"[FAILED] %@, %@", self.url, error);
     [self stopRunLoop];
 }
 
 - (void)success
 {
-    LLLog(@"[SUCCESS] %@: %lu bytes", self.url, _mutableData.length);
     [self stopRunLoop];
 }
 

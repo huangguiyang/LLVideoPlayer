@@ -9,7 +9,6 @@
 #import "LLVideoPlayerCacheRemoteTask.h"
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
-#import "LLVideoPlayerInternal.h"
 #import "NSURLResponse+LLVideoPlayer.h"
 
 #define MAX_MEM_SIZE (1024 * 1024)
@@ -106,7 +105,6 @@
     [self.cacheFile receivedResponse:response forLoadingRequest:self.loadingRequest];
     
     if (NO == [response ll_supportRange]) {
-        LLLog(@"[ERROR] not support range");
         _offset = 0;
     }
 }

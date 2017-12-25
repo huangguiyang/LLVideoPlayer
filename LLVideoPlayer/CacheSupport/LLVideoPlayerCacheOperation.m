@@ -9,7 +9,6 @@
 #import "LLVideoPlayerCacheOperation.h"
 #import "LLVideoPlayerCacheLocalTask.h"
 #import "LLVideoPlayerCacheRemoteTask.h"
-#import "LLVideoPlayerInternal.h"
 
 @interface LLVideoPlayerCacheOperation () <LLVideoPlayerCacheTaskDelegate>
 {

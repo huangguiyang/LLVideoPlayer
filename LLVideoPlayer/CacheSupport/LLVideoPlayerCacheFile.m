@@ -9,7 +9,6 @@
 #import "LLVideoPlayerCacheFile.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSURLResponse+LLVideoPlayer.h"
-#import "LLVideoPlayerInternal.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerDownloader.h"
@@ -69,19 +68,16 @@
         NSString *dir = [filePath stringByDeletingLastPathComponent];
         if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir] &&
             NO == [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
-            LLLog(@"[ERROR] Cannot create cache directory: %@", dir);
             return nil;
         }
         
         if (NO == [[NSFileManager defaultManager] fileExistsAtPath:self.cacheFilePath] &&
             NO == [[NSFileManager defaultManager] createFileAtPath:self.cacheFilePath contents:nil attributes:nil]) {
-            LLLog(@"[ERROR] Cannot create cache file: %@", self.cacheFilePath);
             return nil;
         }
         
         if (NO == [[NSFileManager defaultManager] fileExistsAtPath:self.indexFilePath] &&
             NO == [[NSFileManager defaultManager] createFileAtPath:self.indexFilePath contents:nil attributes:nil]) {
-            LLLog(@"[ERROR] Cannot create index file: %@", self.cacheFilePath);
             return nil;
         }
         
@@ -91,9 +87,6 @@
         [self loadIndexFileAtStartup];
         [self loadExternalCache];
         [self checkComplete];
-        
-        LLLog(@"[LocalCache] {fileLength: %lu, ranges: %@, headers: %@}",
-              _fileLength, self.ranges, self.allHeaderFields);
     }
     return self;
 }
@@ -111,7 +104,6 @@
         return;
     }
     
-    LLLog(@"Read Download Cache OK.");
     BOOL needToSave = NO;
     
     if (nil == _allHeaderFields) {
@@ -125,8 +117,6 @@
     if (NO == LLValidFileRange(cache)) {
         [self writeData:dict[@"data"] atOffset:range.location];
         needToSave = YES;
-    } else {
-        LLLog(@"Range: %@ already cached.", NSStringFromRange(range));
     }
     
     if (needToSave) {
@@ -142,11 +132,6 @@
     } else {
         _complete = NO;
     }
-#ifdef DEBUG
-    if (_complete) {
-        LLLog(@"Cache Complete!!!");
-    }
-#endif
 }
 
 - (void)loadIndexFileAtStartup
@@ -162,7 +147,6 @@
     NSData *indexData = [NSData dataWithContentsOfFile:self.indexFilePath];
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:indexData options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers error:nil];
     if (nil == dict || NO == [dict isKindOfClass:[NSDictionary class]]) {
-        LLLog(@"[WRN] empty or invalid index file: %@", dict);
         return NO;
     }
     
@@ -240,7 +224,6 @@
                                      code:code
                                  userInfo:@{NSLocalizedDescriptionKey:message}];
     }
-    LLLog(@"[ERROR] can't read range: %@", message);
 }
 
 - (void)addRange:(NSRange)range
@@ -315,7 +298,6 @@
         [self.readFileHandle seekToFileOffset:range.location];
         return [self.readFileHandle readDataOfLength:range.length];
     } @catch (NSException *exception) {
-        LLLog(@"read exception: %@", exception);
         return nil;
     }
 }
@@ -367,11 +349,9 @@
 - (void)writeData:(NSData *)data atOffset:(NSInteger)offset
 {
     if (nil == data || data.length == 0 || nil == self.writeFileHandle) {
-        LLLog(@"[ERROR] write data nil");
         return;
     }
     if (offset > [self fileLength]) {
-        LLLog(@"[ERROR] write data overflow: %ld > %ld", offset, [self fileLength]);
         return;
     }
     
@@ -381,7 +361,6 @@
                 [self.writeFileHandle seekToFileOffset:offset];
                 [self.writeFileHandle writeData:data];
             } @catch (NSException *exception) {
-                LLLog(@"write exception: %@", exception);
                 return;
             }
             
@@ -511,7 +490,6 @@ static uint64_t diskFreeCapacity(void)
     [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
     NSString *index = [path stringByAppendingString:[self indexFileExtension]];
     [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
-    LLLog(@"cache deleted: %@, %@", path, index);
 }
 
 + (void)checkCacheDirectoryWithCachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
@@ -540,7 +518,6 @@ static uint64_t diskFreeCapacity(void)
         error = nil;
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
         if (error) {
-            LLLog(@"[ERR] can't get attributes of file: %@, error: %@", path, error);
             continue;
         }
         if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {

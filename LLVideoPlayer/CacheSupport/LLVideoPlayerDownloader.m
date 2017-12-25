@@ -9,7 +9,6 @@
 #import "LLVideoPlayerDownloader.h"
 #import "LLVideoPlayerDownloadFile.h"
 #import "NSString+LLVideoPlayer.h"
-#import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerDownloadOperation.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSURL+LLVideoPlayer.h"
@@ -74,17 +73,14 @@
 - (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
 {
     if ([url ll_m3u8]) {
-        LLLog(@"[ERROR] m3u8 file ignore");
         return;
     }
     
     LLVideoPlayerDownloadFile *file = [LLVideoPlayerDownloader downloadFileWithURL:url];
     if (nil == file) {
-        LLLog(@"[ERROR] can't create cache file");
         return;
     }
     if (0 == bytes) {
-        LLLog(@"[ERROR] invalid range");
         return;
     }
     

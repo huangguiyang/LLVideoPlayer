@@ -96,11 +96,9 @@ typedef void (^VoidBlock) (void);
             case LLVideoPlayerStateDismissed:
             case LLVideoPlayerStateContentLoading:
             case LLVideoPlayerStateContentPaused:
-                LLLog(@"Reload stream now.");
                 completionHandler();
                 break;
             case LLVideoPlayerStateContentPlaying:
-                LLLog(@"Reload stream after pause.");
                 [self pauseContent:NO completionHandler:completionHandler];
                 break;
             default:
