@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 #import "LLVideoPlayerDefines.h"
 #import "LLVideoPlayerView.h"
 #import "LLVideoTrack.h"
@@ -38,8 +39,8 @@
 #pragma mark - Control
 - (void)playContent;
 - (void)pauseContent;
-- (void)pauseContentWithCompletionHandler:(void (^)())completionHandler;
-- (void)pauseContent:(BOOL)isUserAction completionHandler:(void (^)())completionHandler;
+- (void)pauseContentWithCompletionHandler:(void (^)(void))completionHandler;
+- (void)pauseContent:(BOOL)isUserAction completionHandler:(void (^)(void))completionHandler;
 - (void)dismissContent;
 - (void)seekToTimeInSecond:(float)sec userAction:(BOOL)isUserAction completionHandler:(void (^)(BOOL finished))completionHandler;
 - (void)seekToLastWatchedDuration;

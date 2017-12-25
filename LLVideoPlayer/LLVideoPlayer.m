@@ -134,12 +134,12 @@ typedef void (^VoidBlock) (void);
     [self pauseContent:NO completionHandler:nil];
 }
 
-- (void)pauseContentWithCompletionHandler:(void (^)())completionHandler
+- (void)pauseContentWithCompletionHandler:(void (^)(void))completionHandler
 {
     [self pauseContent:NO completionHandler:completionHandler];
 }
 
-- (void)pauseContent:(BOOL)isUserAction completionHandler:(void (^)())completionHandler
+- (void)pauseContent:(BOOL)isUserAction completionHandler:(void (^)(void))completionHandler
 {
     ll_run_on_ui_thread(^{
         switch (self.avPlayerItem.status) {
@@ -278,7 +278,7 @@ typedef void (^VoidBlock) (void);
     self.avPlayerItem = nil;
     self.resourceLoader = nil;
     self.avPlayer = nil;
-    [[self activePlayerView].playerLayerView setPlayer:nil];
+    [[self activePlayerView] setPlayer:nil];
 }
 
 - (void)playVideoTrack:(LLVideoTrack *)track
@@ -295,7 +295,7 @@ typedef void (^VoidBlock) (void);
         return;
     }
     
-    [self playOnAVPlayer:streamURL playerLayerView:[self activePlayerView].playerLayerView track:track];
+    [self playOnAVPlayer:streamURL playerLayerView:[self activePlayerView] track:track];
 }
 
 - (LLVideoPlayerView *)activePlayerView
@@ -320,7 +320,7 @@ typedef void (^VoidBlock) (void);
     return YES;
 }
 
-- (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerLayerView *)playerLayerView track:(LLVideoTrack *)track
+- (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerView *)playerLayerView track:(LLVideoTrack *)track
 {
     static NSString *kPlayableKey = @"playable";
     static NSString *kTracks = @"tracks";
@@ -433,12 +433,12 @@ typedef void (^VoidBlock) (void);
 
 - (void)setVideoGravity:(NSString *)videoGravity
 {
-    [(AVPlayerLayer *)self.view.playerLayerView.layer setVideoGravity:videoGravity];
+    [(AVPlayerLayer *)[self activePlayerView].layer setVideoGravity:videoGravity];
 }
 
 - (NSString *)videoGravity
 {
-    return [(AVPlayerLayer *)self.view.playerLayerView.layer videoGravity];
+    return [(AVPlayerLayer *)[self activePlayerView].layer videoGravity];
 }
 
 #pragma mark - KVO

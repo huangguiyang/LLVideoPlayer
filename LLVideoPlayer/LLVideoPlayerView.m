@@ -18,16 +18,18 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor blackColor];
-        self.playerLayerView = [LLVideoPlayerLayerView new];
-        [self addSubview:self.playerLayerView];
     }
     return self;
 }
 
-- (void)layoutSubviews
++ (Class)layerClass
 {
-    [super layoutSubviews];
-    self.playerLayerView.frame = self.bounds;
+    return [AVPlayerLayer class];
+}
+
+- (void)setPlayer:(AVPlayer *)player
+{
+    [(AVPlayerLayer *)[self layer] setPlayer:player];
 }
 
 @end

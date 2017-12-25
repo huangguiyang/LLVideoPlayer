@@ -7,14 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 #import "LLVideoPlayerDefines.h"
-#import "LLVideoPlayerLayerView.h"
 
 /// LLVideoPlayerView: Low Level Video View
 
 @interface LLVideoPlayerView : UIView
 
-// The player's layer view
-@property (nonatomic, strong) LLVideoPlayerLayerView *playerLayerView;
+- (void)setPlayer:(AVPlayer *)player;
 
 @end
