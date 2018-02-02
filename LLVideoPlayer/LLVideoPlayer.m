@@ -568,10 +568,11 @@ typedef void (^VoidBlock) (void);
     if (timeInSeconds <= 0) {
         return;
     }
-        
-    if ([self.avPlayer ll_currentItemDuration] > 1) {
-        if (nil == self.track.totalDuration) {
-            self.track.totalDuration = [NSNumber numberWithFloat:[self.avPlayer ll_currentItemDuration]];
+    
+    NSTimeInterval duration = [self.avPlayer ll_currentItemDuration];
+    if (duration > 1) {
+        if (nil == self.track.totalDuration || (NSInteger)[self.track.totalDuration floatValue] != (NSInteger)duration) {
+            self.track.totalDuration = [NSNumber numberWithFloat:duration];
             if ([self.delegate respondsToSelector:@selector(videoPlayer:durationDidLoad:)]) {
                 [self.delegate videoPlayer:self durationDidLoad:self.track.totalDuration];
             }
