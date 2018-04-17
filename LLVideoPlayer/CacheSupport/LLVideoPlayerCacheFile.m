@@ -197,14 +197,17 @@
     return success;
 }
 
-- (BOOL)truncateFileToLength:(NSInteger)length
+- (BOOL)truncateFileToLength:(long long)length
 {
     if (nil == self.writeFileHandle) {
         return NO;
     }
+    if (length < 0) {
+        return NO;
+    }
     
-    [self.writeFileHandle truncateFileAtOffset:length];
     @try {
+        [self.writeFileHandle truncateFileAtOffset:length];
         unsigned long long end = [self.writeFileHandle seekToEndOfFile];
         if (end != length) {
             return NO;

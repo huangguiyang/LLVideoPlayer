@@ -19,7 +19,7 @@
     return ((NSHTTPURLResponse *)self).allHeaderFields[@"Content-Range"] != nil;
 }
 
-- (NSInteger)ll_totalLength
+- (long long)ll_totalLength
 {
     // Get total content length
     
@@ -31,7 +31,7 @@
     NSString *contentRange = ((NSHTTPURLResponse *)self).allHeaderFields[@"Content-Range"];
     NSString *lengthString = [contentRange ll_decodeLengthFromContentRange];
     if (lengthString) {
-        return [lengthString integerValue];
+        return [lengthString longLongValue];
     }
     
     return [self expectedContentLength];
