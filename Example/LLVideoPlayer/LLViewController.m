@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"http://mycdn.seeyouyima.com/news/vod/1b389b8678066924d8f493866d4e84f5.mp4"]
+#define kTestVideoURL [NSURL URLWithString:@"http://vods.xmmeiyou.com/advideo/ed74f7ce-4416-44bc-bb81-8f1a9e8ba760.mp4"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 
@@ -165,6 +165,7 @@
 {
     NSLog(@"[PRESS] loadAction");
     self.player.cacheSupportEnabled = self.cacheSwitch.on;
+    
     [self.player loadVideoWithStreamURL:kTestVideoURL];
 }
 
@@ -236,6 +237,7 @@
 #pragma mark - LLVideoPlayerDelegate
 
 #pragma mark - State Changed
+
 - (BOOL)shouldVideoPlayer:(LLVideoPlayer *)videoPlayer changeStateTo:(LLVideoPlayerState)state
 {
     return YES;
@@ -251,38 +253,45 @@
 }
 
 #pragma mark - Play Control
-- (BOOL)shouldVideoPlayer:(LLVideoPlayer *)videoPlayer startVideo:(LLVideoTrack *)track
+
+- (BOOL)shouldVideoPlayerStartVideo:(LLVideoPlayer *)videoPlayer
 {
     return YES;
 }
 
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer willStartVideo:(LLVideoTrack *)track
+- (void)videoPlayerWillStartVideo:(LLVideoPlayer *)videoPlayer
 {
+    
 }
 
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didStartVideo:(LLVideoTrack *)track
+- (void)videoPlayerDidStartVideo:(LLVideoPlayer *)videoPlayer
 {
-    self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[track.totalDuration floatValue]];
+    self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[videoPlayer.track.totalDuration floatValue]];
 }
 
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(LLVideoTrack *)track time:(NSTimeInterval)time
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(NSTimeInterval)time
 {
+    NSLog(@"didPlayFrame: %f", time);
     self.currentTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:time];
-    self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[track.totalDuration floatValue]];
-    self.slider.value = time / [track.totalDuration doubleValue];
+    self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[videoPlayer.track.totalDuration floatValue]];
+    self.slider.value = time / [videoPlayer.track.totalDuration doubleValue];
 }
 
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges track:(LLVideoTrack *)track
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer loadedTimeRanges:(NSArray<NSValue *> *)ranges
 {
+    
 }
 
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayToEnd:(LLVideoTrack *)track
+- (void)videoPlayerDidPlayToEnd:(LLVideoPlayer *)videoPlayer
 {
+    
 }
 
 #pragma mark - Error
-- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error track:(LLVideoTrack *)track
+
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer didFailWithError:(NSError *)error
 {
+    
 }
 
 @end

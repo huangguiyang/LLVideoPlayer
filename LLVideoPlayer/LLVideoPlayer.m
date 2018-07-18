@@ -24,6 +24,7 @@ typedef void (^VoidBlock) (void);
 @property (nonatomic, strong) id avTimeObserver;
 @property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
 @property (nonatomic, strong) NSMutableSet *failingURLs;
+@property (nonatomic, assign) NSInteger lastFrameTime;
 
 @end
 
@@ -277,6 +278,7 @@ typedef void (^VoidBlock) (void);
     self.resourceLoader = nil;
     self.avPlayer = nil;
     [[self activePlayerView] setPlayer:nil];
+    self.lastFrameTime = 0;
 }
 
 - (void)playVideoTrack:(LLVideoTrack *)track
@@ -578,6 +580,15 @@ typedef void (^VoidBlock) (void);
             }
         }
     }
+    
+    if (self.state != LLVideoPlayerStateContentPlaying) {
+        return;
+    }
+    NSInteger thisSecond = (NSInteger)(timeInSeconds + 0.5f);
+    if (thisSecond == self.lastFrameTime) {
+        return;
+    }
+    self.lastFrameTime = thisSecond;
     
     if ([self.delegate respondsToSelector:@selector(videoPlayer:didPlayFrame:)]) {
         [self.delegate videoPlayer:self didPlayFrame:timeInSeconds];
