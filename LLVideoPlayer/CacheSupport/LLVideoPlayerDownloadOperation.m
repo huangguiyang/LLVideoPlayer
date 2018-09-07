@@ -105,7 +105,7 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.url
                                                            cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     // NOT allowed cellular access
-    request.allowsCellularAccess = NO;
+//    request.allowsCellularAccess = NO;
     
     NSString *rangeString = LLRangeToHTTPRangeHeader(self.range);
     [request setValue:rangeString forHTTPHeaderField:@"Range"];
