@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LLVideoPlayer'
-  s.version          = '0.9.9'
+  s.version          = '0.9.10'
   s.summary          = 'A low level, flexible video player based on AVPlayer for iOS.'
 
   s.description      = <<-DESC

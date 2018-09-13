@@ -18,6 +18,7 @@
 @property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, strong) NSMutableArray<LLVideoPlayerCacheTask *> *taskQueue;
+@property (nonatomic, strong) NSRecursiveLock *lock;
 
 @end
 
@@ -28,8 +29,9 @@
 {
     self = [super init];
     if (self) {
-        self.loadingRequest = loadingRequest;
-        self.cacheFile = cacheFile;
+        _loadingRequest = loadingRequest;
+        _cacheFile = cacheFile;
+        _lock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -42,56 +44,56 @@
 
 - (void)resume
 {
-    @synchronized (self) {
-        [self startOperation];
-    }
+    [_lock lock];
+    [self startOperation];
+    [_lock unlock];
 }
 
 - (void)cancel
 {
-    @synchronized (self) {
-        NSArray *copyQueue = [NSArray arrayWithArray:self.taskQueue];
-        for (LLVideoPlayerCacheTask *task in copyQueue) {
-            [task cancel];
-        }
+    [_lock lock];
+    NSArray *copyQueue = [NSArray arrayWithArray:self.taskQueue];
+    for (LLVideoPlayerCacheTask *task in copyQueue) {
+        [task cancel];
     }
+    [_lock unlock];
 }
 
 #pragma mark - LLVideoPlayerCacheTaskDelegate
 
 - (void)taskDidFinish:(LLVideoPlayerCacheTask *)task
 {
-    @synchronized (self) {
-        [self.taskQueue removeObject:task];
-        if (self.taskQueue.count == 0) {
-            if (_cancels == 0) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([self.delegate respondsToSelector:@selector(operationDidFinish:)]) {
-                        [self.delegate operationDidFinish:self];
-                    }
-                });
-            }
-        } else {
-            [self resumeNextTask];
+    [_lock lock];
+    [self.taskQueue removeObject:task];
+    if (self.taskQueue.count == 0) {
+        if (_cancels == 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.delegate respondsToSelector:@selector(operationDidFinish:)]) {
+                    [self.delegate operationDidFinish:self];
+                }
+            });
         }
+    } else {
+        [self resumeNextTask];
     }
+    [_lock unlock];
 }
 
 - (void)task:(LLVideoPlayerCacheTask *)task didFailWithError:(NSError *)error
 {
-    @synchronized (self) {
-        [self.taskQueue removeObject:task];
-        if ([task isCancelled] || error.code == NSURLErrorCancelled) {
-            _cancels++;
-        } else {
-            [self cancel];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
-                    [self.delegate operation:self didFailWithError:error];
-                }
-            });
-        }
+    [_lock lock];
+    [self.taskQueue removeObject:task];
+    if ([task isCancelled] || error.code == NSURLErrorCancelled) {
+        _cancels++;
+    } else {
+        [self cancel];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
+                [self.delegate operation:self didFailWithError:error];
+            }
+        });
     }
+    [_lock unlock];
 }
 
 #pragma mark - Private

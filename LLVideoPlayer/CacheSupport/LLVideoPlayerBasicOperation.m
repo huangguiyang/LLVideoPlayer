@@ -21,25 +21,19 @@
 
 - (BOOL)isExecuting
 {
-    @synchronized (self) {
-        return _executing;
-    }
+    return _executing;
 }
 
 - (BOOL)isFinished
 {
-    @synchronized (self) {
-        return _finished;
-    }
+    return _finished;
 }
 
 - (void)setExecuting:(BOOL)executing
 {
     if (executing != _executing) {
         [self willChangeValueForKey:@"isExecuting"];
-        @synchronized (self) {
-            _executing = executing;
-        }
+        _executing = executing;
         [self didChangeValueForKey:@"isExecuting"];
     }
 }
@@ -48,9 +42,7 @@
 {
     if (finished != _finished) {
         [self willChangeValueForKey:@"isFinished"];
-        @synchronized (self) {
-            _finished = finished;
-        }
+        _finished = finished;
         [self didChangeValueForKey:@"isFinished"];
     }
 }
