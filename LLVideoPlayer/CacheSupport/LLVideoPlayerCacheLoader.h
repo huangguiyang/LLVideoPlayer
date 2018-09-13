@@ -12,10 +12,8 @@
 
 @interface LLVideoPlayerCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
-+ (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
++ (instancetype)loaderWithURL:(NSURL *)url;
 
-- (instancetype)initWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
-
-- (BOOL)isCacheComplete;
+- (instancetype)initWithURL:(NSURL *)url;
 
 @end

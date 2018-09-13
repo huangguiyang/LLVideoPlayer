@@ -8,13 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "LLVideoPlayerCachePolicy.h"
 
 @interface LLVideoPlayerCacheFile : NSObject
 
-+ (instancetype)cacheFileWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
++ (instancetype)cacheFileWithFilePath:(NSString *)filePath;
 
-- (instancetype)initWithFilePath:(NSString *)filePath cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
+- (instancetype)initWithFilePath:(NSString *)filePath;
 
 + (NSString *)cacheDirectory;
 + (NSString *)indexFileExtension;
@@ -37,6 +36,5 @@
 @property (nonatomic, assign, readonly) NSInteger fileLength;
 
 @property (nonatomic, strong, readonly) NSString *cacheFilePath;
-@property (nonatomic, strong, readonly) LLVideoPlayerCachePolicy *cachePolicy;
 
 @end

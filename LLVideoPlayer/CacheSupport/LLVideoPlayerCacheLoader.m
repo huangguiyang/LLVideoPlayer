@@ -31,26 +31,21 @@
     }
 }
 
-+ (instancetype)loaderWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
++ (instancetype)loaderWithURL:(NSURL *)url
 {
-    return [[self alloc] initWithURL:url cachePolicy:cachePolicy];
+    return [[self alloc] initWithURL:url];
 }
 
-- (instancetype)initWithURL:(NSURL *)url cachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
+- (instancetype)initWithURL:(NSURL *)url
 {
     self = [super init];
     if (self) {
         NSString *name = [url.absoluteString ll_md5];
         NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
-        self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path cachePolicy:cachePolicy];
+        self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
         self.operationQueue = [[NSMutableArray alloc] initWithCapacity:4];
     }
     return self;
-}
-
-- (BOOL)isCacheComplete
-{
-    return [self.cacheFile isComplete];
 }
 
 #pragma mark - LLVideoPlayerCacheOperationDelegate

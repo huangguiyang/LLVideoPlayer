@@ -59,14 +59,12 @@
 + (void)removeCacheForURL:(NSURL *)url;
 
 + (void)preloadWithURL:(NSURL *)url;
-+ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes;
 + (void)cancelPreloadWithURL:(NSURL *)url;
 + (void)cancelAllPreloads;
 
 + (NSString *)cachePathForURL:(NSURL *)url;
 + (BOOL)isCacheComplete:(NSURL *)url;
 
-+ (NSString *)cacheDirectory;
-+ (NSString *)preloadCacheDirectory;
++ (void)checkCacheDirectoryWithCachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 @end
