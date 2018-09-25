@@ -59,7 +59,7 @@
     if (self) {
         _lock = [[NSRecursiveLock alloc] init];
         _ranges = [NSMutableArray array];
-        _cacheFilePath = filePath;
+        _cacheFilePath = [filePath copy];
         _indexFilePath = [NSString stringWithFormat:@"%@%@", filePath, [LLVideoPlayerCacheFile indexFileExtension]];
         
         NSString *dir = [filePath stringByDeletingLastPathComponent];

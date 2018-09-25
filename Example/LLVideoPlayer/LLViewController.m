@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"http://video2.listenvod.com/201809132055/2d18faa6df3a84da0f7e14005fe55bf9/vedio/ld/news/vod/ottahkponzkeyqekumylbwyjriewgngq.mp4"]
+#define kTestVideoURL [NSURL URLWithString:@"https://evods.listenvod.com/evideo/20180918/5ba0f38d0d0b3.mp4"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 

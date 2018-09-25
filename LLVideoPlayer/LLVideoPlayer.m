@@ -354,7 +354,7 @@ typedef void (^VoidBlock) (void);
                 [playerLayerView setPlayer:self.avPlayer];
             } else {
                 LLLog(@"The asset's tracks were not loaded: %@", error);
-                [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track];
+                [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track error:error];
             }
         });
     }];
@@ -463,7 +463,7 @@ typedef void (^VoidBlock) (void);
                     break;
                 case AVPlayerStatusFailed:
                     LLLog(@"AVPlayerStatusFailed");
-                    [self handleErrorCode:LLVideoPlayerErrorAVPlayerFail track:self.track];
+                    [self handleErrorCode:LLVideoPlayerErrorAVPlayerFail track:self.track error:nil];
                     break;
                 default:
                     break;
@@ -485,7 +485,7 @@ typedef void (^VoidBlock) (void);
                     break;
                 case AVPlayerItemStatusFailed:
                     LLLog(@"AVPlayerStAVPlayerItemStatusFailedatusFailed");
-                    [self handleErrorCode:LLVideoPlayerErrorAVPlayerItemFail track:self.track];
+                    [self handleErrorCode:LLVideoPlayerErrorAVPlayerItemFail track:self.track error:nil];
                     break;
                 default:
                     break;
@@ -704,7 +704,7 @@ typedef void (^VoidBlock) (void);
 
 #pragma mark - Error
 
-- (void)handleErrorCode:(LLVideoPlayerError)errorCode track:(LLVideoTrack *)track
+- (void)handleErrorCode:(LLVideoPlayerError)errorCode track:(LLVideoTrack *)track error:(NSError *)error
 {
     LLLog(@"[ERROR] %@: %@", [LLVideoPlayerHelper errorCodeToString:errorCode], track);
     [self addFailingURL:track.streamURL];
@@ -712,7 +712,7 @@ typedef void (^VoidBlock) (void);
         [LLVideoPlayer removeCacheForURL:track.streamURL];
     }
     if ([self.delegate respondsToSelector:@selector(videoPlayer:didFailWithError:)]) {
-        [self.delegate videoPlayer:self didFailWithError:[NSError errorWithDomain:@"LLVideoPlayer" code:errorCode userInfo:@{@"track":track}]];
+        [self.delegate videoPlayer:self didFailWithError:[NSError errorWithDomain:@"LLVideoPlayer" code:errorCode userInfo:error ? @{@"track":track, @"error": error} : @{@"track":track}]];
     }
 }
 
