@@ -41,12 +41,14 @@ typedef void (^VoidBlock) (void);
     if (self) {
         self.view = videoPlayerView;
         self.state = LLVideoPlayerStateUnknown;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
     }
     return self;
 }
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     [self clearPlayer];
 }
 
@@ -631,6 +633,13 @@ typedef void (^VoidBlock) (void);
             [self.delegate videoPlayerPlaybackStalled:self];
         }
     });
+}
+
+- (void)handleWillResignActive:(NSNotification *)note
+{
+    if (self.cacheSupportEnabled) {
+        [LLVideoPlayer checkCacheWithPolicy:self.cachePolicy];
+    }
 }
 
 #pragma mark - State Changed
