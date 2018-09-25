@@ -65,6 +65,6 @@
 + (NSString *)cachePathForURL:(NSURL *)url;
 + (BOOL)isCacheComplete:(NSURL *)url;
 
-+ (void)checkCacheDirectoryWithCachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
++ (void)checkCacheWithPolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
 
 @end

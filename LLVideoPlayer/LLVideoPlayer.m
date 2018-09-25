@@ -327,7 +327,6 @@ typedef void (^VoidBlock) (void);
     AVURLAsset *asset;
     
     if ([self sessionCacheEnabled]) {
-        [LLVideoPlayer checkCacheDirectoryWithCachePolicy:self.cachePolicy];
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL] options:nil];
         self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:streamURL];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
@@ -780,7 +779,7 @@ static uint64_t diskFreeCapacity(void)
     [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
 }
 
-+ (void)checkCacheDirectoryWithCachePolicy:(LLVideoPlayerCachePolicy *)cachePolicy
++ (void)checkCacheWithPolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
     NSString *directory = [LLVideoPlayerCacheFile cacheDirectory];
     NSError *error;
