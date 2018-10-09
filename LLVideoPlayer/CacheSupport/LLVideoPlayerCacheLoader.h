@@ -8,12 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "LLVideoPlayerCachePolicy.h"
+#import "LLVideoPlayerCacheFile.h"
 
 @interface LLVideoPlayerCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
-+ (instancetype)loaderWithURL:(NSURL *)url;
++ (instancetype)loaderWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile;
 
-- (instancetype)initWithURL:(NSURL *)url;
+- (instancetype)initWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile;
+
+@property (nonatomic, strong, readonly) LLVideoPlayerCacheFile *cacheFile;
 
 @end

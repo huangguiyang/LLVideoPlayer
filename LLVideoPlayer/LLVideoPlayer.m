@@ -14,10 +14,19 @@
 #import "LLVideoPlayerCacheLoader.h"
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile.h"
-#import "LLVideoPlayerDownloader.h"
 #import "NSString+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheUtils.h"
 
 typedef void (^VoidBlock) (void);
+static NSString *kPlayableKey = @"playable";
+static NSString *kTracks = @"tracks";
+
+static NSString *cacheFilePathWithURL(NSURL *url)
+{
+    NSString *name = [url.absoluteString ll_md5];
+    NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
+    return [dir stringByAppendingPathComponent:name];
+}
 
 @interface LLVideoPlayer ()
 
@@ -324,13 +333,13 @@ typedef void (^VoidBlock) (void);
 
 - (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerView *)playerLayerView track:(LLVideoTrack *)track
 {
-    static NSString *kPlayableKey = @"playable";
-    static NSString *kTracks = @"tracks";
     AVURLAsset *asset;
     
     if ([self sessionCacheEnabled]) {
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL] options:nil];
-        self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:streamURL];
+        NSString *path = cacheFilePathWithURL(streamURL);
+        LLVideoPlayerCacheFile *file = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
+        self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithCacheFile:file];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
     } else {
         asset = [[AVURLAsset alloc] initWithURL:streamURL options:nil];
@@ -759,11 +768,7 @@ typedef void (^VoidBlock) (void);
     return self.avPlayer && self.avPlayer.rate != 0.0;
 }
 
-@end
-
-@implementation LLVideoPlayer (CacheSupport)
-
-#pragma mark - Check
+#pragma mark - Cache Support
 
 #define kMinFreeSpaceLimit (1ULL << 30)
 
@@ -783,9 +788,18 @@ static uint64_t diskFreeCapacity(void)
 
 + (void)removeCacheAtPath:(NSString *)path
 {
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    NSString *index = [path stringByAppendingString:[LLVideoPlayerCacheFile indexFileExtension]];
-    [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    [fileManager removeItemAtPath:path error:nil];
+    
+    NSString *index = [NSString stringWithFormat:@"%@.%@", path, kLLVideoCacheFileExtensionIndex];
+    [fileManager removeItemAtPath:index error:nil];
+    
+    NSString *preload = [NSString stringWithFormat:@"%@.%@", path, kLLVideoCacheFileExtensionPreload];
+    [fileManager removeItemAtPath:preload error:nil];
+    
+    NSString *preloadIndex = [NSString stringWithFormat:@"%@.%@", preload, kLLVideoCacheFileExtensionIndex];
+    [fileManager removeItemAtPath:preloadIndex error:nil];
 }
 
 + (void)checkCacheWithPolicy:(LLVideoPlayerCachePolicy *)cachePolicy
@@ -806,7 +820,7 @@ static uint64_t diskFreeCapacity(void)
     NSMutableArray *paths = [NSMutableArray array];
     
     for (NSString *name in contents) {
-        if ([name hasSuffix:[LLVideoPlayerCacheFile indexFileExtension]]) {
+        if ([name pathExtension].length > 0) {
             continue;
         }
         
@@ -860,56 +874,13 @@ static uint64_t diskFreeCapacity(void)
 
 + (void)clearAllCache
 {
-    NSString *dir;
-    
-    dir = [LLVideoPlayerCacheFile cacheDirectory];
-    [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
-    
-    dir = [LLVideoPlayerDownloader cacheDirectory];
+    NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
     [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
 }
 
 + (void)removeCacheForURL:(NSURL *)url
 {
-    {
-        NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
-        NSString *md5 = [url.absoluteString ll_md5];
-        NSString *data = [dir stringByAppendingPathComponent:md5];
-        NSString *index = [NSString stringWithFormat:@"%@%@", data, [LLVideoPlayerCacheFile indexFileExtension]];
-        
-        [[NSFileManager defaultManager] removeItemAtPath:data error:nil];
-        [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
-    }
-    
-    {
-        NSString *dir = [LLVideoPlayerDownloader cacheDirectory];
-        NSString *md5 = [url.absoluteString ll_md5];
-        NSString *data = [dir stringByAppendingPathComponent:md5];
-        NSString *index = [NSString stringWithFormat:@"%@%@", data, [LLVideoPlayerDownloadFile indexFileExtension]];
-        
-        [[NSFileManager defaultManager] removeItemAtPath:data error:nil];
-        [[NSFileManager defaultManager] removeItemAtPath:index error:nil];
-    }
-}
-
-+ (void)preloadWithURL:(NSURL *)url
-{
-    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:2];
-}
-
-+ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
-{
-    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:bytes];
-}
-
-+ (void)cancelPreloadWithURL:(NSURL *)url
-{
-    [[LLVideoPlayerDownloader defaultDownloader] cancelWithURL:url];
-}
-
-+ (void)cancelAllPreloads
-{
-    [[LLVideoPlayerDownloader defaultDownloader] cancelAllPreloads];
+    [self removeCacheAtPath:cacheFilePathWithURL(url)];
 }
 
 + (NSString *)cachePathForURL:(NSURL *)url
@@ -923,27 +894,112 @@ static uint64_t diskFreeCapacity(void)
     if ([url isFileURL]) {
         return [url absoluteString];
     }
-    NSString *name = [url.absoluteString ll_md5];
-    NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
+    NSString *path = cacheFilePathWithURL(url);
     LLVideoPlayerCacheFile *cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
     return [cacheFile isComplete] ? path : nil;
 }
 
 + (BOOL)isCacheComplete:(NSURL *)url
 {
-    if (nil == url) {
-        return NO;
+    return [self cachePathForURL:url] != nil;
+}
+
++ (NSMutableDictionary *)getPreloadMap
+{
+    static NSMutableDictionary *map;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        map = [NSMutableDictionary dictionary];
+    });
+    return map;
+}
+
++ (void)preloadWithURL:(NSURL *)url
+{
+    if ([url isFileURL] || [url ll_m3u8]) {
+        return;
     }
-    if ([url ll_m3u8]) {
-        return NO;
+    
+    NSMutableDictionary *map = [self getPreloadMap];
+    @synchronized (self) {
+        if ([map objectForKey:url] != nil) {
+            return;
+        }
     }
-    if ([url isFileURL]) {
-        return YES;
+    
+    // check file existence
+    NSString *base = cacheFilePathWithURL(url);
+    NSString *preloadDataFile = [NSString stringWithFormat:@"%@.%@", base, kLLVideoCacheFileExtensionPreload];
+    NSString *preloadIndexFile = [NSString stringWithFormat:@"%@.%@", preloadDataFile, kLLVideoCacheFileExtensionIndex];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:preloadDataFile] &&
+        [[NSFileManager defaultManager] fileExistsAtPath:preloadIndexFile]) {
+        return;
     }
-    NSString *name = [url.absoluteString ll_md5];
-    NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
-    LLVideoPlayerCacheFile *cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
-    return [cacheFile isComplete];
+    
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[url ll_customSchemeURL] options:nil];
+    NSString *preloadingDataFile = [NSString stringWithFormat:@"%@.%@", base, kLLVideoCacheFileExtensionPreloding];
+    LLVideoPlayerCacheFile *file = [LLVideoPlayerCacheFile cacheFileWithFilePath:preloadingDataFile];
+    LLVideoPlayerCacheLoader *loader = [LLVideoPlayerCacheLoader loaderWithCacheFile:file];
+    [asset.resourceLoader setDelegate:loader queue:dispatch_get_main_queue()];
+    
+    @synchronized (self) {
+        [map setObject:@{@"asset": asset, @"loader": loader} forKey:url];
+    }
+    
+    __weak typeof(asset) wasset = asset;
+    [asset loadValuesAsynchronouslyForKeys:@[kPlayableKey, kTracks] completionHandler:^{
+        __strong typeof(wasset) asset = wasset;
+        
+        NSMutableDictionary *map = [self getPreloadMap];
+        @synchronized (self) {
+            [map removeObjectForKey:url];
+        }
+        
+        NSError *error = nil;
+        AVKeyValueStatus status = [asset statusOfValueForKey:kPlayableKey error:&error];
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSString *preloadingIndexFile = [NSString stringWithFormat:@"%@.%@", preloadingDataFile, kLLVideoCacheFileExtensionIndex];
+        
+        if (status == AVKeyValueStatusLoaded) {
+            // move
+            [fileManager moveItemAtPath:preloadingDataFile toPath:preloadDataFile error:nil];
+            [fileManager moveItemAtPath:preloadingIndexFile toPath:preloadIndexFile error:nil];
+            NSLog(@"Preload done. [OK]");
+        } else {
+            // delete
+            [fileManager removeItemAtPath:preloadingDataFile error:nil];
+            [fileManager removeItemAtPath:preloadingIndexFile error:nil];
+            NSLog(@"Preload fail: %@", error);
+        }
+    }];
+}
+
++ (void)cancelPreloadWithURL:(NSURL *)url
+{
+    NSMutableDictionary *map = [self getPreloadMap];
+    @synchronized (self) {
+        NSDictionary *dict = [map objectForKey:url];
+        if (dict) {
+            AVURLAsset *asset = dict[@"asset"];
+            [asset cancelLoading];
+            
+            [map removeObjectForKey:url];
+        }
+    }
+}
+
++ (void)cancelAllPreloads
+{
+    NSMutableDictionary *map = [self getPreloadMap];
+    @synchronized (self) {
+        [map enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            NSDictionary *dict = obj;
+            AVURLAsset *asset = dict[@"asset"];
+            [asset cancelLoading];
+        }];
+        [map removeAllObjects];
+    }
 }
 
 @end

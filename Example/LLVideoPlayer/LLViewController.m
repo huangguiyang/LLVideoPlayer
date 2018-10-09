@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"https://evods.listenvod.com/evideo/20180918/5ba0f38d0d0b3.mp4"]
+#define kTestVideoURL [NSURL URLWithString:@"https://vd3.bdstatic.com/mda-iiss6ez9vrfnhhnn/mda-iiss6ez9vrfnhhnn.mp4?playlist=%5B%22hd%22%2C%22sc%22%5D"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 
@@ -20,8 +20,8 @@
 @property (nonatomic, strong) UILabel *totalTimeLabel;
 @property (nonatomic, strong) UISlider *slider;
 @property (nonatomic, strong) UISwitch *cacheSwitch;
-//@property (nonatomic, strong) LLVideoPlayerCacheLoader *resourceLoader;
-//@property (nonatomic, strong) AVURLAsset *asset;
+@property (nonatomic, assign) NSTimeInterval beginTime;
+@property (nonatomic, assign) NSTimeInterval endTime;
 
 @end
 
@@ -164,6 +164,7 @@
 - (void)loadAction:(id)sender
 {
     NSLog(@"[PRESS] loadAction");
+    self.beginTime = CFAbsoluteTimeGetCurrent();
     self.player.cacheSupportEnabled = self.cacheSwitch.on;
     
     [self.player loadVideoWithStreamURL:kTestVideoURL];
@@ -221,17 +222,8 @@
 
 - (void)preloadAction:(id)sender
 {
-//    [LLVideoPlayerCacheHelper preloadWithURL:kTestVideoURL bytes:1024*20];
-    
-//    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[kTestVideoURL ll_customSchemeURL] options:nil];
-//    self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithURL:kTestVideoURL cachePolicy:nil];
-//    [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
-//    
-//    [asset loadValuesAsynchronouslyForKeys:@[@"playable", @"tracks"] completionHandler:^{
-//        NSLog(@"AVURLAsset loaded. [OK]");
-//    }];
-//    
-//    self.asset = asset;
+    NSLog(@"[PRESS] preloadAction");
+    [LLVideoPlayer preloadWithURL:kTestVideoURL];
 }
 
 #pragma mark - LLVideoPlayerDelegate
@@ -249,6 +241,10 @@
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didChangeStateFrom:(LLVideoPlayerState)state
 {
+    if (state == LLVideoPlayerStateContentLoading && videoPlayer.state == LLVideoPlayerStateContentPlaying) {
+        self.endTime =CFAbsoluteTimeGetCurrent();
+        NSLog(@"time: %f", self.endTime - self.beginTime);
+    }
     self.stateLabel.text = [LLVideoPlayerHelper playerStateToString:self.player.state];
 }
 

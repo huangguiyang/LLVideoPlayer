@@ -144,7 +144,7 @@
     NSInteger start = requestRange.location;
     NSInteger end = requestRange.length == NSIntegerMax ? NSIntegerMax : NSMaxRange(requestRange);
     
-    NSArray<NSValue *> *ranges = [self.cacheFile cachedRanges];
+    NSArray<NSValue *> *ranges = [self.cacheFile ranges];
     for (NSValue *value in ranges) {
         NSRange range = [value rangeValue];
         

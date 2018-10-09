@@ -7,10 +7,6 @@
 //
 
 #import "LLVideoPlayerCacheLoader.h"
-#import "LLVideoPlayerCacheFile.h"
-#import "LLVideoPlayerCacheUtils.h"
-#import "LLVideoPlayerCachePolicy.h"
-#import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheOperation.h"
 
 @interface LLVideoPlayerCacheLoader () <LLVideoPlayerCacheOperationDelegate>
@@ -31,19 +27,17 @@
     }
 }
 
-+ (instancetype)loaderWithURL:(NSURL *)url
++ (instancetype)loaderWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile
 {
-    return [[self alloc] initWithURL:url];
+    return [[self alloc] initWithCacheFile:cacheFile];
 }
 
-- (instancetype)initWithURL:(NSURL *)url
+- (instancetype)initWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile
 {
     self = [super init];
     if (self) {
-        NSString *name = [url.absoluteString ll_md5];
-        NSString *path = [[LLVideoPlayerCacheFile cacheDirectory] stringByAppendingPathComponent:name];
-        self.cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
-        self.operationQueue = [[NSMutableArray alloc] initWithCapacity:4];
+        _cacheFile = cacheFile;
+        _operationQueue = [[NSMutableArray alloc] initWithCapacity:4];
     }
     return self;
 }

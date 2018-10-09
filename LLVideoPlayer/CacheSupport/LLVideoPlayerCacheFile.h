@@ -9,14 +9,15 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 
+FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionIndex;
+FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreload;
+FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreloding;
+
 @interface LLVideoPlayerCacheFile : NSObject
 
 + (instancetype)cacheFileWithFilePath:(NSString *)filePath;
 
 - (instancetype)initWithFilePath:(NSString *)filePath;
-
-+ (NSString *)cacheDirectory;
-+ (NSString *)indexFileExtension;
 
 #pragma mark - Read/Write
 
@@ -27,14 +28,15 @@
 - (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
 
 - (void)synchronize;
-- (void)clear;
 
 - (BOOL)isComplete;
 
-#pragma mark - Property
-- (NSArray<NSValue *> *)cachedRanges;
-@property (nonatomic, assign, readonly) NSInteger fileLength;
++ (NSString *)cacheDirectory;
 
+#pragma mark - Property
+
+@property (nonatomic, strong, readonly) NSMutableArray<NSValue *> *ranges;
+@property (nonatomic, assign, readonly) NSUInteger fileLength;
 @property (nonatomic, strong, readonly) NSString *cacheFilePath;
 
 @end

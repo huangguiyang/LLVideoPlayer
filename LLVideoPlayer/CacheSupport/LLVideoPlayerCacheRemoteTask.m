@@ -11,28 +11,15 @@
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSURLResponse+LLVideoPlayer.h"
 
-#define MAX_MEM_SIZE (1024 * 1024)
-
 @interface LLVideoPlayerCacheRemoteTask () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 {
     NSURLConnection *_connection;
     NSInteger _offset;
-    NSMutableData *_mutableData;
-    NSRecursiveLock *_lock;
 }
 
 @end
 
 @implementation LLVideoPlayerCacheRemoteTask
-
-- (instancetype)initWithRequest:(AVAssetResourceLoadingRequest *)loadingRequest range:(NSRange)range cacheFile:(LLVideoPlayerCacheFile *)cacheFile
-{
-    self = [super initWithRequest:loadingRequest range:range cacheFile:cacheFile];
-    if (self) {
-        _lock = [[NSRecursiveLock alloc] init];
-    }
-    return self;
-}
 
 - (void)dealloc
 {
@@ -47,7 +34,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(wself) self = wself;
         
-        [_lock lock];
         if ([self isCancelled]) {
             return;
         }
@@ -56,7 +42,6 @@
         request.URL = [self.loadingRequest.request.URL ll_originalSchemeURL];
         request.cachePolicy = NSURLRequestReloadIgnoringCacheData;  // very important
         _offset = 0;
-        _mutableData = [NSMutableData data];
         
         NSString *rangeString = LLRangeToHTTPRangeHeader(self.range);
         if (rangeString) {
@@ -66,36 +51,22 @@
         
         _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         [_connection start];
-        [_lock unlock];
     });
 }
 
 - (void)cancel
 {
-    [_lock lock];
     [_connection cancel];
     _connection = nil;
-    [self synchronize];
+    [self.cacheFile synchronize];
     [super cancel];
-    [_lock unlock];
-}
-
-- (void)synchronize
-{
-    if ([_mutableData length] > 0) {
-        [self.cacheFile writeData:_mutableData atOffset:_offset];
-        _mutableData = nil;
-        [self.cacheFile synchronize];
-    }
 }
 
 #pragma mark - NSURLConnectionDelegate && NSURLConnectionDataDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    [_lock lock];
-    [self synchronize];
-    [_lock unlock];
+    [self.cacheFile synchronize];
     if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
         [self.delegate task:self didFailWithError:error];
     }
@@ -103,9 +74,7 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    [_lock lock];
-    [self synchronize];
-    [_lock unlock];
+    [self.cacheFile synchronize];
     if ([self.delegate respondsToSelector:@selector(taskDidFinish:)]) {
         [self.delegate taskDidFinish:self];
     }
@@ -125,14 +94,8 @@
     [self.loadingRequest.dataRequest respondWithData:data];
     
     // save local
-    [_lock lock];
-    [_mutableData appendData:data];
-    if (_mutableData.length >= MAX_MEM_SIZE) {
-        [self.cacheFile writeData:_mutableData atOffset:_offset];
-        _offset += [_mutableData length];
-        _mutableData = [NSMutableData data];
-    }
-    [_lock unlock];
+    [self.cacheFile writeData:data atOffset:_offset];
+    _offset += [data length];
 }
 
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response

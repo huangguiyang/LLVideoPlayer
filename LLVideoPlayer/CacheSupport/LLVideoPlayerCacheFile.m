@@ -11,41 +11,65 @@
 #import "NSURLResponse+LLVideoPlayer.h"
 #import "AVAssetResourceLoadingRequest+LLVideoPlayer.h"
 #import "NSString+LLVideoPlayer.h"
-#import "LLVideoPlayerDownloader.h"
+#import <sys/stat.h>
+#import <sys/mman.h>
+
+NSString * const kLLVideoCacheFileExtensionIndex = @"idx";
+NSString * const kLLVideoCacheFileExtensionPreload = @"preload";
+NSString * const kLLVideoCacheFileExtensionPreloding = @"preloading";
+
+static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLength) {
+    int fd;
+    int outError = 0;
+    struct stat statInfo;
+    *outDataPtr = NULL;
+    *outDataLength = 0;
+    
+    fd = open(filename, O_RDWR, 0);
+    if (fd < 0) {
+        outError = errno;
+    } else {
+        if (fstat(fd, &statInfo) < 0) {
+            outError = errno;
+        } else {
+            *outDataPtr = mmap(NULL,
+                               statInfo.st_size,
+                               PROT_READ | PROT_WRITE,
+                               MAP_FILE | MAP_SHARED, fd, 0);
+            if (*outDataPtr == MAP_FAILED) {
+                outError = errno;
+            } else {
+                *outDataLength = statInfo.st_size;
+            }
+        }
+        
+        close(fd);
+    }
+    
+    return outError;
+}
 
 @interface LLVideoPlayerCacheFile () {
-    NSInteger _fileLength;
-    NSURLResponse *_response;
+    NSUInteger _fileLength;
+    void *_fileDataPtr;
     BOOL _complete;
 }
 
 @property (nonatomic, strong) NSString *cacheFilePath;
 @property (nonatomic, strong) NSString *indexFilePath;
-@property (nonatomic, strong) NSMutableArray<NSValue *> *ranges;
 @property (nonatomic, strong) NSDictionary *allHeaderFields;
-@property (nonatomic, strong) NSFileHandle *writeFileHandle;
-@property (nonatomic, strong) NSFileHandle *readFileHandle;
 @property (nonatomic, strong) NSRecursiveLock *lock;
+@property (nonatomic, strong) NSURLResponse *response;
 
 @end
 
 @implementation LLVideoPlayerCacheFile
 
-+ (NSString *)cacheDirectory
-{
-    NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    return [cache stringByAppendingPathComponent:@"LLVideoPlayer"];
-}
-
-+ (NSString *)indexFileExtension
-{
-    return @".idx";
-}
-
 - (void)dealloc
 {
-    [self.writeFileHandle closeFile];
-    [self.readFileHandle closeFile];
+    if (_fileDataPtr && _fileLength > 0) {
+        munmap(_fileDataPtr, _fileLength);
+    }
 }
 
 + (instancetype)cacheFileWithFilePath:(NSString *)filePath
@@ -60,29 +84,21 @@
         _lock = [[NSRecursiveLock alloc] init];
         _ranges = [NSMutableArray array];
         _cacheFilePath = [filePath copy];
-        _indexFilePath = [NSString stringWithFormat:@"%@%@", filePath, [LLVideoPlayerCacheFile indexFileExtension]];
+        _indexFilePath = [NSString stringWithFormat:@"%@.%@", filePath, kLLVideoCacheFileExtensionIndex];
         
+        NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *dir = [filePath stringByDeletingLastPathComponent];
-        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:dir] &&
-            NO == [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
+        if (NO == [fileManager fileExistsAtPath:dir] &&
+            NO == [fileManager createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
             return nil;
         }
         
-        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:_cacheFilePath] &&
-            NO == [[NSFileManager defaultManager] createFileAtPath:_cacheFilePath contents:nil attributes:nil]) {
-            return nil;
-        }
-        
-        if (NO == [[NSFileManager defaultManager] fileExistsAtPath:_indexFilePath] &&
-            NO == [[NSFileManager defaultManager] createFileAtPath:_indexFilePath contents:nil attributes:nil]) {
-            return nil;
-        }
-        
-        _readFileHandle = [NSFileHandle fileHandleForReadingAtPath:_cacheFilePath];
-        _writeFileHandle = [NSFileHandle fileHandleForWritingAtPath:_cacheFilePath];
-        
-        [self loadIndexFileAtStartup];
         [self loadExternalCache];
+        if (NO == [self loadCacheFile]) {
+            [fileManager removeItemAtPath:_indexFilePath error:nil];
+            [fileManager removeItemAtPath:_cacheFilePath error:nil];
+        }
+        
         [self checkComplete];
     }
     return self;
@@ -92,85 +108,97 @@
 
 - (void)loadExternalCache
 {
-    LLVideoPlayerDownloadFile *downloadFile = [LLVideoPlayerDownloader getExternalDownloadFileWithName:[self.cacheFilePath lastPathComponent]];
-    if (nil == downloadFile) {
-        return;
-    }
-    NSDictionary *dict = [downloadFile readCache];
-    if (nil == dict) {
-        return;
-    }
-    
-    BOOL needToSave = NO;
-    
-    if (nil == _allHeaderFields) {
-        _allHeaderFields = dict[@"headers"];
-        _fileLength = [[_allHeaderFields[@"Content-Range"] ll_decodeLengthFromContentRange] integerValue];
-        needToSave = YES;
-    }
-
-    NSRange range = NSRangeFromString(dict[@"range"]);
-    NSRange cache = [self cachedRangeForRange:range];
-    if (NO == LLValidFileRange(cache)) {
-        [self writeData:dict[@"data"] atOffset:range.location];
-        needToSave = YES;
-    }
-    
-    if (needToSave) {
-        [self synchronize];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (NO == [fileManager fileExistsAtPath:_indexFilePath] || NO == [fileManager fileExistsAtPath:_cacheFilePath]) {
+        NSString *data = [NSString stringWithFormat:@"%@.%@", _cacheFilePath, kLLVideoCacheFileExtensionPreload];
+        NSString *index = [NSString stringWithFormat:@"%@.%@", data, kLLVideoCacheFileExtensionIndex];
+        if ([fileManager fileExistsAtPath:data] && [fileManager fileExistsAtPath:index]) {
+            [fileManager removeItemAtPath:_indexFilePath error:nil];
+            [fileManager removeItemAtPath:_cacheFilePath error:nil];
+            [fileManager moveItemAtPath:index toPath:_indexFilePath error:nil];
+            [fileManager moveItemAtPath:data toPath:_cacheFilePath error:nil];
+        }
     }
 }
 
 - (void)checkComplete
 {
-    if (self.ranges.count == 1) {
-        NSRange range = [self.ranges[0] rangeValue];
+    if (_ranges.count == 1) {
+        NSRange range = [_ranges[0] rangeValue];
         _complete = range.location == 0 && range.length == _fileLength;
     } else {
         _complete = NO;
     }
 }
 
-- (void)loadIndexFileAtStartup
+- (BOOL)loadCacheFile
 {
-    // load index data
-    if (NO == [self loadIndexFile]) {
-        [self truncateFileToLength:0];
+    NSData *indexData = [NSData dataWithContentsOfFile:_indexFilePath];
+    if (nil == indexData) {
+        return NO;
     }
-}
-
-- (BOOL)loadIndexFile
-{
-    NSData *indexData = [NSData dataWithContentsOfFile:self.indexFilePath];
+    
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:indexData options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers error:nil];
     if (nil == dict || NO == [dict isKindOfClass:[NSDictionary class]]) {
         return NO;
     }
     
-    NSMutableArray *ranges = dict[@"ranges"];
-    [self.ranges removeAllObjects];
-    for (NSString *rangeString in ranges) {
-        NSRange range = NSRangeFromString(rangeString);
-        [self.ranges addObject:[NSValue valueWithRange:range]];
-    }
-    
     _allHeaderFields = dict[@"allHeaderFields"];
     _fileLength = [[_allHeaderFields[@"Content-Range"] ll_decodeLengthFromContentRange] integerValue];
+    if (_allHeaderFields.count == 0 || _fileLength == 0) {
+        return NO;
+    }
+    
+    NSMutableArray *ranges = dict[@"ranges"];
+    [_ranges removeAllObjects];
+    for (NSString *rangeString in ranges) {
+        NSRange range = NSRangeFromString(rangeString);
+        [_ranges addObject:[NSValue valueWithRange:range]];
+    }
+    
+    struct stat statInfo;
+    const char *filename = [_cacheFilePath UTF8String];
+    int r = stat(filename, &statInfo);
+    if (r == 0) {
+        if (statInfo.st_size > 0 && statInfo.st_size != _fileLength) {
+            return NO;
+        }
+        if (statInfo.st_size == 0) {
+            if (truncate([_cacheFilePath UTF8String], _fileLength) != 0) {
+                return NO;
+            }
+        }
+        if (MapFile(filename, &_fileDataPtr, &_fileLength) != 0) {
+            return NO;
+        }
+    } else if (r == ENOENT) {
+        if (NO == [[NSFileManager defaultManager] createFileAtPath:_cacheFilePath contents:nil attributes:nil]) {
+            return NO;
+        }
+        if (truncate(filename, _fileLength) != 0) {
+            return NO;
+        }
+        if (MapFile(filename, &_fileDataPtr, &_fileLength) != 0) {
+            return NO;
+        }
+    } else {
+        return NO;
+    }
     
     return YES;
 }
 
-- (BOOL)saveIndexFileWithHeaders:(NSDictionary *)headers
+- (BOOL)saveIndexFileWithHeaders:(NSDictionary *)aHeaders andRanges:(NSArray *)aRanges
 {
     NSMutableArray *ranges = [NSMutableArray array];
     
-    for (NSValue *rangeValue in self.ranges) {
+    for (NSValue *rangeValue in aRanges) {
         [ranges addObject:NSStringFromRange([rangeValue rangeValue])];
     }
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     dict[@"ranges"] = ranges;
-    dict[@"allHeaderFields"] = headers;
+    dict[@"allHeaderFields"] = aHeaders;
     
     NSData *indexData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
     if (nil == indexData) {
@@ -180,41 +208,13 @@
     return [indexData writeToFile:self.indexFilePath atomically:YES];
 }
 
-- (BOOL)saveIndexFile
-{
-    return [self saveIndexFileWithHeaders:self.allHeaderFields];
-}
-
 - (BOOL)saveAllHeaderFields:(NSDictionary *)allHeaderFields
 {
-    BOOL success = [self saveIndexFileWithHeaders:allHeaderFields];
+    BOOL success = [self saveIndexFileWithHeaders:allHeaderFields andRanges:self.ranges];
     if (success) {
         self.allHeaderFields = allHeaderFields;
     }
     return success;
-}
-
-- (BOOL)truncateFileToLength:(long long)length
-{
-    if (nil == self.writeFileHandle) {
-        return NO;
-    }
-    if (length < 0) {
-        return NO;
-    }
-    
-    @try {
-        [self.writeFileHandle truncateFileAtOffset:length];
-        unsigned long long end = [self.writeFileHandle seekToEndOfFile];
-        if (end != length) {
-            return NO;
-        }
-        _fileLength = length;
-    } @catch (NSException *exception) {
-        return NO;
-    }
-    
-    return YES;
 }
 
 - (void)makeErrorWithMessage:(NSString *)message code:(NSInteger)code forError:(NSError **)error
@@ -289,36 +289,10 @@
 
 - (BOOL)hasCachedHTTPURLResponse
 {
-    return _fileLength > 0 && self.allHeaderFields.count > 0;
-}
-
-- (NSData *)readDataWithRange:(NSRange)range
-{
-    @try {
-        [self.readFileHandle seekToFileOffset:range.location];
-        return [self.readFileHandle readDataOfLength:range.length];
-    } @catch (NSException *exception) {
-        return nil;
-    }
+    return _fileLength > 0 && _allHeaderFields.count > 0;
 }
 
 #pragma mark - Read/Write
-
-- (NSInteger)fileLength
-{
-    [_lock lock];
-    NSInteger length = _fileLength;
-    [_lock unlock];
-    return length;
-}
-
-- (NSArray<NSValue *> *)cachedRanges
-{
-    [_lock lock];
-    NSArray *ranges = [NSArray arrayWithArray:_ranges];
-    [_lock unlock];
-    return ranges;
-}
 
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error
 {
@@ -327,7 +301,7 @@
         return nil;
     }
     
-    if (nil == self.readFileHandle) {
+    if (NULL == _fileDataPtr) {
         [self makeErrorWithMessage:@"read file handle nil" code:-2 forError:error];
         return nil;
     }
@@ -340,7 +314,7 @@
         return nil;
     }
     
-    NSData *data = [self readDataWithRange:range];
+    NSData *data = [[NSData alloc] initWithBytes:(char *)_fileDataPtr + range.location length:range.length];
     if (nil == data) {
         [self makeErrorWithMessage:@"read null" code:-4 forError:error];
     }
@@ -350,10 +324,10 @@
 
 - (void)writeData:(NSData *)data atOffset:(NSInteger)offset
 {
-    if (nil == data || data.length == 0 || nil == self.writeFileHandle) {
+    if (nil == data || data.length == 0 || NULL == _fileDataPtr) {
         return;
     }
-    if (offset > [self fileLength]) {
+    if (offset > _fileLength) {
         return;
     }
     
@@ -362,25 +336,43 @@
         __strong typeof(wself) self = wself;
         
         [self.lock lock];
-        @try {
-            [self.writeFileHandle seekToFileOffset:offset];
-            [self.writeFileHandle writeData:data];
-        } @catch (NSException *exception) {
-            [self.lock unlock];
-            return;
-        }
-        
+        memcpy((char *)_fileDataPtr + offset, [data bytes], data.length);
         // Add Range
         [self addRange:NSMakeRange(offset, data.length)];
         [self.lock unlock];
     });
 }
 
+- (BOOL)gotFileLength:(NSUInteger)length
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    if ([fileManager fileExistsAtPath:_cacheFilePath]) {
+        [fileManager removeItemAtPath:_cacheFilePath error:nil];
+    }
+    
+    if (NO == [fileManager createFileAtPath:_cacheFilePath contents:nil attributes:nil]) {
+        return NO;
+    }
+    
+    const char *filename = [_cacheFilePath UTF8String];
+    
+    if (truncate(filename, length) != 0) {
+        return NO;
+    }
+    
+    if (MapFile(filename, &_fileDataPtr, &_fileLength) != 0) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (BOOL)writeResponse:(NSHTTPURLResponse *)response
 {
     BOOL success = YES;
     if (_fileLength == 0) {
-        success = [self truncateFileToLength:[response ll_totalLength]];
+        success = [self gotFileLength:[response ll_totalLength]];
     }
     success = success && [self saveAllHeaderFields:[response allHeaderFields]];
     
@@ -452,29 +444,20 @@
         __strong typeof(wself) self = wself;
         
         [self.lock lock];
-        [self saveIndexFile];
+        [self saveIndexFileWithHeaders:self.allHeaderFields andRanges:self.ranges];
         [self.lock unlock];
     });
 }
 
-- (void)clear
-{
-    [_lock lock];
-    _fileLength = 0;
-    _response = nil;
-    self.allHeaderFields = nil;
-    [self.ranges removeAllObjects];
-    [[NSFileManager defaultManager] removeItemAtPath:self.indexFilePath error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:self.cacheFilePath error:nil];
-    [_lock unlock];
-}
-
 - (BOOL)isComplete
 {
-    [_lock lock];
-    BOOL complete = _complete;
-    [_lock unlock];
-    return complete;
+    return _complete;
+}
+
++ (NSString *)cacheDirectory
+{
+    NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    return [cache stringByAppendingPathComponent:@"LLVideoPlayer"];
 }
 
 @end

@@ -50,21 +50,15 @@
 - (NSTimeInterval)currentTime;
 - (BOOL)stalling;
 
-@end
-
-
-@interface LLVideoPlayer (CacheSupport)
-
+#pragma mark - Cache Support
 + (void)clearAllCache;
 + (void)removeCacheForURL:(NSURL *)url;
-
-+ (void)preloadWithURL:(NSURL *)url;
-+ (void)cancelPreloadWithURL:(NSURL *)url;
-+ (void)cancelAllPreloads;
 
 + (NSString *)cachePathForURL:(NSURL *)url;
 + (BOOL)isCacheComplete:(NSURL *)url;
 
-+ (void)checkCacheWithPolicy:(LLVideoPlayerCachePolicy *)cachePolicy;
++ (void)preloadWithURL:(NSURL *)url;
++ (void)cancelPreloadWithURL:(NSURL *)url;
++ (void)cancelAllPreloads;
 
 @end
