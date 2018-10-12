@@ -60,6 +60,7 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 @property (nonatomic, strong) NSDictionary *allHeaderFields;
 @property (nonatomic, strong) NSRecursiveLock *lock;
 @property (nonatomic, strong) NSURLResponse *response;
+@property (nonatomic, strong) NSMutableArray<NSValue *> *ranges;
 
 @end
 
@@ -452,6 +453,11 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 - (BOOL)isComplete
 {
     return _complete;
+}
+
+- (NSArray *)cachedRanges
+{
+    return [NSArray arrayWithArray:_ranges];
 }
 
 + (NSString *)cacheDirectory

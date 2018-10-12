@@ -31,11 +31,12 @@ FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreloding;
 
 - (BOOL)isComplete;
 
+- (NSArray *)cachedRanges;
+
 + (NSString *)cacheDirectory;
 
 #pragma mark - Property
 
-@property (nonatomic, strong, readonly) NSMutableArray<NSValue *> *ranges;
 @property (nonatomic, assign, readonly) NSUInteger fileLength;
 @property (nonatomic, strong, readonly) NSString *cacheFilePath;
 
