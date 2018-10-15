@@ -457,7 +457,10 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 
 - (NSArray *)cachedRanges
 {
-    return [NSArray arrayWithArray:_ranges];
+    [_lock lock];
+    NSArray *ranges = [NSArray arrayWithArray:_ranges];
+    [_lock unlock];
+    return ranges;
 }
 
 + (NSString *)cacheDirectory
