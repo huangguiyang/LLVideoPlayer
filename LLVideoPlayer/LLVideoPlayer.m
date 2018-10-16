@@ -51,12 +51,14 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         self.view = videoPlayerView;
         self.state = LLVideoPlayerStateUnknown;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+        [self.view.layer addObserver:self forKeyPath:@"readyForDisplay" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
 }
 
 - (void)dealloc
 {
+    [self.view.layer removeObserver:self forKeyPath:@"readyForDisplay" context:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     [self clearPlayer];
 }
@@ -533,6 +535,17 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
             if ([self.delegate respondsToSelector:@selector(videoPlayer:loadedTimeRanges:)]) {
                 [self.delegate videoPlayer:self loadedTimeRanges:self.avPlayerItem.loadedTimeRanges];
+            }
+        }
+    } else if (object == self.view.layer) {
+        /// LLVideoPlayerView
+        
+        /// readyToDisplay
+        if ([keyPath isEqualToString:@"readyForDisplay"]) {
+            AVPlayerLayer *layer = (AVPlayerLayer *)self.view.layer;
+            LLLog(@"playerReadyForDisplay: %@", layer.readyForDisplay ? @"YES" : @"NO");
+            if ([self.delegate respondsToSelector:@selector(videoPlayer:readyForDisplay:)]) {
+                [self.delegate videoPlayer:self readyForDisplay:layer.readyForDisplay];
             }
         }
     }

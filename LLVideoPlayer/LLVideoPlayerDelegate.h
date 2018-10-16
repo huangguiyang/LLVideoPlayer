@@ -39,5 +39,6 @@
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty;
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp;
 - (void)videoPlayerPlaybackStalled:(LLVideoPlayer *)videoPlayer;
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer readyForDisplay:(BOOL)readyForDisplay;
 
 @end
