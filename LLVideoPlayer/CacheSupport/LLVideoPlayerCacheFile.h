@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
 
 FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionIndex;
 FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreload;
@@ -23,16 +22,16 @@ FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreloding;
 
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error;
 - (void)writeData:(NSData *)data atOffset:(NSInteger)offset;
+- (void)receiveResponse:(NSURLResponse *)response;
 
-- (void)receivedResponse:(NSURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest;
-- (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange;
+- (NSURLResponse *)constructURLResponseForURL:(NSURL *)url andRange:(NSRange)range;
+- (void)enumerateRangesWithRequestRange:(NSRange)requestRange usingBlock:(void (^)(NSRange range, BOOL cached))block;
 
 - (void)synchronize;
 
 - (BOOL)isComplete;
 
 - (NSArray *)cachedRanges;
-
 + (NSString *)cacheDirectory;
 
 #pragma mark - Property

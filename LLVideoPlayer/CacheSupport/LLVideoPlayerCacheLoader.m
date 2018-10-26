@@ -7,9 +7,9 @@
 //
 
 #import "LLVideoPlayerCacheLoader.h"
-#import "LLVideoPlayerCacheOperation.h"
+#import "LLVideoPlayerLoadingRequest.h"
 
-@interface LLVideoPlayerCacheLoader () <LLVideoPlayerCacheOperationDelegate>
+@interface LLVideoPlayerCacheLoader () <LLVideoPlayerLoadingRequestDelegate>
 
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, strong) NSMutableArray *operationQueue;
@@ -22,14 +22,9 @@
 
 - (void)dealloc
 {
-    for (LLVideoPlayerCacheOperation *operation in self.operationQueue) {
+    for (LLVideoPlayerLoadingRequest *operation in self.operationQueue) {
         [operation cancel];
     }
-}
-
-+ (instancetype)loaderWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile
-{
-    return [[self alloc] initWithCacheFile:cacheFile];
 }
 
 - (instancetype)initWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile
@@ -42,15 +37,15 @@
     return self;
 }
 
-#pragma mark - LLVideoPlayerCacheOperationDelegate
+#pragma mark - LLVideoPlayerLoadingRequestDelegate
 
-- (void)operationDidFinish:(LLVideoPlayerCacheOperation *)operation
+- (void)requestDidFinish:(LLVideoPlayerLoadingRequest *)operation
 {
     [operation.loadingRequest finishLoading];
     [self.operationQueue removeObject:operation];
 }
 
-- (void)operation:(LLVideoPlayerCacheOperation *)operation didFailWithError:(NSError *)error
+- (void)request:(LLVideoPlayerLoadingRequest *)operation didFailWithError:(NSError *)error
 {
     [operation.loadingRequest finishLoadingWithError:error];
     [self.operationQueue removeObject:operation];
@@ -60,7 +55,7 @@
 
 - (void)startLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    LLVideoPlayerCacheOperation *operation = [LLVideoPlayerCacheOperation operationWithLoadingRequest:loadingRequest cacheFile:self.cacheFile];
+    LLVideoPlayerLoadingRequest *operation = [[LLVideoPlayerLoadingRequest alloc] initWithLoadingRequest:loadingRequest cacheFile:self.cacheFile];
     operation.delegate = self;
     [self.operationQueue addObject:operation];
     [operation resume];
@@ -69,7 +64,7 @@
 - (void)cancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     for (NSInteger i = 0; i < self.operationQueue.count; i++) {
-        LLVideoPlayerCacheOperation *operation = self.operationQueue[i];
+        LLVideoPlayerLoadingRequest *operation = self.operationQueue[i];
         if (operation.loadingRequest == loadingRequest) {
             [operation cancel];
             [self.operationQueue removeObjectAtIndex:i];

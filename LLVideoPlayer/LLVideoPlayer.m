@@ -341,7 +341,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL] options:nil];
         NSString *path = cacheFilePathWithURL(streamURL);
         LLVideoPlayerCacheFile *file = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
-        self.resourceLoader = [LLVideoPlayerCacheLoader loaderWithCacheFile:file];
+        self.resourceLoader = [[LLVideoPlayerCacheLoader alloc] initWithCacheFile:file];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
     } else {
         asset = [[AVURLAsset alloc] initWithURL:streamURL options:nil];
@@ -952,7 +952,7 @@ static uint64_t diskFreeCapacity(void)
     AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[url ll_customSchemeURL] options:nil];
     NSString *preloadingDataFile = [NSString stringWithFormat:@"%@.%@", base, kLLVideoCacheFileExtensionPreloding];
     LLVideoPlayerCacheFile *file = [LLVideoPlayerCacheFile cacheFileWithFilePath:preloadingDataFile];
-    LLVideoPlayerCacheLoader *loader = [LLVideoPlayerCacheLoader loaderWithCacheFile:file];
+    LLVideoPlayerCacheLoader *loader = [[LLVideoPlayerCacheLoader alloc] initWithCacheFile:file];
     [asset.resourceLoader setDelegate:loader queue:dispatch_get_main_queue()];
     
     @synchronized (self) {
@@ -978,12 +978,10 @@ static uint64_t diskFreeCapacity(void)
             // move
             [fileManager moveItemAtPath:preloadingDataFile toPath:preloadDataFile error:nil];
             [fileManager moveItemAtPath:preloadingIndexFile toPath:preloadIndexFile error:nil];
-            NSLog(@"Preload done. [OK]");
         } else {
             // delete
             [fileManager removeItemAtPath:preloadingDataFile error:nil];
             [fileManager removeItemAtPath:preloadingIndexFile error:nil];
-            NSLog(@"Preload fail: %@", error);
         }
     }];
 }

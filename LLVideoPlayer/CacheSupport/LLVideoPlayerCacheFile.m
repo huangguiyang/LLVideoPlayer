@@ -288,11 +288,6 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     }
 }
 
-- (BOOL)hasCachedHTTPURLResponse
-{
-    return _fileLength > 0 && _allHeaderFields.count > 0;
-}
-
 #pragma mark - Read/Write
 
 - (NSData *)dataWithRange:(NSRange)range error:(NSError **)error
@@ -380,43 +375,13 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     return success;
 }
 
-- (NSHTTPURLResponse *)constructHTTPURLResponseForURL:(NSURL *)url andRange:(NSRange)range
-{
-    if (NO == [self hasCachedHTTPURLResponse]) {
-        return nil;
-    }
-    
-    if (range.length == NSIntegerMax) {
-        range.length = _fileLength - range.location;
-    }
-    
-    NSMutableDictionary *responseHeaders = [self.allHeaderFields mutableCopy];
-    NSString *contentRangeKey = @"Content-Range";
-    BOOL supportRange = responseHeaders[contentRangeKey] != nil;
-    
-    if (supportRange && LLValidByteRange(range)) {
-        responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, _fileLength);
-    } else {
-        [responseHeaders removeObjectForKey:contentRangeKey];
-    }
-    
-    responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu", range.length];
-    NSInteger statusCode = supportRange ? 206 : 200;
-    
-    return [[NSHTTPURLResponse alloc] initWithURL:url
-                                       statusCode:statusCode
-                                      HTTPVersion:@"HTTP/1.1"
-                                     headerFields:responseHeaders];
-}
-
-- (void)receivedResponse:(NSURLResponse *)response forLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
+- (void)receiveResponse:(NSURLResponse *)response
 {
     if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
         return;
     }
     [_lock lock];
     if (nil == _response) {
-        [loadingRequest ll_fillContentInformation:response];
         // save local
         [self writeResponse:(NSHTTPURLResponse *)response];
         _response = response;
@@ -424,18 +389,82 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     [_lock unlock];
 }
 
-- (void)tryResponseForLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest withRange:(NSRange)requestRange
+- (NSURLResponse *)constructURLResponseForURL:(NSURL *)url andRange:(NSRange)range
 {
+    NSHTTPURLResponse *response = nil;
+    
     [_lock lock];
-    if (nil == _response && [self hasCachedHTTPURLResponse]) {
-        NSHTTPURLResponse *respone = [self constructHTTPURLResponseForURL:loadingRequest.request.URL
-                                                                 andRange:requestRange];
-        if (respone) {
-            [loadingRequest ll_fillContentInformation:respone];
-            _response = respone;
+    if (_fileLength > 0 && _allHeaderFields.count > 0) {
+        if (range.length == NSIntegerMax) {
+            range.length = _fileLength - range.location;
         }
+        
+        NSMutableDictionary *responseHeaders = [self.allHeaderFields mutableCopy];
+        NSString *contentRangeKey = @"Content-Range";
+        BOOL supportRange = responseHeaders[contentRangeKey] != nil;
+        
+        if (supportRange && LLValidByteRange(range)) {
+            responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, _fileLength);
+        } else {
+            [responseHeaders removeObjectForKey:contentRangeKey];
+        }
+        
+        responseHeaders[@"Content-Length"] = [NSString stringWithFormat:@"%tu", range.length];
+        NSInteger statusCode = supportRange ? 206 : 200;
+        NSString *httpVersion = @"HTTP/1.1";
+        
+        response = [[NSHTTPURLResponse alloc] initWithURL:url
+                                               statusCode:statusCode
+                                              HTTPVersion:httpVersion
+                                             headerFields:responseHeaders];
     }
     [_lock unlock];
+    return response;
+}
+
+- (void)enumerateRangesWithRequestRange:(NSRange)requestRange usingBlock:(void (^)(NSRange range, BOOL cached))block
+{
+    NSParameterAssert(block);
+    NSInteger start = requestRange.location;
+    NSInteger end = requestRange.length == NSIntegerMax ? NSIntegerMax : NSMaxRange(requestRange);
+    
+    NSArray<NSValue *> *ranges = [self cachedRanges];
+    for (NSValue *value in ranges) {
+        NSRange range = [value rangeValue];
+        
+        if (start >= NSMaxRange(range)) {
+            continue;
+        }
+        
+        if (start < range.location) {
+            NSInteger cacheEnd = MIN(range.location, end);
+            block(NSMakeRange(start, cacheEnd - start), NO);
+            start = cacheEnd;
+            if (start == end) {
+                break;
+            }
+        }
+        
+        // in range
+        NSAssert(NSLocationInRange(start, range), @"Oops!!!");
+        
+        if (end <= NSMaxRange(range)) {
+            block(NSMakeRange(start, end - start), YES);
+            start = end;
+            break;
+        }
+        
+        block(NSMakeRange(start, NSMaxRange(range) - start), YES);
+        start = NSMaxRange(range);
+    }
+    
+    if (end > start && (self.fileLength == 0 || start < self.fileLength)) {
+        if (end == NSIntegerMax) {
+            block(NSMakeRange(start, NSIntegerMax), NO);
+        } else {
+            block(NSMakeRange(start, end - start), NO);
+        }
+    }
 }
 
 - (void)synchronize

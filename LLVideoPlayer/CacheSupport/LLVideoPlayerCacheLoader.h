@@ -12,10 +12,6 @@
 
 @interface LLVideoPlayerCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
-+ (instancetype)loaderWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile;
-
 - (instancetype)initWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile;
-
-@property (nonatomic, strong, readonly) LLVideoPlayerCacheFile *cacheFile;
 
 @end

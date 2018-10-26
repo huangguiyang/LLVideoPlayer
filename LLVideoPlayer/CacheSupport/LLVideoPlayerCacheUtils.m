@@ -25,6 +25,31 @@ NSString *LLRangeToHTTPRangeHeader(NSRange range)
     }
 }
 
+NSRange LLHTTPRangeHeaderToRange(NSString *rangeStr)
+{
+    if (NO == [rangeStr hasPrefix:@"bytes="]) {
+        return NSMakeRange(0, 0);
+    }
+    
+    NSString *sub = [rangeStr substringFromIndex:6];
+    if ([sub hasPrefix:@"-"]) {
+        NSInteger length = [[sub substringFromIndex:1] integerValue];
+        return NSMakeRange(NSNotFound, length);
+    } else if ([sub hasSuffix:@"-"]) {
+        NSInteger loc = [[sub substringToIndex:sub.length-1] integerValue];
+        return NSMakeRange(loc, NSIntegerMax);
+    } else {
+        NSArray *components = [sub componentsSeparatedByString:@"-"];
+        if (components.count != 2) {
+            return NSMakeRange(0, 0);
+        }
+        NSInteger start = [components[0] integerValue];
+        NSInteger end = [components[1] integerValue];
+        
+        return NSMakeRange(start, end - start + 1);
+    }
+}
+
 NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length)
 {
     if (LLValidByteRange(range)) {

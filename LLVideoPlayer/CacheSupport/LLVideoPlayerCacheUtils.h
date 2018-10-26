@@ -27,6 +27,7 @@ NS_INLINE BOOL LLRangeCanMerge(NSRange range1, NSRange range2)
 }
 
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeHeader(NSRange range);
+FOUNDATION_EXTERN NSRange LLHTTPRangeHeaderToRange(NSString *rangeStr);
 FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUInteger length);
 
 FOUNDATION_EXTERN NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest);
