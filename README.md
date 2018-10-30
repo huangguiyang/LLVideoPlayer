@@ -4,14 +4,13 @@
 [![License](https://img.shields.io/cocoapods/l/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
 [![Platform](https://img.shields.io/cocoapods/p/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
 
-A Low Level Video Player inspired by [VKVideoPlayer](https://github.com/viki-org/VKVideoPlayer).
+A low level video player based on AVPlayer with cache support.
 
 
 
-- [x] simple and flexible
-- [x] customize cache support
-- [x] preload support
-- [ ] AirPlay support
+- [x] Simple and flexible
+- [x] Cache support
+- [x] Preload support
 
 
 ## Example
@@ -48,7 +47,7 @@ NSURL *url = [NSURL URLWithString:@"<your stream url>"];
 
 LLVideoPlayer comes without any UI controls for flexibility. Your can add your custom contols to the container view `LLVideoPlayerView`.
 
-## Customize Cache Support
+## Cache Support
 
 LLVideoPlayer supports customize cache policy. To enable the cache support (default is disable):
 
@@ -67,7 +66,7 @@ See `LLVideoPlayerCachePolicy` for more details.
 ## Preload Support
 
 ```
-[LLVideoPlayerCacheHelper preloadWithURL:url];
+[LLVideoPlayer preloadWithURL:url];
 ```
 
 ## Requirements

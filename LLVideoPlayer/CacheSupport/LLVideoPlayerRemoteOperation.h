@@ -16,7 +16,7 @@ typedef NS_OPTIONS(NSUInteger, LLVideoPlayerRemoteOptions) {
 
 @interface LLVideoPlayerRemoteOperation : NSOperation <NSURLSessionDataDelegate>
 
-- (instancetype)initWithRequest:(NSURLRequest *)request cacheFile:(LLVideoPlayerCacheFile *)cacheFile session:(NSURLSession *)session options:(LLVideoPlayerRemoteOptions)options;
+- (instancetype)initWithRequest:(NSURLRequest *)request cacheFile:(LLVideoPlayerCacheFile *)cacheFile;
 
 @property (nonatomic, weak) id<LLVideoPlayerOperationDelegate> delegate;
 @property (nonatomic, strong) NSURLRequest *request;

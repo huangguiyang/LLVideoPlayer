@@ -10,23 +10,23 @@
 #import "LLVideoTrack.h"
 #import <AVFoundation/AVFoundation.h>
 #import "AVPlayer+LLPlayer.h"
-#import "LLVideoPlayerInternal.h"
 #import "LLVideoPlayerCacheLoader.h"
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheFile.h"
 #import "NSString+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
+#import "LLVideoPlayerDownloader.h"
+#import "LLVideoPlayerCacheManager.h"
+
+#if defined DEBUG
+#define NSLog(...)  NSLog(__VA_ARGS__)
+#else
+#define NSLog(...)
+#endif
 
 typedef void (^VoidBlock) (void);
 static NSString *kPlayableKey = @"playable";
 static NSString *kTracks = @"tracks";
-
-static NSString *cacheFilePathWithURL(NSURL *url)
-{
-    NSString *name = [url.absoluteString ll_md5];
-    NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
-    return [dir stringByAppendingPathComponent:name];
-}
 
 @interface LLVideoPlayer ()
 
@@ -156,12 +156,12 @@ static NSString *cacheFilePathWithURL(NSURL *url)
     ll_run_on_ui_thread(^{
         switch (self.avPlayerItem.status) {
             case AVPlayerItemStatusFailed:
-                LLLog(@"Trying to pause content but AVPlayerItemStatusFailed");
+                NSLog(@"Trying to pause content but AVPlayerItemStatusFailed");
                 self.state = LLVideoPlayerStateError;
                 return;
                 break;
             case AVPlayerItemStatusUnknown:
-                LLLog(@"Trying to pause content but AVPlayerItemStatusUnknown");
+                NSLog(@"Trying to pause content but AVPlayerItemStatusUnknown");
                 self.state = LLVideoPlayerStateContentLoading;
                 return;
                 break;
@@ -171,12 +171,12 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         
         switch (self.avPlayer.status) {
             case AVPlayerStatusFailed:
-                LLLog(@"Trying to pause content but AVPlayerStatusFailed");
+                NSLog(@"Trying to pause content but AVPlayerStatusFailed");
                 self.state = LLVideoPlayerStateError;
                 return;
                 break;
             case AVPlayerStatusUnknown:
-                LLLog(@"Trying to pause content but AVPlayerStatusUnknown");
+                NSLog(@"Trying to pause content but AVPlayerStatusUnknown");
                 self.state = LLVideoPlayerStateContentLoading;
                 return;
                 break;
@@ -186,7 +186,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         
         switch (self.state) {
             case LLVideoPlayerStateError:
-                LLLog(@"Trying to pause content but LLVideoPlayerStateError");
+                NSLog(@"Trying to pause content but LLVideoPlayerStateError");
                 // fall through
             case LLVideoPlayerStateContentPlaying:
             case LLVideoPlayerStateContentPaused:
@@ -197,7 +197,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
                 break;
                 
             case LLVideoPlayerStateContentLoading:
-                LLLog(@"Trying to pause content but LLVideoPlayerStateContentLoading");
+                NSLog(@"Trying to pause content but LLVideoPlayerStateContentLoading");
                 break;
                 
             case LLVideoPlayerStateDismissed:
@@ -213,10 +213,10 @@ static NSString *cacheFilePathWithURL(NSURL *url)
     ll_run_on_ui_thread(^{
         switch (self.avPlayerItem.status) {
             case AVPlayerItemStatusFailed:
-                LLLog(@"Trying to dismiss content at AVPlayerItemStatusFailed");
+                NSLog(@"Trying to dismiss content at AVPlayerItemStatusFailed");
                 break;
             case AVPlayerItemStatusUnknown:
-                LLLog(@"Trying to dismiss content at AVPlayerItemStatusUnknown");
+                NSLog(@"Trying to dismiss content at AVPlayerItemStatusUnknown");
                 break;
             default:
                 break;
@@ -224,10 +224,10 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         
         switch (self.avPlayer.status) {
             case AVPlayerStatusFailed:
-                LLLog(@"Trying to dismiss content at AVPlayerStatusFailed");
+                NSLog(@"Trying to dismiss content at AVPlayerStatusFailed");
                 break;
             case AVPlayerStatusUnknown:
-                LLLog(@"Trying to dismiss content at AVPlayerStatusUnknown");
+                NSLog(@"Trying to dismiss content at AVPlayerStatusUnknown");
                 break;
             default:
                 break;
@@ -235,11 +235,11 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         
         switch (self.state) {
             case LLVideoPlayerStateContentPlaying:
-                LLLog(@"Trying to dismiss content at LLVideoPlayerStateContentPlaying");
+                NSLog(@"Trying to dismiss content at LLVideoPlayerStateContentPlaying");
                 [self pauseContent:NO completionHandler:nil];
                 break;
             case LLVideoPlayerStateContentLoading:
-                LLLog(@"Trying to dismiss content at LLVideoPlayerStateContentLoading");
+                NSLog(@"Trying to dismiss content at LLVideoPlayerStateContentLoading");
                 break;
             case LLVideoPlayerStateContentPaused:
                 break;
@@ -256,7 +256,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
 
 - (void)seekToTimeInSecond:(float)sec userAction:(BOOL)isUserAction completionHandler:(void (^)(BOOL finished))completionHandler
 {
-    LLLog(@"seekToTimeInSecond: %f, userAction: %@", sec, isUserAction ? @"YES" : @"NO");
+    NSLog(@"seekToTimeInSecond: %f, userAction: %@", sec, isUserAction ? @"YES" : @"NO");
     [self.avPlayer ll_seekToTimeInSeconds:sec completionHandler:completionHandler];
 }
 
@@ -275,7 +275,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
             }
         }
         
-        LLLog(@"Seeking to last watched duration: %f", lastWatchedTime);
+        NSLog(@"Seeking to last watched duration: %f", lastWatchedTime);
         
         [self.avPlayer ll_seekToTimeInSeconds:lastWatchedTime completionHandler:completionHandler];
     });
@@ -339,9 +339,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
     
     if ([self sessionCacheEnabled]) {
         asset = [[AVURLAsset alloc] initWithURL:[streamURL ll_customSchemeURL] options:nil];
-        NSString *path = cacheFilePathWithURL(streamURL);
-        LLVideoPlayerCacheFile *file = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
-        self.resourceLoader = [[LLVideoPlayerCacheLoader alloc] initWithCacheFile:file];
+        self.resourceLoader = [[LLVideoPlayerCacheLoader alloc] initWithURL:streamURL];
         [asset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
     } else {
         asset = [[AVURLAsset alloc] initWithURL:streamURL options:nil];
@@ -351,21 +349,21 @@ static NSString *cacheFilePathWithURL(NSURL *url)
     [asset loadValuesAsynchronouslyForKeys:@[kPlayableKey, kTracks] completionHandler:^{
         ll_run_on_ui_thread(^{
             if (NO == [streamURL isEqual:self.track.streamURL]) {
-                LLLog(@"URL dismatch: %@ loaded, but cuurent is %@",streamURL, self.track.streamURL);
+                NSLog(@"URL dismatch: %@ loaded, but cuurent is %@",streamURL, self.track.streamURL);
                 return;
             }
             if (self.state == LLVideoPlayerStateDismissed) {
-                LLLog(@"Asset was dismissed while status %ld", (long)[asset statusOfValueForKey:kPlayableKey error:nil]);
+                NSLog(@"Asset was dismissed while status %ld", (long)[asset statusOfValueForKey:kPlayableKey error:nil]);
                 return;
             }
             NSError *error = nil;
             AVKeyValueStatus status = [asset statusOfValueForKey:kPlayableKey error:&error];
             if (status == AVKeyValueStatusLoaded) {
-                LLLog(@"AVURLAsset loaded. [OK]");
+                NSLog(@"AVURLAsset loaded. [OK]");
                 self.avPlayer = [self playerWithPlayerItem:self.avPlayerItem];
                 [playerLayerView setPlayer:self.avPlayer];
             } else {
-                LLLog(@"The asset's tracks were not loaded: %@", error);
+                NSLog(@"The asset's tracks were not loaded: %@", error);
                 [self handleErrorCode:LLVideoPlayerErrorAssetLoadError track:track error:error];
             }
         });
@@ -468,13 +466,13 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         if ([keyPath isEqualToString:@"status"]) {
             switch (self.avPlayer.status) {
                 case AVPlayerStatusReadyToPlay:
-                    LLLog(@"AVPlayerStatusReadyToPlay");
+                    NSLog(@"AVPlayerStatusReadyToPlay");
                     if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
                         [self handlePlayerItemReadyToPlay];
                     }
                     break;
                 case AVPlayerStatusFailed:
-                    LLLog(@"AVPlayerStatusFailed");
+                    NSLog(@"AVPlayerStatusFailed");
                     [self handleErrorCode:LLVideoPlayerErrorAVPlayerFail track:self.track error:nil];
                     break;
                 default:
@@ -490,13 +488,13 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         if ([keyPath isEqualToString:@"status"]) {
             switch (self.avPlayerItem.status) {
                 case AVPlayerItemStatusReadyToPlay:
-                    LLLog(@"AVPlayerItemStatusReadyToPlay");
+                    NSLog(@"AVPlayerItemStatusReadyToPlay");
                     if (self.avPlayer.status == AVPlayerStatusReadyToPlay) {
                         [self handlePlayerItemReadyToPlay];
                     }
                     break;
                 case AVPlayerItemStatusFailed:
-                    LLLog(@"AVPlayerStAVPlayerItemStatusFailedatusFailed");
+                    NSLog(@"AVPlayerStAVPlayerItemStatusFailedatusFailed");
                     [self handleErrorCode:LLVideoPlayerErrorAVPlayerItemFail track:self.track error:nil];
                     break;
                 default:
@@ -507,7 +505,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         /// playbackBufferEmpty
         
         if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
-            LLLog(@"playbackBufferEmpty: %@", self.avPlayerItem.playbackBufferEmpty ? @"YES" : @"NO");
+            NSLog(@"playbackBufferEmpty: %@", self.avPlayerItem.playbackBufferEmpty ? @"YES" : @"NO");
             if (self.state == LLVideoPlayerStateContentPlaying &&
                 [self currentTime] > 0 &&
                 [self currentTime] < [self.avPlayer ll_currentItemDuration] - 1) {
@@ -520,7 +518,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         /// playbackLikelyToKeepUp
         
         if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
-            LLLog(@"playbackLikelyToKeepUp: %@", self.avPlayerItem.playbackLikelyToKeepUp ? @"YES" : @"NO");
+            NSLog(@"playbackLikelyToKeepUp: %@", self.avPlayerItem.playbackLikelyToKeepUp ? @"YES" : @"NO");
             if (self.state == LLVideoPlayerStateContentPlaying) {
                 if ([self.delegate respondsToSelector:@selector(videoPlayer:playbackLikelyToKeepUp:)]) {
                     [self.delegate videoPlayer:self playbackLikelyToKeepUp:self.avPlayerItem.playbackLikelyToKeepUp];
@@ -543,7 +541,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
         /// readyToDisplay
         if ([keyPath isEqualToString:@"readyForDisplay"]) {
             AVPlayerLayer *layer = (AVPlayerLayer *)self.view.layer;
-            LLLog(@"playerReadyForDisplay: %@", layer.readyForDisplay ? @"YES" : @"NO");
+            NSLog(@"playerReadyForDisplay: %@", layer.readyForDisplay ? @"YES" : @"NO");
             if ([self.delegate respondsToSelector:@selector(videoPlayer:readyForDisplay:)]) {
                 [self.delegate videoPlayer:self readyForDisplay:layer.readyForDisplay];
             }
@@ -623,10 +621,10 @@ static NSString *cacheFilePathWithURL(NSURL *url)
 
 - (void)playerDidPlayToEnd:(NSNotification *)note
 {
-    LLLog(@"playerDidPlayToEnd: %@", note.object);
+    NSLog(@"playerDidPlayToEnd: %@", note.object);
     AVPlayerItem *finishedItem = note.object;
     if (NO == [finishedItem isEqual:self.avPlayerItem]) {
-        LLLog(@"[WRN] finished playerItem of another AVPlayer");
+        NSLog(@"[WRN] finished playerItem of another AVPlayer");
         return;
     }
     
@@ -643,10 +641,10 @@ static NSString *cacheFilePathWithURL(NSURL *url)
 
 - (void)playItemPlaybackStall:(NSNotification *)note
 {
-    LLLog(@"playItemPlaybackStall: %@", note.object);
+    NSLog(@"playItemPlaybackStall: %@", note.object);
     AVPlayerItem *stallItem = note.object;
     if (NO == [stallItem isEqual:self.avPlayerItem]) {
-        LLLog(@"[WRN] stall playerItem of another AVPlayer");
+        NSLog(@"[WRN] stall playerItem of another AVPlayer");
         return;
     }
     
@@ -660,7 +658,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
 - (void)handleWillResignActive:(NSNotification *)note
 {
     if (self.cacheSupportEnabled) {
-        [LLVideoPlayer checkCacheWithPolicy:self.cachePolicy];
+        [LLVideoPlayer cleanCacheWithPolicy:self.cachePolicy];
     }
 }
 
@@ -700,7 +698,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
                 break;
         }
         
-        LLLog(@"Player State: %@ -> %@",
+        NSLog(@"Player State: %@ -> %@",
               [LLVideoPlayerHelper playerStateToString:oldState],
               [LLVideoPlayerHelper playerStateToString:newState]);
         
@@ -736,7 +734,7 @@ static NSString *cacheFilePathWithURL(NSURL *url)
 
 - (void)handleErrorCode:(LLVideoPlayerError)errorCode track:(LLVideoTrack *)track error:(NSError *)error
 {
-    LLLog(@"[ERROR] %@: %@", [LLVideoPlayerHelper errorCodeToString:errorCode], track);
+    NSLog(@"[ERROR] %@: %@", [LLVideoPlayerHelper errorCodeToString:errorCode], track);
     [self addFailingURL:track.streamURL];
     if (errorCode == LLVideoPlayerErrorAssetLoadError) {
         [LLVideoPlayer removeCacheForURL:track.streamURL];
@@ -783,133 +781,33 @@ static NSString *cacheFilePathWithURL(NSURL *url)
 
 #pragma mark - Cache Support
 
-#define kMinFreeSpaceLimit (1ULL << 30)
-
-static uint64_t diskFreeCapacity(void)
++ (void)cleanCacheWithPolicy:(LLVideoPlayerCachePolicy *)cachePolicy
 {
-    NSError *error = nil;
-    NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
-    if (error) {
-        return -1;
-    }
-    int64_t space = [attrs[NSFileSystemFreeSize] longLongValue];
-    if (space < 0) {
-        space = -1;
-    }
-    return space;
-}
-
-+ (void)removeCacheAtPath:(NSString *)path
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    
-    [fileManager removeItemAtPath:path error:nil];
-    
-    NSString *index = [NSString stringWithFormat:@"%@.%@", path, kLLVideoCacheFileExtensionIndex];
-    [fileManager removeItemAtPath:index error:nil];
-    
-    NSString *preload = [NSString stringWithFormat:@"%@.%@", path, kLLVideoCacheFileExtensionPreload];
-    [fileManager removeItemAtPath:preload error:nil];
-    
-    NSString *preloadIndex = [NSString stringWithFormat:@"%@.%@", preload, kLLVideoCacheFileExtensionIndex];
-    [fileManager removeItemAtPath:preloadIndex error:nil];
-}
-
-+ (void)checkCacheWithPolicy:(LLVideoPlayerCachePolicy *)cachePolicy
-{
-    NSString *directory = [LLVideoPlayerCacheFile cacheDirectory];
-    NSError *error;
-    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:&error];
-    if (error) {
-        return;
-    }
-    
-    if (nil == cachePolicy) {
-        cachePolicy = [LLVideoPlayerCachePolicy defaultPolicy];
-    }
-    
-    NSUInteger totalSize = 0;
-    NSDate *now = [NSDate date];
-    NSMutableArray *paths = [NSMutableArray array];
-    
-    for (NSString *name in contents) {
-        if ([name pathExtension].length > 0) {
-            continue;
-        }
-        
-        NSString *path = [directory stringByAppendingPathComponent:name];
-        error = nil;
-        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
-        if (error) {
-            continue;
-        }
-        if (NO == [[attr fileType] isEqualToString:NSFileTypeRegular]) {
-            continue;
-        }
-        
-        NSDate *date = [attr fileCreationDate];
-        NSInteger hours = [now timeIntervalSinceDate:date] / 3600;
-        if (hours >= cachePolicy.outdatedHours) {
-            [self removeCacheAtPath:path];
-            continue;
-        }
-        
-        [paths addObject:path];
-        totalSize += [attr fileSize];
-    }
-    
-    const uint64_t minFreeSpaceLimit = kMinFreeSpaceLimit;
-    int64_t diskSpaceFreeSize = diskFreeCapacity();
-    
-    if (totalSize < cachePolicy.diskCapacity) {
-        if (diskSpaceFreeSize >= minFreeSpaceLimit) {
-            return;
-        }
-    }
-    
-    [paths sortUsingComparator:^NSComparisonResult(NSString *obj1, NSString *obj2) {
-        NSDictionary *attr1 = [[NSFileManager defaultManager] attributesOfItemAtPath:obj1 error:nil];
-        NSDictionary *attr2 = [[NSFileManager defaultManager] attributesOfItemAtPath:obj2 error:nil];
-        NSDate *date1 = [attr1 fileCreationDate];
-        NSDate *date2 = [attr2 fileCreationDate];
-        return [date1 compare:date2];
-    }];
-    
-    while (paths.count > 0 && (totalSize >= cachePolicy.diskCapacity || diskSpaceFreeSize < minFreeSpaceLimit)) {
-        NSString *path = [paths firstObject];
-        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-        [self removeCacheAtPath:path];
-        totalSize -= [attr fileSize];
-        diskSpaceFreeSize += [attr fileSize];
-        [paths removeObject:path];
-    }
+    [[LLVideoPlayerCacheManager defaultManager] cleanCacheWithPolicy:cachePolicy];
 }
 
 + (void)clearAllCache
 {
-    NSString *dir = [LLVideoPlayerCacheFile cacheDirectory];
-    [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
+    [[LLVideoPlayerCacheManager defaultManager] clearAllCache];
 }
 
 + (void)removeCacheForURL:(NSURL *)url
 {
-    [self removeCacheAtPath:cacheFilePathWithURL(url)];
+    [[LLVideoPlayerCacheManager defaultManager] removeCacheForURL:url];
 }
 
 + (NSString *)cachePathForURL:(NSURL *)url
 {
-    if (nil == url) {
-        return nil;
-    }
-    if ([url ll_m3u8]) {
+    if (nil == url || [url ll_m3u8]) {
         return nil;
     }
     if ([url isFileURL]) {
         return [url absoluteString];
     }
-    NSString *path = cacheFilePathWithURL(url);
-    LLVideoPlayerCacheFile *cacheFile = [LLVideoPlayerCacheFile cacheFileWithFilePath:path];
-    return [cacheFile isComplete] ? path : nil;
+    LLVideoPlayerCacheFile *cacheFile = [[LLVideoPlayerCacheManager defaultManager] createCacheFileForURL:url];
+    NSString *path = [cacheFile isComplete] ? cacheFile.cacheFilePath : nil;
+    [[LLVideoPlayerCacheManager defaultManager] releaseCacheFileForURL:url];
+    return path;
 }
 
 + (BOOL)isCacheComplete:(NSURL *)url
@@ -917,100 +815,32 @@ static uint64_t diskFreeCapacity(void)
     return [self cachePathForURL:url] != nil;
 }
 
-+ (NSMutableDictionary *)getPreloadMap
-{
-    static NSMutableDictionary *map;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        map = [NSMutableDictionary dictionary];
-    });
-    return map;
-}
-
 + (void)preloadWithURL:(NSURL *)url
 {
-    if ([url isFileURL] || [url ll_m3u8]) {
+    [self preloadWithURL:url bytes:(1 << 20)];
+}
+
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes
+{
+    if (nil == url || [url isFileURL] || [url ll_m3u8]) {
         return;
     }
     
-    NSMutableDictionary *map = [self getPreloadMap];
-    @synchronized (self) {
-        if ([map objectForKey:url] != nil) {
-            return;
-        }
-    }
-    
-    // check file existence
-    NSString *base = cacheFilePathWithURL(url);
-    NSString *preloadDataFile = [NSString stringWithFormat:@"%@.%@", base, kLLVideoCacheFileExtensionPreload];
-    NSString *preloadIndexFile = [NSString stringWithFormat:@"%@.%@", preloadDataFile, kLLVideoCacheFileExtensionIndex];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:preloadDataFile] &&
-        [[NSFileManager defaultManager] fileExistsAtPath:preloadIndexFile]) {
-        return;
-    }
-    
-    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[url ll_customSchemeURL] options:nil];
-    NSString *preloadingDataFile = [NSString stringWithFormat:@"%@.%@", base, kLLVideoCacheFileExtensionPreloding];
-    LLVideoPlayerCacheFile *file = [LLVideoPlayerCacheFile cacheFileWithFilePath:preloadingDataFile];
-    LLVideoPlayerCacheLoader *loader = [[LLVideoPlayerCacheLoader alloc] initWithCacheFile:file];
-    [asset.resourceLoader setDelegate:loader queue:dispatch_get_main_queue()];
-    
-    @synchronized (self) {
-        [map setObject:@{@"asset": asset, @"loader": loader} forKey:url];
-    }
-    
-    __weak typeof(asset) wasset = asset;
-    [asset loadValuesAsynchronouslyForKeys:@[kPlayableKey, kTracks] completionHandler:^{
-        __strong typeof(wasset) asset = wasset;
-        
-        NSMutableDictionary *map = [self getPreloadMap];
-        @synchronized (self) {
-            [map removeObjectForKey:url];
-        }
-        
-        NSError *error = nil;
-        AVKeyValueStatus status = [asset statusOfValueForKey:kPlayableKey error:&error];
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSString *preloadingIndexFile = [NSString stringWithFormat:@"%@.%@", preloadingDataFile, kLLVideoCacheFileExtensionIndex];
-        
-        if (status == AVKeyValueStatusLoaded) {
-            // move
-            [fileManager moveItemAtPath:preloadingDataFile toPath:preloadDataFile error:nil];
-            [fileManager moveItemAtPath:preloadingIndexFile toPath:preloadIndexFile error:nil];
-        } else {
-            // delete
-            [fileManager removeItemAtPath:preloadingDataFile error:nil];
-            [fileManager removeItemAtPath:preloadingIndexFile error:nil];
-        }
-    }];
+    [[LLVideoPlayerDownloader defaultDownloader] preloadWithURL:url bytes:bytes];
 }
 
 + (void)cancelPreloadWithURL:(NSURL *)url
 {
-    NSMutableDictionary *map = [self getPreloadMap];
-    @synchronized (self) {
-        NSDictionary *dict = [map objectForKey:url];
-        if (dict) {
-            AVURLAsset *asset = dict[@"asset"];
-            [asset cancelLoading];
-            
-            [map removeObjectForKey:url];
-        }
+    if (nil == url || [url isFileURL] || [url ll_m3u8]) {
+        return;
     }
+    
+    [[LLVideoPlayerDownloader defaultDownloader] cancelPreloadWithURL:url];
 }
 
 + (void)cancelAllPreloads
 {
-    NSMutableDictionary *map = [self getPreloadMap];
-    @synchronized (self) {
-        [map enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            NSDictionary *dict = obj;
-            AVURLAsset *asset = dict[@"asset"];
-            [asset cancelLoading];
-        }];
-        [map removeAllObjects];
-    }
+    [[LLVideoPlayerDownloader defaultDownloader] cancelAllPreloads];
 }
 
 @end

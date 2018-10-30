@@ -12,8 +12,9 @@
 
 @protocol LLVideoPlayerOperationDelegate <NSObject>
 
-- (void)operationDidFinish:(NSOperation *)operation;
-- (void)operation:(NSOperation *)operation didFailWithError:(NSError *)error;
+@optional
+
+- (void)operation:(NSOperation *)operation didCompleteWithError:(NSError *)error;
 - (void)operation:(NSOperation *)operation didReceiveData:(NSData *)data;
 - (void)operation:(NSOperation *)operation didReceiveResponse:(NSURLResponse *)response;
 

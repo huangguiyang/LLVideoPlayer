@@ -13,8 +13,7 @@
 @class LLVideoPlayerLoadingRequest;
 @protocol LLVideoPlayerLoadingRequestDelegate <NSObject>
 
-- (void)requestDidFinish:(LLVideoPlayerLoadingRequest *)operation;
-- (void)request:(LLVideoPlayerLoadingRequest *)operation didFailWithError:(NSError *)error;
+- (void)request:(LLVideoPlayerLoadingRequest *)operation didComepleteWithError:(NSError *)error;
 
 @end
 

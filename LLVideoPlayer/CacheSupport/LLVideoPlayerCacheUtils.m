@@ -84,6 +84,21 @@ NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest
     }
 }
 
+NSString *LLValueForHTTPHeaderField(NSDictionary *headers, NSString *key)
+{
+    NSString *value;
+    
+    if (nil == headers || nil == key) return nil;
+    value = [headers objectForKey:key];
+    if (value) return value;
+    value = [headers objectForKey:[key lowercaseString]];
+    if (value) return value;
+    value = [headers objectForKey:[key capitalizedString]];
+    if (value) return value;
+    
+    return nil;
+}
+
 void ll_run_on_non_ui_thread(dispatch_block_t block)
 {
     if ([NSThread isMainThread]) {

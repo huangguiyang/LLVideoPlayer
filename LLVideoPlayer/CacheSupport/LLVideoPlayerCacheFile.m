@@ -15,10 +15,8 @@
 #import <sys/mman.h>
 
 NSString * const kLLVideoCacheFileExtensionIndex = @"idx";
-NSString * const kLLVideoCacheFileExtensionPreload = @"preload";
-NSString * const kLLVideoCacheFileExtensionPreloding = @"preloading";
 
-static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLength) {
+static int mapfile(const char *filename, void **outDataPtr, size_t *outDataLength) {
     int fd;
     int outError = 0;
     struct stat statInfo;
@@ -58,7 +56,7 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 @property (nonatomic, strong) NSString *cacheFilePath;
 @property (nonatomic, strong) NSString *indexFilePath;
 @property (nonatomic, strong) NSDictionary *allHeaderFields;
-@property (nonatomic, strong) NSRecursiveLock *lock;
+@property (nonatomic, strong) NSLock *lock;
 @property (nonatomic, strong) NSURLResponse *response;
 @property (nonatomic, strong) NSMutableArray<NSValue *> *ranges;
 
@@ -73,54 +71,29 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     }
 }
 
-+ (instancetype)cacheFileWithFilePath:(NSString *)filePath
-{
-    return [[self alloc] initWithFilePath:filePath];
-}
-
-- (instancetype)initWithFilePath:(NSString *)filePath
+- (instancetype)initWithURL:(NSURL *)url
 {
     self = [super init];
     if (self) {
-        _lock = [[NSRecursiveLock alloc] init];
+        _lock = [[NSLock alloc] init];
         _ranges = [NSMutableArray array];
-        _cacheFilePath = [filePath copy];
-        _indexFilePath = [NSString stringWithFormat:@"%@.%@", filePath, kLLVideoCacheFileExtensionIndex];
+        _cacheFilePath = [LLVideoPlayerCacheFile cacheFilePathWithURL:url];
+        _indexFilePath = [NSString stringWithFormat:@"%@.%@", _cacheFilePath, kLLVideoCacheFileExtensionIndex];
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSString *dir = [filePath stringByDeletingLastPathComponent];
+        NSString *dir = [_cacheFilePath stringByDeletingLastPathComponent];
         if (NO == [fileManager fileExistsAtPath:dir] &&
             NO == [fileManager createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) {
             return nil;
         }
         
-        [self loadExternalCache];
-        if (NO == [self loadCacheFile]) {
-            [fileManager removeItemAtPath:_indexFilePath error:nil];
-            [fileManager removeItemAtPath:_cacheFilePath error:nil];
-        }
-        
+        [self loadCacheFile];
         [self checkComplete];
     }
     return self;
 }
 
 #pragma mark - Private
-
-- (void)loadExternalCache
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (NO == [fileManager fileExistsAtPath:_indexFilePath] || NO == [fileManager fileExistsAtPath:_cacheFilePath]) {
-        NSString *data = [NSString stringWithFormat:@"%@.%@", _cacheFilePath, kLLVideoCacheFileExtensionPreload];
-        NSString *index = [NSString stringWithFormat:@"%@.%@", data, kLLVideoCacheFileExtensionIndex];
-        if ([fileManager fileExistsAtPath:data] && [fileManager fileExistsAtPath:index]) {
-            [fileManager removeItemAtPath:_indexFilePath error:nil];
-            [fileManager removeItemAtPath:_cacheFilePath error:nil];
-            [fileManager moveItemAtPath:index toPath:_indexFilePath error:nil];
-            [fileManager moveItemAtPath:data toPath:_cacheFilePath error:nil];
-        }
-    }
-}
 
 - (void)checkComplete
 {
@@ -132,7 +105,20 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     }
 }
 
-- (BOOL)loadCacheFile
+- (void)loadCacheFile
+{
+    if (NO == [self tryloadCacheFile]) {
+        // reset index
+        _fileLength = 0;
+        _fileDataPtr = NULL;
+        _allHeaderFields = nil;
+        [_ranges removeAllObjects];
+        [[NSFileManager defaultManager] removeItemAtPath:_indexFilePath error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:_cacheFilePath error:nil];
+    }
+}
+
+- (BOOL)tryloadCacheFile
 {
     NSData *indexData = [NSData dataWithContentsOfFile:_indexFilePath];
     if (nil == indexData) {
@@ -145,7 +131,8 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     }
     
     _allHeaderFields = dict[@"allHeaderFields"];
-    _fileLength = [[_allHeaderFields[@"Content-Range"] ll_decodeLengthFromContentRange] integerValue];
+    NSString *contentRange = LLValueForHTTPHeaderField(_allHeaderFields, @"Content-Range");
+    _fileLength = [[contentRange ll_decodeLengthFromContentRange] integerValue];
     if (_allHeaderFields.count == 0 || _fileLength == 0) {
         return NO;
     }
@@ -169,7 +156,7 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
                 return NO;
             }
         }
-        if (MapFile(filename, &_fileDataPtr, &_fileLength) != 0) {
+        if (mapfile(filename, &_fileDataPtr, &_fileLength) != 0) {
             return NO;
         }
     } else if (r == ENOENT) {
@@ -179,7 +166,7 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
         if (truncate(filename, _fileLength) != 0) {
             return NO;
         }
-        if (MapFile(filename, &_fileDataPtr, &_fileLength) != 0) {
+        if (mapfile(filename, &_fileDataPtr, &_fileLength) != 0) {
             return NO;
         }
     } else {
@@ -189,17 +176,17 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     return YES;
 }
 
-- (BOOL)saveIndexFileWithHeaders:(NSDictionary *)aHeaders andRanges:(NSArray *)aRanges
+- (BOOL)saveIndexFile
 {
     NSMutableArray *ranges = [NSMutableArray array];
     
-    for (NSValue *rangeValue in aRanges) {
+    for (NSValue *rangeValue in self.ranges) {
         [ranges addObject:NSStringFromRange([rangeValue rangeValue])];
     }
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     dict[@"ranges"] = ranges;
-    dict[@"allHeaderFields"] = aHeaders;
+    dict[@"allHeaderFields"] = self.allHeaderFields;
     
     NSData *indexData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
     if (nil == indexData) {
@@ -207,24 +194,6 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     }
     
     return [indexData writeToFile:self.indexFilePath atomically:YES];
-}
-
-- (BOOL)saveAllHeaderFields:(NSDictionary *)allHeaderFields
-{
-    BOOL success = [self saveIndexFileWithHeaders:allHeaderFields andRanges:self.ranges];
-    if (success) {
-        self.allHeaderFields = allHeaderFields;
-    }
-    return success;
-}
-
-- (void)makeErrorWithMessage:(NSString *)message code:(NSInteger)code forError:(NSError **)error
-{
-    if (error) {
-        *error = [NSError errorWithDomain:@"LLVideoPlayerCacheFile"
-                                     code:code
-                                 userInfo:@{NSLocalizedDescriptionKey:message}];
-    }
 }
 
 - (void)addRange:(NSRange)range
@@ -260,7 +229,6 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     [self checkComplete];
 }
 
-
 - (NSRange)cachedRangeForRange:(NSRange)requestRange
 {
     if (requestRange.location >= _fileLength) {
@@ -290,35 +258,29 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 
 #pragma mark - Read/Write
 
-- (NSData *)dataWithRange:(NSRange)range error:(NSError **)error
+- (NSData *)dataWithRange:(NSRange)range
 {
     if (NO == LLValidFileRange(range)) {
-        [self makeErrorWithMessage:@"invalid file range" code:-1 forError:error];
         return nil;
     }
     
     if (NULL == _fileDataPtr) {
-        [self makeErrorWithMessage:@"read file handle nil" code:-2 forError:error];
         return nil;
     }
     
-    [_lock lock];
+    NSData *data = nil;
+    
+    [self.lock lock];
     NSRange resultRange = [self cachedRangeForRange:range];
-    if (NO == LLValidFileRange(resultRange)) {
-        [self makeErrorWithMessage:@"no cached found or not match" code:-3 forError:error];
-        [_lock unlock];
-        return nil;
+    if (LLValidFileRange(resultRange)) {
+        data = [[NSData alloc] initWithBytes:(char *)_fileDataPtr + range.location length:range.length];
     }
+    [self.lock unlock];
     
-    NSData *data = [[NSData alloc] initWithBytes:(char *)_fileDataPtr + range.location length:range.length];
-    if (nil == data) {
-        [self makeErrorWithMessage:@"read null" code:-4 forError:error];
-    }
-    [_lock unlock];
     return data;
 }
 
-- (void)writeData:(NSData *)data atOffset:(NSInteger)offset
+- (void)writeData:(NSData *)data atOffset:(NSUInteger)offset
 {
     if (nil == data || data.length == 0 || NULL == _fileDataPtr) {
         return;
@@ -327,16 +289,11 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
         return;
     }
     
-    __weak typeof(self) wself = self;
-    ll_run_on_non_ui_thread(^{
-        __strong typeof(wself) self = wself;
-        
-        [self.lock lock];
-        memcpy((char *)_fileDataPtr + offset, [data bytes], data.length);
-        // Add Range
-        [self addRange:NSMakeRange(offset, data.length)];
-        [self.lock unlock];
-    });
+    [self.lock lock];
+    memcpy((char *)_fileDataPtr + offset, [data bytes], data.length);
+    // Add Range
+    [self addRange:NSMakeRange(offset, data.length)];
+    [self.lock unlock];
 }
 
 - (BOOL)gotFileLength:(NSUInteger)length
@@ -357,22 +314,17 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
         return NO;
     }
     
-    if (MapFile(filename, &_fileDataPtr, &_fileLength) != 0) {
+    void *dataPtr = NULL;
+    size_t dataLength = 0;
+    
+    if (mapfile(filename, &dataPtr, &dataLength) != 0) {
         return NO;
     }
     
-    return YES;
-}
-
-- (BOOL)writeResponse:(NSHTTPURLResponse *)response
-{
-    BOOL success = YES;
-    if (_fileLength == 0) {
-        success = [self gotFileLength:[response ll_totalLength]];
-    }
-    success = success && [self saveAllHeaderFields:[response allHeaderFields]];
+    _fileDataPtr = dataPtr;
+    _fileLength = dataLength;
     
-    return success;
+    return YES;
 }
 
 - (void)receiveResponse:(NSURLResponse *)response
@@ -380,20 +332,26 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
     if (nil == response || NO == [response isKindOfClass:[NSHTTPURLResponse class]]) {
         return;
     }
-    [_lock lock];
+    [self.lock lock];
     if (nil == _response) {
         // save local
-        [self writeResponse:(NSHTTPURLResponse *)response];
         _response = response;
+        if (_fileLength == 0) {
+            [self gotFileLength:[response ll_totalLength]];
+        }
+        if (nil == _allHeaderFields) {
+            _allHeaderFields = [(NSHTTPURLResponse *)response allHeaderFields];
+        }
+        [self saveIndexFile];
     }
-    [_lock unlock];
+    [self.lock unlock];
 }
 
 - (NSURLResponse *)constructURLResponseForURL:(NSURL *)url andRange:(NSRange)range
 {
     NSHTTPURLResponse *response = nil;
     
-    [_lock lock];
+    [self.lock lock];
     if (_fileLength > 0 && _allHeaderFields.count > 0) {
         if (range.length == NSIntegerMax) {
             range.length = _fileLength - range.location;
@@ -401,7 +359,7 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
         
         NSMutableDictionary *responseHeaders = [self.allHeaderFields mutableCopy];
         NSString *contentRangeKey = @"Content-Range";
-        BOOL supportRange = responseHeaders[contentRangeKey] != nil;
+        BOOL supportRange = LLValueForHTTPHeaderField(responseHeaders, contentRangeKey) != nil;
         
         if (supportRange && LLValidByteRange(range)) {
             responseHeaders[contentRangeKey] = LLRangeToHTTPRangeResponseHeader(range, _fileLength);
@@ -418,7 +376,7 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
                                               HTTPVersion:httpVersion
                                              headerFields:responseHeaders];
     }
-    [_lock unlock];
+    [self.lock unlock];
     return response;
 }
 
@@ -469,14 +427,9 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 
 - (void)synchronize
 {
-    __weak typeof(self) wself = self;
-    ll_run_on_non_ui_thread(^{
-        __strong typeof(wself) self = wself;
-        
-        [self.lock lock];
-        [self saveIndexFileWithHeaders:self.allHeaderFields andRanges:self.ranges];
-        [self.lock unlock];
-    });
+    [self.lock lock];
+    [self saveIndexFile];
+    [self.lock unlock];
 }
 
 - (BOOL)isComplete
@@ -486,9 +439,9 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 
 - (NSArray *)cachedRanges
 {
-    [_lock lock];
+    [self.lock lock];
     NSArray *ranges = [NSArray arrayWithArray:_ranges];
-    [_lock unlock];
+    [self.lock unlock];
     return ranges;
 }
 
@@ -496,6 +449,13 @@ static int MapFile(const char *filename, void **outDataPtr, size_t *outDataLengt
 {
     NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
     return [cache stringByAppendingPathComponent:@"LLVideoPlayer"];
+}
+
++ (NSString *)cacheFilePathWithURL:(NSURL *)url
+{
+    NSString *name = [url.absoluteString ll_md5];
+    NSString *dir = [self cacheDirectory];
+    return [dir stringByAppendingPathComponent:name];
 }
 
 @end

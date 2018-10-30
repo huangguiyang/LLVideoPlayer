@@ -58,6 +58,7 @@
 + (BOOL)isCacheComplete:(NSURL *)url;
 
 + (void)preloadWithURL:(NSURL *)url;
++ (void)preloadWithURL:(NSURL *)url bytes:(NSUInteger)bytes;
 + (void)cancelPreloadWithURL:(NSURL *)url;
 + (void)cancelAllPreloads;
 

@@ -8,9 +8,12 @@
 
 #import "LLVideoPlayerCacheLoader.h"
 #import "LLVideoPlayerLoadingRequest.h"
+#import "LLVideoPlayerCacheFile.h"
+#import "LLVideoPlayerCacheManager.h"
 
 @interface LLVideoPlayerCacheLoader () <LLVideoPlayerLoadingRequestDelegate>
 
+@property (nonatomic, strong) NSURL *streamURL;
 @property (nonatomic, strong) LLVideoPlayerCacheFile *cacheFile;
 @property (nonatomic, strong) NSMutableArray *operationQueue;
 
@@ -22,32 +25,32 @@
 
 - (void)dealloc
 {
-    for (LLVideoPlayerLoadingRequest *operation in self.operationQueue) {
+    for (LLVideoPlayerLoadingRequest *operation in _operationQueue) {
         [operation cancel];
     }
+    [[LLVideoPlayerCacheManager defaultManager] releaseCacheFileForURL:_streamURL];
 }
 
-- (instancetype)initWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile
+- (instancetype)initWithURL:(NSURL *)streamURL
 {
     self = [super init];
     if (self) {
-        _cacheFile = cacheFile;
+        _streamURL = streamURL;
         _operationQueue = [[NSMutableArray alloc] initWithCapacity:4];
+        _cacheFile = [[LLVideoPlayerCacheManager defaultManager] createCacheFileForURL:streamURL];
     }
     return self;
 }
 
 #pragma mark - LLVideoPlayerLoadingRequestDelegate
 
-- (void)requestDidFinish:(LLVideoPlayerLoadingRequest *)operation
+- (void)request:(LLVideoPlayerLoadingRequest *)operation didComepleteWithError:(NSError *)error
 {
-    [operation.loadingRequest finishLoading];
-    [self.operationQueue removeObject:operation];
-}
-
-- (void)request:(LLVideoPlayerLoadingRequest *)operation didFailWithError:(NSError *)error
-{
-    [operation.loadingRequest finishLoadingWithError:error];
+    if (nil == error) {
+        [operation.loadingRequest finishLoading];
+    } else {
+        [operation.loadingRequest finishLoadingWithError:error];
+    }
     [self.operationQueue removeObject:operation];
 }
 

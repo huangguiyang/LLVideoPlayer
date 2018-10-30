@@ -7,7 +7,6 @@
 //
 
 #import "LLVideoPlayerView.h"
-#import "LLVideoPlayerInternal.h"
 
 @implementation LLVideoPlayerView
 

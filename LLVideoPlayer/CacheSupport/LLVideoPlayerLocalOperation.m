@@ -51,21 +51,21 @@
             
             NSString *rangeStr = [self.request valueForHTTPHeaderField:@"Range"];
             NSRange range = LLHTTPRangeHeaderToRange(rangeStr);
-            data = [self.cacheFile dataWithRange:range error:&error];
+            data = [self.cacheFile dataWithRange:range];
             [self finish];
         }
         
-        if (nil == error) {
+        if (data) {
             if ([self.delegate respondsToSelector:@selector(operation:didReceiveData:)]) {
                 [self.delegate operation:self didReceiveData:data];
             }
-            if ([self.delegate respondsToSelector:@selector(operationDidFinish:)]) {
-                [self.delegate operationDidFinish:self];
-            }
         } else {
-            if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
-                [self.delegate operation:self didFailWithError:error];
-            }
+            // data == nil
+            error = [NSError errorWithDomain:NSURLErrorDomain code:404 userInfo:nil];
+        }
+        
+        if ([self.delegate respondsToSelector:@selector(operation:didCompleteWithError:)]) {
+            [self.delegate operation:self didCompleteWithError:error];
         }
     }
 }
@@ -85,8 +85,8 @@
         }
     }
     
-    if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
-        [self.delegate operation:self didFailWithError:
+    if ([self.delegate respondsToSelector:@selector(operation:didCompleteWithError:)]) {
+        [self.delegate operation:self didCompleteWithError:
          [NSError errorWithDomain:@"LLVideoPlayerCacheTask" code:NSURLErrorCancelled userInfo:nil]];
     }
 }

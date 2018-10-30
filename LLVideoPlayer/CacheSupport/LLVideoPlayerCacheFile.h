@@ -9,19 +9,15 @@
 #import <Foundation/Foundation.h>
 
 FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionIndex;
-FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreload;
-FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreloding;
 
 @interface LLVideoPlayerCacheFile : NSObject
 
-+ (instancetype)cacheFileWithFilePath:(NSString *)filePath;
-
-- (instancetype)initWithFilePath:(NSString *)filePath;
+- (instancetype)initWithURL:(NSURL *)url;
 
 #pragma mark - Read/Write
 
-- (NSData *)dataWithRange:(NSRange)range error:(NSError **)error;
-- (void)writeData:(NSData *)data atOffset:(NSInteger)offset;
+- (NSData *)dataWithRange:(NSRange)range;
+- (void)writeData:(NSData *)data atOffset:(NSUInteger)offset;
 - (void)receiveResponse:(NSURLResponse *)response;
 
 - (NSURLResponse *)constructURLResponseForURL:(NSURL *)url andRange:(NSRange)range;
@@ -31,8 +27,8 @@ FOUNDATION_EXTERN NSString * const kLLVideoCacheFileExtensionPreloding;
 
 - (BOOL)isComplete;
 
-- (NSArray *)cachedRanges;
 + (NSString *)cacheDirectory;
++ (NSString *)cacheFilePathWithURL:(NSURL *)url;
 
 #pragma mark - Property
 

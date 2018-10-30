@@ -20,8 +20,8 @@
 @property (nonatomic, strong) NSMutableArray<NSOperation *> *taskQueue;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 @property (nonatomic, strong) NSRecursiveLock *lock;
-@property (nonatomic, assign) NSInteger cancels;
 @property (nonatomic, strong) NSURLResponse *response;
+@property (nonatomic, assign) NSInteger cancels;
 
 @end
 
@@ -43,52 +43,49 @@
 
 - (void)resume
 {
-    [_lock lock];
+    [self.lock lock];
     [self startOperation];
-    [_lock unlock];
+    [self.lock unlock];
 }
 
 - (void)cancel
 {
-    [_lock lock];
+    [self.lock lock];
     NSArray *copyQueue = [NSArray arrayWithArray:self.taskQueue];
     for (NSOperation *operation in copyQueue) {
         [operation cancel];
     }
-    [_lock unlock];
+    [self.lock unlock];
 }
 
-#pragma mark - LLVideoPlayerCacheTaskDelegate
+#pragma mark - LLVideoPlayerOperationDelegate
 
-- (void)operationDidFinish:(NSOperation *)task
+- (void)operation:(NSOperation *)operation didCompleteWithError:(NSError *)error
 {
-    [_lock lock];
-    [self.taskQueue removeObject:task];
-    if (self.taskQueue.count == 0 && self.cancels == 0) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.delegate respondsToSelector:@selector(requestDidFinish:)]) {
-                [self.delegate requestDidFinish:self];
-            }
-        });
-    }
-    [_lock unlock];
-}
-
-- (void)operation:(NSOperation *)task didFailWithError:(NSError *)error
-{
-    [_lock lock];
-    [self.taskQueue removeObject:task];
-    if ([task isCancelled] || error.code == NSURLErrorCancelled) {
-        self.cancels++;
+    [self.lock lock];
+    [self.taskQueue removeObject:operation];
+    // must cancel all request if error occurs, otherwise `respondWithData:` would corrupt.
+    if (nil == error) {
+        if (self.taskQueue.count == 0 && self.cancels == 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.delegate respondsToSelector:@selector(request:didComepleteWithError:)]) {
+                    [self.delegate request:self didComepleteWithError:nil];
+                }
+            });
+        }
     } else {
-        [self cancel];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.delegate respondsToSelector:@selector(request:didFailWithError:)]) {
-                [self.delegate request:self didFailWithError:error];
-            }
-        });
+        if ([operation isCancelled] || error.code == NSURLErrorCancelled) {
+            self.cancels++;
+        } else {
+            [self cancel];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.delegate respondsToSelector:@selector(request:didComepleteWithError:)]) {
+                    [self.delegate request:self didComepleteWithError:error];
+                }
+            });
+        }
     }
-    [_lock unlock];
+    [self.lock unlock];
 }
 
 - (void)operation:(NSOperation *)operation didReceiveResponse:(NSURLResponse *)response
@@ -151,7 +148,7 @@
         task = [[LLVideoPlayerLocalOperation alloc] initWithRequest:request cacheFile:self.cacheFile];
         [(LLVideoPlayerLocalOperation *)task setDelegate:self];
     } else {
-        task = [[LLVideoPlayerRemoteOperation alloc] initWithRequest:request cacheFile:self.cacheFile session:nil options:0];
+        task = [[LLVideoPlayerRemoteOperation alloc] initWithRequest:request cacheFile:self.cacheFile];
         [(LLVideoPlayerRemoteOperation *)task setDelegate:self];
     }
     

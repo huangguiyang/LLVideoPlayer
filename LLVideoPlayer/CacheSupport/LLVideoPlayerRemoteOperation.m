@@ -10,6 +10,7 @@
 #import "NSURL+LLVideoPlayer.h"
 #import "LLVideoPlayerCacheUtils.h"
 #import "NSURLResponse+LLVideoPlayer.h"
+#import "LLVideoPlayerCacheManager.h"
 
 @interface LLVideoPlayerRemoteOperation ()
 
@@ -20,7 +21,7 @@
 @property (nonatomic, strong) NSURLSession *ownedSession;
 @property (nonatomic, strong) NSURLSessionDataTask *dataTask;
 @property (nonatomic, assign) LLVideoPlayerRemoteOptions options;
-@property (nonatomic, assign) NSInteger offset;
+@property (nonatomic, assign) NSUInteger offset;
 
 @end
 
@@ -33,20 +34,21 @@
     return [NSString stringWithFormat:@"<%@: %p> %@", NSStringFromClass(self.class), self, [self.request valueForHTTPHeaderField:@"Range"]];
 }
 
-- (instancetype)initWithRequest:(NSURLRequest *)request cacheFile:(LLVideoPlayerCacheFile *)cacheFile session:(NSURLSession *)session options:(LLVideoPlayerRemoteOptions)options
+- (instancetype)initWithRequest:(NSURLRequest *)request cacheFile:(LLVideoPlayerCacheFile *)cacheFile
 {
     self = [super init];
     if (self) {
         _request = request;
         _cacheFile = cacheFile;
-        _unownedSession = session;
-        _options = options;
+        _unownedSession = [LLVideoPlayerCacheManager defaultManager].session;
+        _options = 0;
     }
     return self;
 }
 
 - (void)reset
 {
+    self.delegate = nil;
     self.dataTask = nil;
     if (self.ownedSession) {
         [self.ownedSession invalidateAndCancel];
@@ -82,7 +84,13 @@
         
         NSRange range = LLHTTPRangeHeaderToRange([self.request valueForHTTPHeaderField:@"Range"]);
         self.offset = range.location;
-        self.dataTask = [session dataTaskWithRequest:self.request];
+        
+        if (session == [LLVideoPlayerCacheManager defaultManager].session) {
+            self.dataTask = [[LLVideoPlayerCacheManager defaultManager] createDataTaskWithRequest:self.request delegate:self];
+        } else {
+            self.dataTask = [session dataTaskWithRequest:self.request];
+        }
+        
         [self.dataTask resume];
     }
 }
@@ -95,6 +103,13 @@
         }
         
         [super cancel];
+        
+        [self.cacheFile synchronize];
+        
+        if ([self.delegate respondsToSelector:@selector(operation:didCompleteWithError:)]) {
+            [self.delegate operation:self didCompleteWithError:
+             [NSError errorWithDomain:@"LLVideoPlayerCacheTask" code:NSURLErrorCancelled userInfo:nil]];
+        }
 
         if (self.dataTask) {
             [self.dataTask cancel];
@@ -109,13 +124,6 @@
         
         [self reset];
     }
-    
-    [self.cacheFile synchronize];
-    
-    if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
-        [self.delegate operation:self didFailWithError:
-         [NSError errorWithDomain:@"LLVideoPlayerCacheTask" code:NSURLErrorCancelled userInfo:nil]];
-    }
 }
 
 #pragma mark - NSURLSessionDataDelegate
@@ -124,15 +132,10 @@
 {
     [self.cacheFile synchronize];
     
-    if (nil == error) {
-        if ([self.delegate respondsToSelector:@selector(operationDidFinish:)]) {
-            [self.delegate operationDidFinish:self];
-        }
-    } else {
-        if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
-            [self.delegate operation:self didFailWithError:error];
-        }
+    if ([self.delegate respondsToSelector:@selector(operation:didCompleteWithError:)]) {
+        [self.delegate operation:self didCompleteWithError:error];
     }
+    
     [self finish];
 }
 
@@ -146,9 +149,13 @@
     } else {
         NSUInteger code = [((NSHTTPURLResponse *)response) statusCode];
         NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:code userInfo:nil];
-        if ([self.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
-            [self.delegate operation:self didFailWithError:error];
+        
+        [self.dataTask cancel];
+        
+        if ([self.delegate respondsToSelector:@selector(operation:didCompleteWithError:)]) {
+            [self.delegate operation:self didCompleteWithError:error];
         }
+        
         [self finish];
     }
     

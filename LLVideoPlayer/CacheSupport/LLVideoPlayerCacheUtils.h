@@ -32,4 +32,7 @@ FOUNDATION_EXTERN NSString *LLRangeToHTTPRangeResponseHeader(NSRange range, NSUI
 
 FOUNDATION_EXTERN NSString *LLLoadingRequestToString(AVAssetResourceLoadingRequest *loadingRequest);
 
+// case insensitive
+FOUNDATION_EXTERN NSString *LLValueForHTTPHeaderField(NSDictionary *headers, NSString *key);
+
 void ll_run_on_non_ui_thread(dispatch_block_t);

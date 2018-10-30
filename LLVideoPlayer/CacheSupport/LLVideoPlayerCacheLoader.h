@@ -8,10 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "LLVideoPlayerCacheFile.h"
 
 @interface LLVideoPlayerCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
-- (instancetype)initWithCacheFile:(LLVideoPlayerCacheFile *)cacheFile;
+- (instancetype)initWithURL:(NSURL *)streamURL;
 
 @end
