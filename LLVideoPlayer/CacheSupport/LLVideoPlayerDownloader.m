@@ -11,6 +11,7 @@
 #import "LLVideoPlayerCacheUtils.h"
 
 #define kDefaultBytesLimit  (1 << 20)
+#define kDefaultConcurrentCount 6
 
 @interface LLVideoPlayerDownloader ()
 
@@ -39,8 +40,8 @@
     if (self) {
         _lock = [[NSLock alloc] init];
         _manager = [LLVideoPlayerCacheManager defaultManager];
-        _maxConcurrentCount = 4;
-        _runningRequests = [NSMutableArray arrayWithCapacity:4];
+        _maxConcurrentCount = kDefaultConcurrentCount;
+        _runningRequests = [NSMutableArray arrayWithCapacity:kDefaultConcurrentCount];
         _pendingRequests = [NSMutableArray array];
     }
     return self;
