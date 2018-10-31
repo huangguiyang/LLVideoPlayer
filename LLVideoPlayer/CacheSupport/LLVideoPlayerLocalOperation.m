@@ -46,6 +46,9 @@
                 [self finish];
                 return;
             }
+            if ([self isExecuting]) {
+                return;
+            }
             
             self.executing = YES;
             
