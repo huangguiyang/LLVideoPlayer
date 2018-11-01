@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/cocoapods/l/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
 [![Platform](https://img.shields.io/cocoapods/p/LLVideoPlayer.svg?style=flat)](http://cocoapods.org/pods/LLVideoPlayer)
 
-A low level video player based on AVPlayer with cache support.
+A low level video player based on AVPlayer with cache and preload support.
 
 
 
