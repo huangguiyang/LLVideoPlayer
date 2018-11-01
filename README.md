@@ -52,13 +52,17 @@ LLVideoPlayer comes without any UI controls for flexibility. Your can add your c
 LLVideoPlayer supports customize cache policy. To enable the cache support (default is disable):
 
 ```
-player.cacheSupportEnabled = YES;
+player.cacheSupportEnabled = YES;	// That's all, so simple...
 ```
 
 To set your customize cache policy:
 
 ```
-player.cachePolicy = your_policy;
+LLVideoPlayerCachePolicy *policy = [LLVideoPlayerCachePolicy new];
+policy.diskCapacity = 500ULL << 20;	 // max disk capacity in bytes, for example 500MiB
+policy.outdatedHours = 7 *24;	// outdated hours, for example 7 days
+
+player.cachePolicy = policy;
 ```
 
 See `LLVideoPlayerCachePolicy` for more details.
@@ -66,7 +70,17 @@ See `LLVideoPlayerCachePolicy` for more details.
 ## Preload Support
 
 ```
+// start a preload request
 [LLVideoPlayer preloadWithURL:url];
+
+// start a preload request with specified bytes
+[LLVideoPlayer preloadWithURL:url bytes:(1 << 20)];
+
+// cancel a preload request
+[LLVideoPlayer cancelPreloadWithURL:url];
+
+// cancel all preload requests
+[LLVideoPlayer cancelAllPreloads];
 ```
 
 ## Requirements
