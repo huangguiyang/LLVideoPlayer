@@ -43,6 +43,31 @@ NSURL *url = [NSURL URLWithString:@"<your stream url>"];
 // see the header file for details.
 ```
 
+## Delegate
+
+There are some significant delegate methods you may be interested in:
+
+```
+// The first frame of the video is ready to display.
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer readyForDisplay:(BOOL)readyForDisplay;
+
+// The duration is available.
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(NSNumber *)duration;
+
+// The buffer is empty or not.
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackBufferEmpty:(BOOL)bufferEmpty;
+
+// The video is likely to keepup or not.
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer playbackLikelyToKeepUp:(BOOL)likelyToKeepUp;
+
+// The playback is stalled.
+- (void)videoPlayerPlaybackStalled:(LLVideoPlayer *)videoPlayer;
+
+/// more...
+```
+
+See `LLVideoPlayerDelegate` for more details.
+
 ## Customize UI Controls
 
 LLVideoPlayer comes without any UI controls for flexibility. Your can add your custom contols to the container view `LLVideoPlayerView`.
@@ -59,13 +84,19 @@ To set your customize cache policy:
 
 ```
 LLVideoPlayerCachePolicy *policy = [LLVideoPlayerCachePolicy new];
-policy.diskCapacity = 500ULL << 20;	 // max disk capacity in bytes, for example 500MiB
-policy.outdatedHours = 7 *24;	// outdated hours, for example 7 days
+policy.diskCapacity = 500ULL << 20;	// max disk capacity in bytes, for example 500MiB
+policy.outdatedHours = 7 *24;		// outdated hours, for example 7 days
 
 player.cachePolicy = policy;
 ```
 
 See `LLVideoPlayerCachePolicy` for more details.
+
+To clear cache manually:
+
+```
+[LLVideoPlayer clearAllCache];
+```
 
 ## Preload Support
 
