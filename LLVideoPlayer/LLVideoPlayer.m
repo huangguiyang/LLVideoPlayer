@@ -25,8 +25,6 @@
 #endif
 
 typedef void (^VoidBlock) (void);
-static NSString *kPlayableKey = @"playable";
-static NSString *kTracks = @"tracks";
 
 @interface LLVideoPlayer ()
 
@@ -335,6 +333,9 @@ static NSString *kTracks = @"tracks";
 
 - (void)playOnAVPlayer:(NSURL *)streamURL playerLayerView:(LLVideoPlayerView *)playerLayerView track:(LLVideoTrack *)track
 {
+    static NSString *kPlayableKey = @"playable";
+    static NSString *kTracks = @"tracks";
+    
     AVURLAsset *asset;
     
     if ([self sessionCacheEnabled]) {

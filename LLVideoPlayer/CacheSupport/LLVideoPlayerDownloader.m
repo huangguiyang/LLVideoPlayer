@@ -76,6 +76,10 @@
 
 - (void)cancelPreloadWithURL:(NSURL *)url
 {
+    if (nil == url || [url isFileURL]) {
+        return;
+    }
+    
     [self.lock lock];
     for (int i = 0; i < self.pendingRequests.count; i++) {
         NSURLRequest *request = self.pendingRequests[i];

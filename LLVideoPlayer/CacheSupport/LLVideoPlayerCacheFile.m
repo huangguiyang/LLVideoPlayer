@@ -16,35 +16,36 @@
 
 NSString * const kLLVideoCacheFileExtensionIndex = @"idx";
 
-static int mapfile(const char *filename, void **outDataPtr, size_t *outDataLength) {
+static int mapfile(const char *filename, void **out_data_ptr, size_t *out_data_length)
+{
     int fd;
-    int outError = 0;
+    int error = 0;
     struct stat statInfo;
-    *outDataPtr = NULL;
-    *outDataLength = 0;
+    *out_data_ptr = NULL;
+    *out_data_length = 0;
     
     fd = open(filename, O_RDWR, 0);
     if (fd < 0) {
-        outError = errno;
+        error = errno;
     } else {
         if (fstat(fd, &statInfo) < 0) {
-            outError = errno;
+            error = errno;
         } else {
-            *outDataPtr = mmap(NULL,
-                               statInfo.st_size,
-                               PROT_READ | PROT_WRITE,
-                               MAP_FILE | MAP_SHARED, fd, 0);
-            if (*outDataPtr == MAP_FAILED) {
-                outError = errno;
+            *out_data_ptr = mmap(NULL,
+                                 statInfo.st_size,
+                                 PROT_READ | PROT_WRITE,
+                                 MAP_FILE | MAP_SHARED, fd, 0);
+            if (*out_data_ptr == MAP_FAILED) {
+                error = errno;
             } else {
-                *outDataLength = statInfo.st_size;
+                *out_data_length = statInfo.st_size;
             }
         }
         
         close(fd);
     }
     
-    return outError;
+    return error;
 }
 
 @interface LLVideoPlayerCacheFile () {
@@ -341,8 +342,8 @@ static int mapfile(const char *filename, void **outDataPtr, size_t *outDataLengt
         }
         if (nil == _allHeaderFields) {
             _allHeaderFields = [(NSHTTPURLResponse *)response allHeaderFields];
+            [self saveIndexFile];
         }
-        [self saveIndexFile];
     }
     [self.lock unlock];
 }

@@ -206,7 +206,6 @@ static char LLVideoPlayerCacheFileRefCountKey;
     
     if (delegate) {
         [delegate URLSession:session task:task didCompleteWithError:error];
-        
         [self removeDelegateForTask:task];
     }
 }
@@ -227,6 +226,16 @@ static char LLVideoPlayerCacheFileRefCountKey;
 {
     id<NSURLSessionDataDelegate> delegate = [self delegateForTask:task];
     [delegate URLSession:session task:task didReceiveChallenge:challenge completionHandler:completionHandler];
+}
+
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didBecomeDownloadTask:(NSURLSessionDownloadTask *)downloadTask
+{
+    id<NSURLSessionDataDelegate> delegate = [self delegateForTask:dataTask];
+    
+    if (delegate) {
+        [self removeDelegateForTask:dataTask];
+        [self setDelegate:delegate forTask:downloadTask];
+    }
 }
 
 #pragma mark - Clean
