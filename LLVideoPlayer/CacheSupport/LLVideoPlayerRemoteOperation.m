@@ -67,7 +67,6 @@
 {
     @synchronized (self) {
         if ([self isCancelled]) {
-            [self finish];
             return;
         }
 
@@ -90,9 +89,9 @@
         } else {
             self.dataTask = [session dataTaskWithRequest:self.request];
         }
-        
-        [self.dataTask resume];
     }
+    
+    [self.dataTask resume];
 }
 
 - (void)cancel
