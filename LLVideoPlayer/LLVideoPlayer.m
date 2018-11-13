@@ -379,11 +379,7 @@ typedef void (^VoidBlock) (void);
     }
     if ([player respondsToSelector:@selector(setAutomaticallyWaitsToMinimizeStalling:)]) {
         if (@available(iOS 10.0, *)) {
-            if ([self sessionCacheEnabled]) {
-                [player setAutomaticallyWaitsToMinimizeStalling:NO];
-            } else {
-                [player setAutomaticallyWaitsToMinimizeStalling:YES];
-            }
+            [player setAutomaticallyWaitsToMinimizeStalling:NO];
         }
     }
     return player;
