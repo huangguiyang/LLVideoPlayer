@@ -12,7 +12,16 @@
 
 - (void)ll_seekToTimeInSeconds:(float)time completionHandler:(void (^)(BOOL))completionHandler
 {
-    [self seekToTime:CMTimeMakeWithSeconds((NSInteger)time, 1) completionHandler:completionHandler];
+    [self ll_seekToTimeInSeconds:time accurate:NO completionHandler:completionHandler];
+}
+
+- (void)ll_seekToTimeInSeconds:(float)time accurate:(BOOL)accurate completionHandler:(void (^)(BOOL))completionHandler
+{
+    if (accurate) {
+        [self seekToTime:CMTimeMakeWithSeconds((NSInteger)time, 1) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:completionHandler];
+    } else {
+        [self seekToTime:CMTimeMakeWithSeconds((NSInteger)time, 1) completionHandler:completionHandler];
+    }
 }
 
 - (NSTimeInterval)ll_currentItemDuration

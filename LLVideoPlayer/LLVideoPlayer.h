@@ -28,6 +28,7 @@
 @property (nonatomic, strong) NSString *videoGravity;
 @property (nonatomic, assign) BOOL cacheSupportEnabled;
 @property (nonatomic, strong) LLVideoPlayerCachePolicy *cachePolicy;
+@property (nonatomic, assign) BOOL accurateSeek;
 
 - (instancetype)initWithVideoPlayerView:(LLVideoPlayerView *)videoPlayerView;
 

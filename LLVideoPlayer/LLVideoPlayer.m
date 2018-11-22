@@ -255,7 +255,7 @@ typedef void (^VoidBlock) (void);
 - (void)seekToTimeInSecond:(float)sec userAction:(BOOL)isUserAction completionHandler:(void (^)(BOOL finished))completionHandler
 {
     NSLog(@"seekToTimeInSecond: %f, userAction: %@", sec, isUserAction ? @"YES" : @"NO");
-    [self.avPlayer ll_seekToTimeInSeconds:sec completionHandler:completionHandler];
+    [self.avPlayer ll_seekToTimeInSeconds:sec accurate:self.accurateSeek completionHandler:completionHandler];
 }
 
 - (void)seekToLastWatchedDuration
@@ -275,7 +275,7 @@ typedef void (^VoidBlock) (void);
         
         NSLog(@"Seeking to last watched duration: %f", lastWatchedTime);
         
-        [self.avPlayer ll_seekToTimeInSeconds:lastWatchedTime completionHandler:completionHandler];
+        [self.avPlayer ll_seekToTimeInSeconds:lastWatchedTime accurate:self.accurateSeek completionHandler:completionHandler];
     });
 }
 

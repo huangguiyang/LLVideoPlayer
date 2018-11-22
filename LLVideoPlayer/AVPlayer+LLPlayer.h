@@ -12,6 +12,8 @@
 
 - (void)ll_seekToTimeInSeconds:(float)time completionHandler:(void (^)(BOOL finished))completionHandler;
 
+- (void)ll_seekToTimeInSeconds:(float)time accurate:(BOOL)accurate completionHandler:(void (^)(BOOL finished))completionHandler;
+
 - (NSTimeInterval)ll_currentItemDuration;
 
 - (CMTime)ll_currentCMTime;
