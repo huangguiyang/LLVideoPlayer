@@ -13,12 +13,21 @@
 #define kDefaultBytesLimit  (1 << 20)
 #define kDefaultConcurrentCount 2
 
-@interface LLVideoPlayerDownloader ()
+typedef NS_ENUM(NSInteger, LLVideoPlayerDownloaderState) {
+    LLVideoPlayerDownloaderStateIdle,
+    LLVideoPlayerDownloaderStatePaused
+};
 
-@property (nonatomic, strong) NSLock *lock;
+static char kQueueSpecificKey[1];
+
+@interface LLVideoPlayerDownloader () {
+    dispatch_queue_t _queue;
+}
+
 @property (nonatomic, weak) LLVideoPlayerCacheManager *manager;
-@property (nonatomic, strong) NSMutableArray *runningRequests;
-@property (nonatomic, strong) NSMutableArray *pendingRequests;
+@property (nonatomic, strong) NSMutableArray<LLVideoPlayerDownloadRequest *> *runningTasks;
+@property (nonatomic, strong) NSMutableArray<NSURLRequest *> *pendingRequests;
+@property (nonatomic, assign) LLVideoPlayerDownloaderState state;
 
 @end
 
@@ -34,17 +43,45 @@
     return instance;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        _lock = [[NSLock alloc] init];
+        _queue = dispatch_queue_create("LLVideoPlayerDownloader", DISPATCH_QUEUE_SERIAL);
+        dispatch_queue_set_specific(_queue, kQueueSpecificKey, (__bridge void *)_queue, NULL);
         _manager = [LLVideoPlayerCacheManager defaultManager];
         _maxConcurrentCount = kDefaultConcurrentCount;
-        _runningRequests = [NSMutableArray array];
+        _runningTasks = [NSMutableArray array];
         _pendingRequests = [NSMutableArray array];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(cacheLoaderBusy)
+                                                     name:@"LLVideoPlayerCacheLoaderBusy"
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(cacheLoaderIdle)
+                                                     name:@"LLVideoPlayerCacheLoaderIdle"
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)scheduleWithBlock:(dispatch_block_t)block {
+    if (dispatch_get_specific(kQueueSpecificKey) == dispatch_queue_get_specific(_queue, kQueueSpecificKey)) {
+        @autoreleasepool {
+            if (block) block();
+        }
+    } else {
+        dispatch_async(_queue, ^{
+            @autoreleasepool {
+                if (block) block();
+            }
+        });
+    }
 }
 
 - (void)preloadWithURL:(NSURL *)url
@@ -68,10 +105,10 @@
         [request setValue:rangeStr forHTTPHeaderField:@"Range"];
     }
     
-    [self.lock lock];
-    [self.pendingRequests addObject:request];
-    [self.lock unlock];
-    [self processNext];
+    [self scheduleWithBlock:^{
+        [self.pendingRequests addObject:request];
+        [self processNextNoLock];
+    }];
 }
 
 - (void)cancelPreloadWithURL:(NSURL *)url
@@ -80,40 +117,40 @@
         return;
     }
     
-    [self.lock lock];
-    for (int i = 0; i < self.pendingRequests.count; i++) {
-        NSURLRequest *request = self.pendingRequests[i];
-        if ([request.URL isEqual:url]) {
-            [self.pendingRequests removeObjectAtIndex:i];
-            i--;
+    [self scheduleWithBlock:^{
+        for (int i = 0; i < self.pendingRequests.count; i++) {
+            NSURLRequest *request = self.pendingRequests[i];
+            if ([request.URL isEqual:url]) {
+                [self.pendingRequests removeObjectAtIndex:i];
+                i--;
+            }
         }
-    }
-    for (LLVideoPlayerDownloadRequest *task in self.runningRequests) {
-        if ([task.request.URL isEqual:url]) {
-            [task cancel];
+        for (LLVideoPlayerDownloadRequest *task in self.runningTasks) {
+            if ([task.request.URL isEqual:url]) {
+                [task cancel];
+            }
         }
-    }
-    [self.lock unlock];
+    }];
 }
 
 - (void)cancelAllPreloads
 {
-    [self.lock lock];
-    [self.pendingRequests removeAllObjects];
-    for (LLVideoPlayerDownloadRequest *task in self.runningRequests) {
-        [task cancel];
-    }
-    [self.lock unlock];
+    [self scheduleWithBlock:^{
+        [self.pendingRequests removeAllObjects];
+        for (LLVideoPlayerDownloadRequest *task in self.runningTasks) {
+            [task cancel];
+        }
+    }];
 }
 
 #pragma mark - Private
 
-- (BOOL)preloadWithRequest:(NSMutableURLRequest *)request
+- (BOOL)preloadWithRequest:(NSURLRequest *)request
 {
     NSURL *url = request.URL;
     
     // exist?
-    for (LLVideoPlayerDownloadRequest *task in self.runningRequests) {
+    for (LLVideoPlayerDownloadRequest *task in self.runningTasks) {
         if ([task.request.URL isEqual:url]) {
             NSString *range1 = [task.request valueForHTTPHeaderField:@"Range"];
             NSString *range2 = [request valueForHTTPHeaderField:@"Range"];
@@ -136,32 +173,61 @@
     [task setCompletedBlock:^(NSError *error) {
         __strong typeof(wself) self = wself;
         __strong typeof(wtask) task = wtask;
-        [self.lock lock];
-        [self.runningRequests removeObject:task];
-        [self.lock unlock];
-        [self.manager releaseCacheFileForURL:url];
-        [self processNext];
+        [self scheduleWithBlock:^{
+            [self.runningTasks removeObject:task];
+            [self.manager releaseCacheFileForURL:url];
+            [self processNextNoLock];
+        }];
     }];
-    [self.runningRequests addObject:task];
+    [self.runningTasks addObject:task];
     [task resume];
     
     return YES;
 }
 
-- (void)processNext
+- (void)processNextNoLock
 {
-    [self.lock lock];
-    
-    NSInteger count = self.runningRequests.count;
-    while (count < self.maxConcurrentCount && self.pendingRequests.count > 0) {
-        NSMutableURLRequest *request = [self.pendingRequests firstObject];
-        [self.pendingRequests removeObject:request];
-        if ([self preloadWithRequest:request]) {
-            count++;
+    if (self.state == LLVideoPlayerDownloaderStateIdle) {
+        NSInteger count = self.runningTasks.count;
+        while (count < self.maxConcurrentCount && self.pendingRequests.count > 0) {
+            NSURLRequest *request = [self.pendingRequests firstObject];
+            [self.pendingRequests removeObject:request];
+            if ([self preloadWithRequest:request]) {
+                count++;
+            }
         }
     }
+}
+
+- (void)setState:(LLVideoPlayerDownloaderState)state
+{
+    if (_state == state) {
+        return;
+    }
     
-    [self.lock unlock];
+    [self scheduleWithBlock:^{
+        _state = state;
+        if (state == LLVideoPlayerDownloaderStateIdle) {
+            [self processNextNoLock];
+        } else if (state == LLVideoPlayerDownloaderStatePaused) {
+            for (LLVideoPlayerDownloadRequest *task in self.runningTasks) {
+                [self.pendingRequests addObject:task.request];
+                [task cancel];
+            }
+        }
+    }];
+}
+
+#pragma mark - Cache Loader Notification
+
+- (void)cacheLoaderBusy
+{
+    self.state = LLVideoPlayerDownloaderStatePaused;
+}
+
+- (void)cacheLoaderIdle
+{
+    self.state = LLVideoPlayerDownloaderStateIdle;
 }
 
 @end
