@@ -593,18 +593,17 @@ typedef void (^VoidBlock) (void);
     }
     
     NSTimeInterval duration = [self.avPlayer ll_currentItemDuration];
-    if (duration > 1) {
-        if (nil == self.track.totalDuration || (NSInteger)[self.track.totalDuration floatValue] != (NSInteger)duration) {
-            self.track.totalDuration = [NSNumber numberWithFloat:duration];
-            if ([self.delegate respondsToSelector:@selector(videoPlayer:durationDidLoad:)]) {
-                [self.delegate videoPlayer:self durationDidLoad:self.track.totalDuration];
-            }
+    if (nil == self.track.totalDuration || (NSInteger)[self.track.totalDuration floatValue] != (NSInteger)duration) {
+        self.track.totalDuration = [NSNumber numberWithFloat:duration];
+        if ([self.delegate respondsToSelector:@selector(videoPlayer:durationDidLoad:)]) {
+            [self.delegate videoPlayer:self durationDidLoad:self.track.totalDuration];
         }
     }
     
     if (self.state != LLVideoPlayerStateContentPlaying) {
         return;
     }
+    
     NSInteger thisSecond = (NSInteger)(timeInSeconds + 0.5f);
     if (thisSecond == self.lastFrameTime) {
         return;

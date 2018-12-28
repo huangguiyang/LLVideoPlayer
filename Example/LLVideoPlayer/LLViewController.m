@@ -10,7 +10,7 @@
 #import "LLVideoPlayer.h"
 #import "Masonry.h"
 
-#define kTestVideoURL [NSURL URLWithString:@"https://vd3.bdstatic.com/mda-iiss6ez9vrfnhhnn/mda-iiss6ez9vrfnhhnn.mp4?playlist=%5B%22hd%22%2C%22sc%22%5D"]
+#define kTestVideoURL [NSURL URLWithString:@"http://vods2.listenvod.com/201812281005/cc09af4b75e6c402bd0337e11e2ed39e/news/vod/2018/12/svrvideo-iOS-219113733-84F410282B7D0286_720_1280.mp4"]
 
 @interface LLViewController () <LLVideoPlayerDelegate>
 
@@ -263,6 +263,11 @@
 - (void)videoPlayerDidStartVideo:(LLVideoPlayer *)videoPlayer
 {
     self.totalTimeLabel.text = [LLVideoPlayerHelper timeStringFromSecondsValue:[videoPlayer.track.totalDuration floatValue]];
+}
+
+- (void)videoPlayer:(LLVideoPlayer *)videoPlayer durationDidLoad:(NSNumber *)duration
+{
+    NSLog(@"durationDidLoad: %@", duration);
 }
 
 - (void)videoPlayer:(LLVideoPlayer *)videoPlayer didPlayFrame:(NSTimeInterval)time
