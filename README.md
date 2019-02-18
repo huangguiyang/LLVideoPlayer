@@ -11,6 +11,7 @@ A low level video player based on AVPlayer with cache and preload support.
 - [x] Simple and flexible
 - [x] Cache support
 - [x] Preload support
+- [x] Memory Mapped IO
 
 
 ## Example
