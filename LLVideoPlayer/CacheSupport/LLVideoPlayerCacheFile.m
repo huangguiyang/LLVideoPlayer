@@ -286,7 +286,7 @@ static int mapfile(const char *filename, void **out_data_ptr, size_t *out_data_l
     if (nil == data || data.length == 0 || NULL == _fileDataPtr) {
         return;
     }
-    if (offset > _fileLength) {
+    if (offset > _fileLength || offset + data.length > _fileLength) {
         return;
     }
     

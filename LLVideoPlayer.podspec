@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LLVideoPlayer'
-  s.version          = '1.2.5'
+  s.version          = '1.2.6'
   s.summary          = 'A low level, flexible video player based on AVPlayer for iOS.'
 
   s.description      = <<-DESC
@@ -9,7 +9,7 @@ LLVideoPlayer is a low level video player which is simple and easy to extend.
 
   s.homepage         = 'https://github.com/huangguiyang/LLVideoPlayer'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'mario' => 'mohu3g@163.com' }
+  s.author           = { 'mario' => 'guiyang.huang@gmail.com' }
   s.source           = { :git => 'https://github.com/huangguiyang/LLVideoPlayer.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '8.0'
