@@ -128,10 +128,6 @@ it, simply add the following line to your Podfile:
 pod "LLVideoPlayer"
 ```
 
-## Author
-
-mario, guiyang.huang@gmail.com
-
 ## License
 
 LLVideoPlayer is available under the MIT license. See the LICENSE file for more info.
